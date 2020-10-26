@@ -28,7 +28,7 @@ maven-build:
     - mvn clean package -Dmaven.test.skip=true
   artifacts:
     paths:
-      - ./target/*.jar
+      - ./sso/target/*.jar
 
 docker-build:
   image: docker:19.03.8
