@@ -23,7 +23,6 @@ maven-build:
   only:
     - test
   tags:
-    - k8s
     - maven
   script:
     - mvn clean package -Dmaven.test.skip=true
