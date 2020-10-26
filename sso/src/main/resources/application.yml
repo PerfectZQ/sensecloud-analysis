@@ -3,5 +3,5 @@ server:
   ssl:
     protocol: TLS
     key-store: classpath:.keystore
-    key-store-password: javastack
+    key-store-password: 123456
     key-store-type: JKS
