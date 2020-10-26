@@ -1,12 +1,5 @@
 spring:
   application:
-    name: Dlink
+    name: sensecloud-analysis
   profiles:
     active: dev
-  server:
-    port: 8443
-    ssl:
-      protocol: TLS
-      key-store: classpath:.keystore
-      key-store-password: javastack
-      key-store-type: JKS

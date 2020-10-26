@@ -1,5 +1,5 @@
 spring:
   application:
-    name: Dlink
+    name: sensecloud-analysis
   profiles:
     active: prod
