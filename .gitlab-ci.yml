@@ -2,14 +2,14 @@ image: $IMAGE_REGISTRY/workplatform/mvn
 
 variables:
   DOCKER_DRIVER: overlay
-  NAMESPACE: dlink-prod
+  NAMESPACE: dlink-test
   SERVICE_NAME: sensecloud-analysis
   IMAGE_REGISTRY: registry.sensetime.com
   GIT_SUBMODULE_STRATEGY: recursive
   GIT_STRATEGY: clone
   GIT_CHECKOUT: "true"
   APP_IMAGE: $IMAGE_REGISTRY/plat-bigdata/$SERVICE_NAME
-  PREFIX_TAG: prod_v1
+  PREFIX_TAG: test_v1
 
 
 stages:
@@ -21,7 +21,7 @@ maven-build:
   image: $IMAGE_REGISTRY/workplatform/mvn
   stage: build
   only:
-    - prod
+    - test
   tags:
     - k8s
   script:
@@ -34,7 +34,7 @@ docker-build:
   image: docker:19.03.8
   stage: package
   only:
-    - prod
+    - test
   script:
     - export TAG=$PREFIX_TAG-${CI_COMMIT_SHA:0:8}
     - docker build -t $APP_IMAGE:$TAG ./
@@ -42,10 +42,10 @@ docker-build:
     - docker push $APP_IMAGE:$TAG
 
 k8s-deploy:
-  image: $IMAGE_REGISTRY/plat-bigdata/dlink-prod-diamond-kube:latest
+  image: $IMAGE_REGISTRY/plat-bigdata/dlink-test-diamond-kube:latest
   stage: deploy
   only:
-    - prod
+    - test
   dependencies: []
   script:
     - export TAG=$PREFIX_TAG-${CI_COMMIT_SHA:0:8}
