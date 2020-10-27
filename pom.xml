@@ -12,6 +12,7 @@
     <modules>
         <module>authorization</module>
         <module>sso</module>
+        <module>web</module>
     </modules>
 
     <properties>
