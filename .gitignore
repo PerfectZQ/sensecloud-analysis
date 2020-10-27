@@ -31,7 +31,6 @@ target/
 .vscode/
 
 ### My configurations ###
-application.yml
 index.html
 /.DS_Store
 *.css
