@@ -1,11 +1,14 @@
 package sensecloud.auth2.config;
 
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-//@ConfigurationProperties(prefix = "service.sso")
+@Data
+@ConfigurationProperties(prefix = "service.sso")
 public class SSOConfiguration {
 
+    private String tokenUrl;
     private String gatewayUrl;
     private String scope;
     private String clientId;

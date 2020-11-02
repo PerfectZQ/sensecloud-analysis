@@ -3,3 +3,8 @@ spring:
     name: sensecloud-analysis
   profiles:
     active: test
+
+service:
+  sso:
+    scope:
+    tokenUrl: https://sso-sc-dev.sensetime.com/oauth2/token
