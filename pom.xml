@@ -10,9 +10,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>authorization</module>
-        <module>sso</module>
         <module>web</module>
+        <module>auth2</module>
     </modules>
 
     <properties>

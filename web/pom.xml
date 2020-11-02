@@ -41,12 +41,7 @@
         </dependency>
         <dependency>
             <groupId>sensetime</groupId>
-            <artifactId>authorization</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>sensetime</groupId>
-            <artifactId>sso</artifactId>
+            <artifactId>auth2</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

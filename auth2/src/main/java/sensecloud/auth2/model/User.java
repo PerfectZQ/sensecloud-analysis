@@ -1,4 +1,4 @@
-package sensecloud.sso.model;
+package sensecloud.auth2.model;
 
 import lombok.Data;
 
