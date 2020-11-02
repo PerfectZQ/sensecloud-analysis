@@ -1,8 +1,6 @@
 package sensecloud.auth2.model;
 
 import lombok.Data;
-import sensetime.authorization.model.Permission;
-import sensetime.authorization.model.Role;
 
 import java.util.List;
 import java.util.Map;

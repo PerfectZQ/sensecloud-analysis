@@ -3,7 +3,7 @@ package sensecloud.auth2.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "")
+//@ConfigurationProperties(prefix = "service.sso")
 public class SSOConfiguration {
 
     private String gatewayUrl;
