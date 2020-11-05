@@ -1,4 +1,4 @@
-package sensecloud.sso.config.swagger;
+package sensecloud.auth2.config.swagger;
 
 import io.swagger.models.auth.In;
 import org.apache.commons.lang3.reflect.FieldUtils;

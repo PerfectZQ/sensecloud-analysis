@@ -1,9 +1,0 @@
-spring:
-  profiles:
-    active: dev
-
-server:
-  servlet:
-    contextPath: /
-  address: 0.0.0.0
-  port: 8088

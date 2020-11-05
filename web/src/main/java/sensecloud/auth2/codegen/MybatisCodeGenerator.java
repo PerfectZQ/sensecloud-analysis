@@ -1,4 +1,4 @@
-package sensecloud.sso.codegen;
+package sensecloud.auth2.codegen;
 
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
