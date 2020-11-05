@@ -1,4 +1,4 @@
-package sensecloud.auth2;
+package sensecloud.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package sensecloud.auth2.config.db;
+package sensecloud.web.config.db;
 
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
 import com.baomidou.mybatisplus.extension.incrementer.PostgreKeyGenerator;

@@ -1,4 +1,4 @@
-package sensecloud.auth2.config.swagger;
+package sensecloud.web.config.swagger;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
