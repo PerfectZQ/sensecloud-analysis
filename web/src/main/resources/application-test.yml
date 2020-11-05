@@ -6,5 +6,7 @@ spring:
 
 service:
   sso:
-    scope:
-    tokenUrl: https://sso-sc-dev.sensetime.com/oauth2/token
+    domain: bigdata-dev.sensetimetech.cn
+    id_token_header: x-id-token
+    access_token_header: x-access-token
+    no_auth_redirect_url: https://bigdata-dev.sensetimetech.cn/

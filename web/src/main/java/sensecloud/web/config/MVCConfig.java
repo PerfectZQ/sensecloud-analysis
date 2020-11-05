@@ -12,7 +12,7 @@ public class MVCConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new SSOInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/static/login.html");
+                .excludePathPatterns("/login");
     }
 
 }
