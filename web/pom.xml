@@ -14,12 +14,24 @@
     <name>web</name>
 
     <properties>
+<<<<<<< HEAD:web/pom.xml
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+=======
+        <mybatis-plus.version>3.3.1</mybatis-plus.version>
+    </properties>
+
+>>>>>>> master:sso/pom.xml
 
     <dependencies>
+
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -30,20 +42,72 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
+
+        <!-- Swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+        <!-- commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.11</version>
+        </dependency>
+
+        <!-- Mybatis-plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-generator</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+
+        <!-- Mybatis-plus code generator template engine -->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.29</version>
+        </dependency>
+
+        <!-- Mybatis-plus 3rd part SQL Analyse, 有性能损耗，生产环境禁用 -->
+        <dependency>
+            <groupId>p6spy</groupId>
+            <artifactId>p6spy</artifactId>
+            <version>3.8.7</version>
+        </dependency>
+
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
+
+        <!-- Mysql -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.48</version>
+        </dependency>
+
         <dependency>
             <groupId>sensetime</groupId>
             <artifactId>auth2</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -51,6 +115,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+<<<<<<< HEAD:web/pom.xml
                 <configuration>
                     <fork>true</fork>
                     <mainClass>sensecloud.web.App</mainClass>
@@ -63,6 +128,8 @@
                         </goals>
                     </execution>
                 </executions>
+=======
+>>>>>>> master:sso/pom.xml
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -73,9 +140,18 @@
                         <include>**/*.java</include>
                     </includes>
                     <forkMode>pertest</forkMode>
+<<<<<<< HEAD:web/pom.xml
                     <argLine>-Dfile.encoding=utf-8</argLine>
+=======
+                    <argLine>-Djava.security.auth.login.config=./conf/jaas.conf -Dfile.encoding=utf-8</argLine>
+>>>>>>> master:sso/pom.xml
                 </configuration>
             </plugin>
         </plugins>
     </build>
+<<<<<<< HEAD:web/pom.xml
+=======
+
+
+>>>>>>> master:sso/pom.xml
 </project>

@@ -1,12 +1,5 @@
 spring:
   application:
-    name: sensecloud-analysis
+    name: Dlink
   profiles:
     active: test
-
-service:
-  sso:
-    domain: bigdata-dev.sensetimetech.cn
-    id_token_header: x-id-token
-    access_token_header: x-access-token
-    no_auth_redirect_url: https://bigdata-dev.sensetimetech.cn/
