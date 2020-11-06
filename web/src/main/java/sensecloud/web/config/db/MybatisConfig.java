@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@MapperScan(basePackages = {"sensecloud.sso"})
+@MapperScan(basePackages = {"sensecloud"})
 public class MybatisConfig {
 
     /**
