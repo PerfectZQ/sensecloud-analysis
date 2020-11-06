@@ -14,16 +14,14 @@
     <name>web</name>
 
     <properties>
-<<<<<<< HEAD:web/pom.xml
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
-=======
         <mybatis-plus.version>3.3.1</mybatis-plus.version>
+        <springfox.version>3.0.0</springfox.version>
+
     </properties>
 
->>>>>>> master:sso/pom.xml
 
     <dependencies>
 
@@ -52,7 +50,7 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-boot-starter</artifactId>
-            <version>3.0.0</version>
+            <version>${springfox.version}</version>
         </dependency>
 
         <!-- commons-lang3 -->
@@ -115,7 +113,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-<<<<<<< HEAD:web/pom.xml
                 <configuration>
                     <fork>true</fork>
                     <mainClass>sensecloud.web.App</mainClass>
@@ -128,8 +125,6 @@
                         </goals>
                     </execution>
                 </executions>
-=======
->>>>>>> master:sso/pom.xml
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -140,18 +135,10 @@
                         <include>**/*.java</include>
                     </includes>
                     <forkMode>pertest</forkMode>
-<<<<<<< HEAD:web/pom.xml
-                    <argLine>-Dfile.encoding=utf-8</argLine>
-=======
                     <argLine>-Djava.security.auth.login.config=./conf/jaas.conf -Dfile.encoding=utf-8</argLine>
->>>>>>> master:sso/pom.xml
                 </configuration>
             </plugin>
         </plugins>
     </build>
-<<<<<<< HEAD:web/pom.xml
-=======
 
-
->>>>>>> master:sso/pom.xml
 </project>

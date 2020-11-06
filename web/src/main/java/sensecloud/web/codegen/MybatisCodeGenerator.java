@@ -16,18 +16,15 @@ import java.util.List;
 public class MybatisCodeGenerator {
 
     private final static String driverName = "com.mysql.jdbc.Driver";
-    private final static String url = "jdbc:mysql://10.10.41.147:3307/dlink_meta?useUnicode=true&characterEncoding=utf-8&useSSL=false";
-    private final static String username = "dlink_dev";
+    private final static String url = "jdbc:mysql://bj.paas.sensetime.com:34832/sensecloud?useUnicode=true&characterEncoding=utf-8&useSSL=false";
+    private final static String username = "9mmyxokq";
     // 改成正确的密码，不要提交到 gitlab 否则会报安全漏洞
-    private final static String passwd = "Dlink.2020";
-    private final static String moduleName = "meta-service";
+    private final static String passwd = "bxzqx4f5";
+    private final static String moduleName = "web";
     private final static String[] includeTables = new String[]{
-            // "hdfs_dir_meta_test"
-//            "download_task",
-//            "download_task_item",
-//            "download_task_file"
-            "to_download_list",
-            "sensitive_word"
+            "component",
+            "role",
+            "web_componet_role_mapping"
     };
 
     public static void main(String[] args) {
@@ -60,7 +57,7 @@ public class MybatisCodeGenerator {
 
         // 包配置
         PackageConfig pc = new PackageConfig();
-        String packageInfo = "com.sensetime.plat.meta";
+        String packageInfo = "sensecloud.web";
         pc.setParent(packageInfo);
         // pc.setModuleName(moduleName);
         mpg.setPackageInfo(pc);
