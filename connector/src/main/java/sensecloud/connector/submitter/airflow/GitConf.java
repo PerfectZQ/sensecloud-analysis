@@ -1,11 +1,11 @@
 package sensecloud.connector.submitter.airflow;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 @Data
-@ConfigurationProperties(prefix = "submitter.airflow.git")
+@Component @ConfigurationProperties(prefix = "submitter.airflow.git")
 public class GitConf {
 
     private String localRepo;
