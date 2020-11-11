@@ -20,9 +20,11 @@ public interface SupersetRemoteAuthService {
     void deleteRole(@RequestBody AbRole role);
 
     @PostMapping("bindRoleToUser")
-    void bindRoleToUser(@RequestParam String rolename, @RequestParam String username);
+    void bindRoleToUser(@RequestParam("rolename") String rolename,
+                        @RequestParam("username") String username);
 
     @PostMapping("unbindRoleToUser")
-    void unbindRoleToUser(@RequestParam String rolename, @RequestParam String username);
+    void unbindRoleToUser(@RequestParam("rolename") String rolename,
+                          @RequestParam("username") String username);
 
 }
