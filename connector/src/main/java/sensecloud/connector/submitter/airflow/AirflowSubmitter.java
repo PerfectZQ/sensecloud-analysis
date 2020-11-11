@@ -17,7 +17,7 @@ import java.util.Date;
 @Component
 public class AirflowSubmitter {
 
-//    @Autowired
+    @Autowired
     private GitConf gitConf;
 
     @Autowired
