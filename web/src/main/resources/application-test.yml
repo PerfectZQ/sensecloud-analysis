@@ -46,3 +46,11 @@ submitter:
     k8s:
       namespace: dlink-test
 
+remote:
+  rest:
+    airflow:
+      url: http://10.10.18.109:45678
+      username: sre.bigdata
+      password: Dlink@6666
+      provider: ldap
+
