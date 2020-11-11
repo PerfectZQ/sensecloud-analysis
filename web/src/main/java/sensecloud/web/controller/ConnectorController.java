@@ -11,6 +11,7 @@ import sensecloud.web.bean.vo.ConnectorVO;
 import sensecloud.web.bean.vo.ResultVO;
 import sensecloud.web.entity.ConnectorEntity;
 import sensecloud.web.service.IConnectorService;
+import sensecloud.web.service.impl.ConnectorServiceImpl;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ import static sensecloud.web.bean.vo.ResultVO.*;
 public class ConnectorController {
 
     @Autowired
-    private IConnectorService connectorService;
+    private ConnectorServiceImpl connectorService;
 
     @PostMapping
     public ResultVO<Boolean> add(@RequestBody ConnectorVO params) {
