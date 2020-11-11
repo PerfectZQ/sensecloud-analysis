@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class AirflowDAGProvider {
 
-    @Autowired
+//    @Autowired
     private AirflowConf airflowConf;
 
     private TextRenderer renderer = new TextRenderer();
