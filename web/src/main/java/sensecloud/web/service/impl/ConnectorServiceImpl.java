@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import sensecloud.connector.Connector;
 import sensecloud.connector.SinkType;
 import sensecloud.connector.SourceType;
@@ -17,7 +18,7 @@ import sensecloud.web.mapper.ConnectorMapper;
 import sensecloud.web.service.IConnectorService;
 
 @Slf4j
-@Component
+@Service
 public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, ConnectorEntity> implements IConnectorService {
 
     private Connector connector;
