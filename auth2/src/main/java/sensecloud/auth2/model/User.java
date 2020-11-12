@@ -15,7 +15,7 @@ public class User {
     private String name;
     private String familyName;
     private String givenName;
-    private boolean status;
+    private String status;
     private String phoneNumber;
     private String email;
     private String identityType;
