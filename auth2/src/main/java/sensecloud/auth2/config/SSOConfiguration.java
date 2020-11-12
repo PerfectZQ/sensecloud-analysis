@@ -14,9 +14,7 @@ public class SSOConfiguration {
     private String id_token_header;
     private String access_token_header;
     private String no_auth_redirect_url;
-
     private String logout_uri;
-
     private String logout_redirect_url;
 
 }

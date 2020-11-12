@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Data
-@Component @ConfigurationProperties(prefix = "submitter.airflow.git")
+@Component @ConfigurationProperties(prefix = "service.submitter.airflow.git")
 public class GitConf {
 
     private String localRepo;

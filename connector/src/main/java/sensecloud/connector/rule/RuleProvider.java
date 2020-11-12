@@ -17,7 +17,7 @@ public class RuleProvider {
 
     private static ConcurrentHashMap<String, String> rules = new ConcurrentHashMap<>();
 
-    @Value("${connector.rule.path}")
+    @Value("${service.connector.rule.path}")
     private String rulePath;
 
     public void loadFromClassPath() {
