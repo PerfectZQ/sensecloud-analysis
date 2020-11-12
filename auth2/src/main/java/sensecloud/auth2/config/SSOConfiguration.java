@@ -4,9 +4,11 @@ package sensecloud.auth2.config;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 @Data
 @Accessors(fluent = true)
+@Component
 @ConfigurationProperties(prefix = "service.sso")
 public class SSOConfiguration {
 
