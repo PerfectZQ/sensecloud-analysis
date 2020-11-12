@@ -11,6 +11,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import sensecloud.auth2.UserContext;
 import sensecloud.auth2.UserContextProvider;
 import sensecloud.auth2.config.SSOConfiguration;
+import sensecloud.auth2.model.SSOToken;
 import sensecloud.auth2.model.User;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,8 +71,8 @@ public class SSOInterceptor implements HandlerInterceptor {
 
     private User getUser(String x_id_token) {
         String value = new String(Base64Utils.decodeFromString(x_id_token));
-        User user = JSON.parseObject(value, User.class);
-        return user;
+        SSOToken token = JSON.parseObject(value, SSOToken.class);
+        return token.getExt().getIdentity();
     }
 
     @Override
