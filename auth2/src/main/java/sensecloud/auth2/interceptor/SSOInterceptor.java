@@ -25,10 +25,10 @@ public class SSOInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.debug("SSOConfiguration: {}", this.configuration);
+        log.info("SSOConfiguration: {}", this.configuration);
 
         boolean isValid = false;
-        String xIdToken = request.getHeader(configuration.id_token_header());
+        String xIdToken = request.getHeader(configuration.getId_token_header());
 
         String msg = "";
         if(StringUtils.isNotBlank(xIdToken)) {
@@ -79,9 +79,9 @@ public class SSOInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         String uri = request.getRequestURI();
 
-        if (uri.equalsIgnoreCase(this.configuration.logout_uri())) {
+        if (uri.equalsIgnoreCase(this.configuration.getLogout_uri())) {
             UserContext context = UserContextProvider.getContext();
-            String xIdToken = request.getHeader(configuration.id_token_header());
+            String xIdToken = request.getHeader(configuration.getId_token_header());
             User current = this.getUser(xIdToken);
             String username = current.getUsername();
             String domain = current.getDomain();
@@ -91,7 +91,7 @@ public class SSOInterceptor implements HandlerInterceptor {
             } else {
                 log.error("Logout with an invalid user: domain = {}, username = {}", domain, username);
             }
-            response.sendRedirect(this.configuration.logout_redirect_url());
+            response.sendRedirect(this.configuration.getLogout_redirect_url());
         }
     }
 
