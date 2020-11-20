@@ -27,7 +27,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
      * @return
      */
     public RoleComponentVO getProductManager() {
-        return this.getBaseMapper().getRoleComponentVO(SENSE_ANALYSIS_PRODUCT_MANAGER_NAME, SENSE_ANALYSIS_WEB_COMPONENT_NAME);
+        return this.getBaseMapper().getRoleComponentVOByName(SENSE_ANALYSIS_PRODUCT_MANAGER_NAME, SENSE_ANALYSIS_WEB_COMPONENT_NAME);
     }
 
     /**
@@ -36,7 +36,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
      * @return
      */
     public RoleComponentVO getAdmin() {
-        return this.getBaseMapper().getRoleComponentVO(SENSE_ANALYSIS_ADMIN_NAME, SENSE_ANALYSIS_WEB_COMPONENT_NAME);
+        return this.getBaseMapper().getRoleComponentVOByName(SENSE_ANALYSIS_ADMIN_NAME, SENSE_ANALYSIS_WEB_COMPONENT_NAME);
     }
 
     /**
@@ -55,7 +55,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
      * @return
      */
     public RoleComponentVO getRoleComponentVO(String roleName, String componentName) {
-        return this.getBaseMapper().getRoleComponentVO(roleName, componentName);
+        return this.getBaseMapper().getRoleComponentVOByName(roleName, componentName);
     }
 
     /**
@@ -65,7 +65,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
      * @return
      */
     public RoleComponentVO getSenseAnalysisRoleComponentVO(String roleName) {
-        return this.getBaseMapper().getRoleComponentVO(roleName, SENSE_ANALYSIS_WEB_COMPONENT_NAME);
+        return this.getBaseMapper().getRoleComponentVOByName(roleName, SENSE_ANALYSIS_WEB_COMPONENT_NAME);
     }
 
     /**

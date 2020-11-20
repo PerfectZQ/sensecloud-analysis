@@ -19,30 +19,33 @@ public interface RoleMapper extends BaseMapper<Role> {
     @Select("select\n" +
             "   r.id role_id,\n" +
             "   r.name role_name,\n" +
-            "   r.component_id,\n" +
+            "   r.component_id component_id,\n" +
             "   c.name component_name\n" +
             "from\n" +
             "   `role` r\n" +
             "left join component c on\n" +
             "   r.component_id = c.id\n" +
             "where\n" +
-            "   r.id = #{roleId};")
+            "   r.id = #{roleId}\n" +
+            "LIMIT 1;")
     RoleComponentVO getRoleComponentVO(@Param("roleId") Integer roleId);
 
-    @Select("select\n" +
+    @Select("SELECT\n" +
             "   r.id role_id,\n" +
-            "   r.name role_name,\n" +
-            "   r.component_id,\n" +
-            "   c.name component_name\n" +
-            "from\n" +
+            "   r.`name` role_name,\n" +
+            "   r.component_id component_id,\n" +
+            "   c.`name` component_name\n" +
+            "FROM\n" +
             "   `role` r\n" +
-            "left join component c on\n" +
+            "LEFT JOIN component c ON\n" +
             "   r.component_id = c.id\n" +
-            "where\n" +
-            "   r.name = '#{roleName}'\n" +
-            "   and c.name = '#{componentName}'")
-    RoleComponentVO getRoleComponentVO(@Param("roleName") String roleName,
-                                       @Param("componentName") String componentName);
+            "WHERE\n" +
+            "   r.`name` = #{roleName}\n" +
+            "AND\n" +
+            "   c.`name` = #{componentName}\n" +
+            "LIMIT 1;")
+    RoleComponentVO getRoleComponentVOByName(@Param("componentName") String componentName,
+                                             @Param("roleName") String roleName);
 
 
 }
