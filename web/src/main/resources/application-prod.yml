@@ -20,4 +20,5 @@ swagger:
   application-name: ${spring.application.name}
   application-version: 1.0
   application-description: sensecloud-analysis-swagger-openapi
+  # https://${server.address}:${server.port}/swagger-ui/index.html
   try-host: http://${server.address}:${server.port}
