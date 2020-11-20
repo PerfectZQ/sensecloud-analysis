@@ -16,6 +16,8 @@ public interface IRoleService extends IService<Role> {
 
     RoleComponentVO getRoleComponentVO(Integer roleId);
 
+    RoleComponentVO getRoleComponentVO(String roleName, String componentName);
+
     /**
      * 查看当前角色是否是 Web 角色
      *

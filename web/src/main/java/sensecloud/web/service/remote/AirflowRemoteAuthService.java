@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import sensecloud.web.bean.AbRole;
+import sensecloud.web.bean.airflow.AirflowInitGroup;
 
 /**
  * @author zhangqiang
@@ -13,17 +14,26 @@ import sensecloud.web.bean.AbRole;
 @FeignClient(name = "airflowRemoteAuthService", url = "dlink-airflow-auth:8088/airflowAuth")
 public interface AirflowRemoteAuthService {
 
-    @PostMapping("createRole")
+    @PostMapping("/airflowAuth/createRole")
     void createRole(@RequestBody AbRole role);
 
-    @PostMapping("deleteRole")
+    @PostMapping("/airflowAuth/deleteRole")
     void deleteRole(@RequestBody AbRole role);
 
-    @PostMapping("bindRoleToUser")
+    @PostMapping("/airflowAuth/bindRoleToUser")
     void bindRoleToUser(@RequestParam("rolename") String rolename,
                         @RequestParam("username") String username);
 
-    @PostMapping("unbindRoleToUser")
+    @PostMapping("/airflowAuth/unbindRoleToUser")
     void unbindRoleToUser(@RequestParam("rolename") String rolename,
                           @RequestParam("username") String username);
+
+    /**
+     * 初始化 Airflow Group Role
+     *
+     * @param initGroup
+     */
+    @PostMapping("/airflowAuth/initGroupRole")
+    void initGroupRole(@RequestBody AirflowInitGroup initGroup);
+
 }
