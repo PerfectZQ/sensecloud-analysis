@@ -2,7 +2,7 @@ spring:
   application:
     name: sensecloud-analysis
   profiles:
-    active: test
+    active: prod
 
 server:
   port: 8443
