@@ -1,0 +1,3 @@
+.gitlab-ci.yml merge=ignore
+src/main/resources/bootstrap.yml merge=ignore
+src/main/resources/application.yml merge=ignore
