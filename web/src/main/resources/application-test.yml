@@ -21,3 +21,42 @@ swagger:
   application-version: 1.0
   application-description: sensecloud-analysis-swagger-openapi
   try-host: http://${server.address}:${server.port}
+
+service:
+  sso:
+    domain: bigdata
+    id_token_header: X-Id-Token
+    access_token_header: access_token
+    no_auth_redirect_url: https://iam-sc-dev.sensetime.com/login
+    logout_uri: /logout
+    logout_redirect_url: https://iam-sc-dev.sensetime.com/logout?redirect_uri=https://bigdata-dev.sensetimetech.cn
+    rest-api:
+      url: https://sso-sc-dev.sensetime.com
+      endpoints:
+        userinfo: /userinfo
+  connector:
+    rule:
+      path: connector/rule
+  submitter:
+    airflow:
+      conf:
+        templatePath: airflow/dag
+      git:
+        localRepo: /git
+        project: sensecloud-analysis
+        remoteUrl: https://gitlab.bj.sensetime.com/plat-bigdata/airflow-dags-prod.git
+        username: sre.bigdata
+        password: Dlink@6666
+        remoteBranch: test
+        remote: origin
+      k8s:
+        namespace: dlink-test
+
+remote:
+  rest:
+    airflow:
+      url: http://10.10.18.109:45688
+      username: sre.bigdata
+      password: Dlink@6666
+      provider: ldap
+

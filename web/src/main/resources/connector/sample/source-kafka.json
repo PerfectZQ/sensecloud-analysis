@@ -1,0 +1,65 @@
+{
+  "kafka": {
+    "bootstrap.servers": "kafka-kafka-outer-svc:9092",
+    "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+    "value.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+    "group.id": "dlink-sre.bigdata-clickhouse-test",
+    "auto.offset.reset": "earliest",
+    "enable.auto.commit": false,
+    "isolation.level": "read_committed",
+    "request.timeout.ms": "305000",
+    "max.poll.interval.ms": "300000",
+    "max.poll.records": "100"
+  },
+  "topics": [{
+    "name": "api-gateway-log",
+    "partitions": 5,
+    "type": "json",
+    "schema": {
+      "key": {
+        "name": "key",
+        "type": "string"
+      },
+      "message": [{
+        "name": "stream",
+        "type": "string"
+      },{
+        "name": "docker",
+        "type": "string"
+      },{
+        "name": "kubernetes",
+        "type": "string"
+      },{
+        "name": "time_local",
+        "type": "string"
+      },{
+        "name": "remote_addr",
+        "type": "string"
+      },{
+        "name": "request",
+        "type": "string"
+      },{
+        "name": "status",
+        "type": "string"
+      },{
+        "name": "request_time",
+        "type": "string"
+      },{
+        "name": "connection_requests",
+        "type": "string"
+      },{
+        "name": "http_user_agent",
+        "type": "string"
+      },{
+        "name": "service_name",
+        "type": "string"
+      },{
+        "name": "tag",
+        "type": "string"
+      },{
+        "name": "time",
+        "type": "string"
+      }]
+    }
+  }]
+}

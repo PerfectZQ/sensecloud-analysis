@@ -1,9 +1,11 @@
 package sensecloud.web;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -12,6 +14,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         scanBasePackages = {"sensecloud"},
         exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class}
 )
+@ConfigurationPropertiesScan("sensecloud")
+@EnableAutoConfiguration
 @EnableFeignClients
 @EnableAsync
 @EnableScheduling
