@@ -1,18 +1,18 @@
 {
   "kafka": {
-    "bootstrap.servers": "123123",
-    "group.id": "123123213",
-    "security.enable": true,
-    "sasl.mechanism": "SCRAM-SHA-256",
-    "ssl.keystore.location": "./kafka.keystore.jks",
-    "ssl.keystore.password": "dlink2020",
-    "ssl.truststore.location": "./kafka.truststore.jks",
-    "ssl.truststore.password": "dlink2020",
-    "ssl.endpoint.identification.algorithm": "",
-    "sasl.jaas.config": "org.apache.kafka.common.security.scram.ScramLoginModule required username='sre.bigdata' password='Dlink@2020';",
+    "bootstrap.servers": "kafka-kafka-outer-svc:9092",
+    "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+    "value.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+    "group.id": "dlink-sre.bigdata-clickhouse-test",
+    "auto.offset.reset": "earliest",
+    "enable.auto.commit": false,
+    "isolation.level": "read_committed",
+    "request.timeout.ms": "305000",
+    "max.poll.interval.ms": "300000",
+    "max.poll.records": "100"
   },
   "topics": [{
-    "name": "demo1",
+    "name": "api-gateway-log",
     "partitions": 5,
     "type": "json",
     "schema": {
@@ -21,10 +21,43 @@
         "type": "string"
       },
       "message": [{
-        "name": "field1",
+        "name": "stream",
         "type": "string"
       },{
-        "name": "field2",
+        "name": "docker",
+        "type": "string"
+      },{
+        "name": "kubernetes",
+        "type": "string"
+      },{
+        "name": "time_local",
+        "type": "string"
+      },{
+        "name": "remote_addr",
+        "type": "string"
+      },{
+        "name": "request",
+        "type": "string"
+      },{
+        "name": "status",
+        "type": "string"
+      },{
+        "name": "request_time",
+        "type": "string"
+      },{
+        "name": "connection_requests",
+        "type": "string"
+      },{
+        "name": "http_user_agent",
+        "type": "string"
+      },{
+        "name": "service_name",
+        "type": "string"
+      },{
+        "name": "tag",
+        "type": "string"
+      },{
+        "name": "time",
         "type": "string"
       }]
     }

@@ -63,6 +63,7 @@ public class Connector<R extends IRule> {
         data.put("sink", sinkConf);
 
         String plan = this.enforcer.enforce(rule, data);
+        log.info(">>> plan : {}", plan);
         this.connectConf = JSONObject.parseObject(plan);
 
         return this.connectConf != null;

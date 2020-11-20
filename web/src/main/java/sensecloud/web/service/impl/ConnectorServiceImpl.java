@@ -30,7 +30,7 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
     private RuleProvider ruleProvider;
 
     public boolean submit(ConnectorBean bean) {
-        String connectorName = bean.getSourceName() + " -> " + bean.getSinkName();
+        String connectorName = bean.getName();
 
         String name = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
         String ruleExpr = ruleProvider.getRuleExpression(name);
@@ -49,7 +49,7 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
             jobConf = this.connector.connectConf();
         }
 
-        String jobId = connectorName + "" + bean.getId();
+        String jobId = connectorName + "_" + bean.getId();
         return this.submitter.submit(jobId, name, jobConf);
     }
 

@@ -51,26 +51,41 @@ public class AirflowSubmitter {
      */
     public boolean submit(String jobId, String name, JSONObject jobConf) {
         this.init();
-        String code = this.airflowDAGProvider.dag(name, jobConf);
+
+        JSONObject context = new JSONObject();
+        context.put("appName", jobId);
+        context.put("config", jobConf);
+        String code = this.airflowDAGProvider.dag(name, context);
+
         this.gitClient.pull(this.gitConf.getRemoteBranch());
         File codeFile = this.writeCode(jobId, code);
         this.gitClient.addFile(codeFile);
         this.gitClient.commit("Submit a DAG[" + jobId + "]  at " + DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"));
         this.gitClient.push(this.gitConf.getRemoteBranch());
 
+        try {
+            Thread.currentThread().sleep(120 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         AirflowRestInvoker.CommonResponse<JSONObject> response = this.airflowRestInvoker.triggerDAG(jobId, null, null);
         log.debug("Airflow feedback: {}, {}", response.getStatus(), response.getBody());
 
-        return false;
+        if(response.getStatus() == 200) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private File writeCode (String runId, String code) {
-        File dir = new File(this.gitConf.getLocalRepo());
+        File dir = new File(this.gitConf.getLocalRepo() + "/" + this.gitConf.getProject());
         if(!dir.exists()){
             dir.mkdirs();
         }
         String codeFileName = runId + ".py";
-        String codeFileLocation = this.gitConf.getLocalRepo() + "/" + this.gitConf.getProject() + "/" + codeFileName;
+        String codeFileLocation = dir.getAbsolutePath() + "/" + codeFileName;
         File codeFile = new File(codeFileLocation);
 
         try (FileWriter writer = new FileWriter(codeFile);) {

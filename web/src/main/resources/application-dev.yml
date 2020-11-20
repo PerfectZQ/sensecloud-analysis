@@ -53,7 +53,7 @@ service:
 remote:
   rest:
     airflow:
-      url: http://10.10.18.109:45678
+      url: http://10.10.18.109:45688
       username: sre.bigdata
       password: Dlink@6666
       provider: ldap

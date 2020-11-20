@@ -6,9 +6,10 @@ from airflow.utils.dates import days_ago
 
 from base64 import b64encode, b64decode
 
-app_name = "kafka2clickhouse"
+app_name = "{{ appName }}"
 
 job_config = """
+{{ config | raw }}
 
 """
 
@@ -76,7 +77,7 @@ resources = {
 registry = "registry.sensetime.com"
 group = "plat-bigdata"
 app = "kafka2clickhouse"
-tag = "master-49013627"
+tag = "master-3657e7c4"
 image = "%s/%s/%s:%s" % (registry, group, app, tag)
 
 base64_bytes = b64encode(bytes(job_config, encoding="utf-8"))
@@ -92,21 +93,21 @@ submit = [
     "sh", "-c",
     r"""
         /opt/spark/bin/spark-submit \
-        --master "k8s://https://mordor.sensetime.com/k8s/clusters/c-kzszr" \
+        --master "k8s://https://mordor.sensetime.com/k8s/clusters/c-t5mbq" \
         --deploy-mode cluster \
         --name "{app_name}" \
         --driver-cores 1 --driver-memory 1g \
         --class "com.sensetime.dlink.streaming.Kafka2ClickHouse" \
         --files "local:///app/conf/kafka.truststore.jks,local:///app/conf/job.config" \
-        --conf "spark.executor.instances=3" \
-        --conf "spark.kubernetes.executor.limit.cores=3" \
+        --conf "spark.executor.instances=1" \
+        --conf "spark.kubernetes.executor.limit.cores=1" \
         --conf "spark.kubernetes.executor.limit.memory=3Gi" \
         --conf "spark.jars.ivy=/tmp/.ivy" \
         --conf "spark.kubernetes.container.image={image}" \
         --conf "spark.kubernetes.container.image.pullPolicy=IfNotPresent" \
         --conf "spark.kubernetes.container.image.pullSecrets=sensetime" \
-        --conf "spark.kubernetes.context=aliyun-hd1-diamond" \
-        --conf "spark.kubernetes.namespace=dlink-prod" \
+        --conf "spark.kubernetes.context=bjidc-test-diamond" \
+        --conf "spark.kubernetes.namespace=dlink-test" \
         --conf "spark.kubernetes.authenticate.driver.serviceAccountName=dlink-spark" \
         --conf "spark.kubernetes.authenticate.submission.oauthToken={oauthToken}" \
         --conf "spark.streaming.concurrentJobs=1" \
@@ -120,12 +121,12 @@ submit = [
 ]
 
 spark_submit_operator = KubernetesPodOperator(
-    name="senselink-kafka2clickhouse-onk8s-aliyun-test-submit",
+    name=app_name + "-submitter",
     task_id="spark-streaming-submit",
     in_cluster=False,
-    cluster_context='aliyun-hd1-diamond',
+    cluster_context='bjidc-test-diamond',
     config_file='/opt/bitnami/airflow/.kube/config',
-    namespace='dlink-prod',
+    namespace='dlink-test',
     image=image,
     image_pull_policy="Always",
     image_pull_secrets="sensetime",

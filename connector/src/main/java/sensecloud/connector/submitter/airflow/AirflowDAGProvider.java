@@ -28,8 +28,7 @@ public class AirflowDAGProvider {
     public void reloadTemplates() {
         String templatePath = this.airflowConf.getTemplatePath();
 
-        File dir = new File(templatePath);
-        if(dir.exists()) {
+        if(StringUtils.isNotBlank(templatePath)) {
             templates.clear();
 
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();

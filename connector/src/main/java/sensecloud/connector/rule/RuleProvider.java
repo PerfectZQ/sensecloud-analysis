@@ -1,6 +1,7 @@
 package sensecloud.connector.rule;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -21,9 +22,7 @@ public class RuleProvider {
     private String rulePath;
 
     public void loadFromClassPath() {
-        File dir = new File(rulePath);
-
-        if(dir.exists()) {
+        if(StringUtils.isNotBlank(this.rulePath)) {
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             try {
                 Resource[] resources = resolver.getResources(this.rulePath + "/*.rule");

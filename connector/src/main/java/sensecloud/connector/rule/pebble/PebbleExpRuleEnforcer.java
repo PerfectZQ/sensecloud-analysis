@@ -37,14 +37,17 @@ public class PebbleExpRuleEnforcer implements IEnforcer<PebbleExpRule, JSONObjec
     public static void main(String[] args) {
         URL url = PebbleExpRuleEnforcer.class.getClassLoader().getResource("connector");
         try {
-            String json = FileUtils.readFileToString(new File(url.getFile() + "/sample/source-kafka.json"), "utf-8");
-            String expr =  FileUtils.readFileToString(new File(url.getFile() + "/rule/kafka2clickhouse.rule"), "utf-8");
+            String sourceJson = FileUtils.readFileToString(new File(url.getFile() + "/sample/source-kafka.json"), "utf-8");
+            String sinkJson = FileUtils.readFileToString(new File(url.getFile() + "/sample/sink-clickhouse.json"), "utf-8");
+            String expr = FileUtils.readFileToString(new File(url.getFile() + "/rule/kafka2clickhouse.rule"), "utf-8");
             PebbleExpRule rule = new PebbleExpRule();
             rule.expression(expr);
 
             PebbleExpRuleEnforcer enforcer = new PebbleExpRuleEnforcer();
 
-            JSONObject data = JSONObject.parseObject(json);
+            JSONObject data = new JSONObject();
+            data.put("source", JSONObject.parseObject(sourceJson));
+            data.put("sink", JSONObject.parseObject(sinkJson));
             String result = enforcer.enforce(rule, data);
 
             System.out.println(result);

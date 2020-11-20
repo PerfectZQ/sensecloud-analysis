@@ -1,9 +1,9 @@
 {
     "@Kafka": {
-        "bootstrap.servers": "{{ kafka["bootstrap.servers"] }}",
+        "bootstrap.servers": "{{ source.kafka["bootstrap.servers"] }}",
         "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
         "value.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
-        "group.id": "{{ kafka.group.id }}",
+        "group.id": "{{ source.kafka["group.id"] }}",
         "auto.offset.reset": "earliest",
         "enable.auto.commit": false,
         "isolation.level": "read_committed",
@@ -12,81 +12,35 @@
         "max.poll.records": "100"
     },
     "@Mappings": [
+{% for topic in source.topics %}{% for table in sink.tables %}{% if table.ref == topic.name %}
         {
-            "kafka.topic.name": "", // 必填
-            "kafka.topic.partition.num": "5", // 非必填，topic 分区数量
+            "kafka.topic.name": "{{ topic.name }}", // 必填
+            "kafka.topic.partition.num": "{{ topic.partitions }}", // 非必填，topic 分区数量
             "kafka.data.type": "Json", // 非必填，Json, String, <Avro, Protobuf> 默认 String
-            "target.db.type": "clickhouse",
-            "target.db": "dlink",
-            "target.table": "application_log",
-            "target.time.fields": ["date_partition"],
-            "target.order.fields": ["date_partition"],
-            "target.sample.fields": ["date_partition"],
-            "target.url": "jdbc:clickhouse://clickhouse:8123",
-            "target.db.username": "writer",
-            "target.db.password": "2c82mirS",
-            "kafka.mapping.key": {
-                "target.field": "kafka_key",
-                "target.field.type": "string"
-            },
+            "target.db.type": "{{ sink["db.type"] }}",
+            "target.db": "{{ sink.db }}",
+            "target.table": "{{ table.table }}",
+            {% if sink.partitions is not null %}"target.time.fields": [{% for partition in sink.partitions %}"{{ partition }}"{% if loop.last == false %},{%endif%}{% endfor %}], {% endif %}
+
+            {% if sink.orders is not null %}"target.order.fields": [{% for order in sink.orders %}"{{ order }}"{% if loop.last == false %},{%endif%}{% endfor %}], {% endif %}
+
+            {% if sink.samples is not null %}"target.sample.fields": [{% for sample in sink.samples %}"{{ sample }}"{% if loop.last == false %},{%endif%}{% endfor %}], {% endif %}
+
+            "target.url": "{{ sink["jdbc.url"] }}",
+            "target.db.username": "{{ sink["jdbc.user"] }}",
+            "target.db.password": "{{ sink["jdbc.password"] }}",
             "kafka.mapping.value": [
+{% for msg in topic.schema.message %}{% for col in table.cols %}{% if col.ref == msg.name %}
+
                 {
-                    "source.field": "stream",
-                    "target.field": "stream",
-                    "source.field.type": "string",
-                    "target.field.type": "String",
+                    "source.field": "{{ msg.name }}",
+                    "target.field": "{{ col.field }}",
+                    "source.field.type": "{{ msg.type }}",
+                    "target.field.type": "{{ col.type }}",
                     "remain": true
-                },
-                {
-                    "source.field": "docker",
-                    "target.field": "docker",
-                    "source.field.type": "string",
-                    "target.field.type": "String",
-                    "remain": true
-                },
-                {
-                    "source.field": "kubernetes",
-                    "target.field": "kubernetes",
-                    "source.field.type": "string",
-                    "target.field.type": "String",
-                    "remain": true
-                },
-                {
-                    "source.field": "f_message",
-                    "target.field": "f_message",
-                    "source.field.type": "string",
-                    "target.field.type": "String",
-                    "remain": true
-                },
-                {
-                    "source.field": "service_name",
-                    "target.field": "service_name",
-                    "source.field.type": "string",
-                    "target.field.type": "String",
-                    "remain": true
-                },
-                {
-                    "source.field": "tag",
-                    "target.field": "tag",
-                    "source.field.type": "string",
-                    "target.field.type": "String",
-                    "remain": true
-                },
-                {
-                    "source.field": "time",
-                    "target.field": "time",
-                    "source.field.type": "long",
-                    "target.field.type": "DateTime",
-                    "remain": true
-                },
-                {
-                    "source.field": "from_unixtime(time, 'yyyy-MM-dd')",
-                    "target.field": "date_partition",
-                    "source.field.type": "string",
-                    "target.field.type": "DateTime",
-                    "remain": true
-                }
+                }{% if loop.last == false %},{%endif%}
+{% endif %}{% endfor %}{% endfor %}
             ]
-        }
+        }{% if loop.last == false %},{%endif%}{% endif %}{% endfor %}{% endfor %}
     ]
 }

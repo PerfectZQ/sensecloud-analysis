@@ -80,7 +80,7 @@ public class AirflowRestInvoker {
         }
 
 
-        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(new JSONObject(), headers);
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(null, headers);
         ResponseEntity<JSONObject> response = restTemplate.exchange(api, method, requestEntity, JSONObject.class);
 
         JSONObject responseBody = response.getBody();
