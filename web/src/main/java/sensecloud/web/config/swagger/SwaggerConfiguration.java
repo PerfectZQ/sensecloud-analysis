@@ -23,7 +23,7 @@ import java.util.*;
 
 
 /**
- * 启动服务后访问： {@link <a href="http://${server.address}:${server.port}/${server.servlet.contextPath}/swagger-ui.html"/> }
+ * 启动服务后访问： {@link <a href="http://${server.address}:${server.port}/${server.servlet.contextPath}/swagger-ui/index.html"/> }
  */
 @EnableOpenApi
 @Configuration
