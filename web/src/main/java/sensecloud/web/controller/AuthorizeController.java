@@ -64,7 +64,9 @@ public class AuthorizeController {
             componentRoleName = AIRFLOW_SUPERSET_GROUP_ROLE_NAME.equals(componentRoleName) ? groupName : componentRoleName;
             switch (componentName) {
                 case AIRFLOW_COMPONENT_NAME:
-                    airflowRemoteAuthService.bindRoleToUser(componentRoleName, username);
+                    if (!AIRFLOW_COMPONENT_GITLAB.equalsIgnoreCase(componentRoleName)) {
+                        airflowRemoteAuthService.bindRoleToUser(componentRoleName, username);
+                    }
                     break;
                 case SUPERSET_COMPONENT_NAME:
                     supersetRemoteAuthService.bindRoleToUser(componentRoleName, username);
@@ -102,7 +104,9 @@ public class AuthorizeController {
             componentRoleName = AIRFLOW_SUPERSET_GROUP_ROLE_NAME.equals(componentRoleName) ? groupName : componentRoleName;
             switch (componentName) {
                 case AIRFLOW_COMPONENT_NAME:
-                    airflowRemoteAuthService.unbindRoleToUser(componentRoleName, username);
+                    if (!AIRFLOW_COMPONENT_GITLAB.equalsIgnoreCase(componentRoleName)) {
+                        airflowRemoteAuthService.unbindRoleToUser(componentRoleName, username);
+                    }
                     break;
                 case SUPERSET_COMPONENT_NAME:
                     supersetRemoteAuthService.unbindRoleToUser(componentRoleName, username);
@@ -155,16 +159,21 @@ public class AuthorizeController {
             componentRoleName = AIRFLOW_SUPERSET_GROUP_ROLE_NAME.equals(componentRoleName) ? groupName : componentRoleName;
             switch (componentName) {
                 case AIRFLOW_COMPONENT_NAME:
-                    log.info("====> Init Product Manager " + username + " of " + groupName + " on Airflow...");
-                    airflowRemoteAuthService.bindRoleToUser(componentRoleName, username);
+                    if (!AIRFLOW_COMPONENT_GITLAB.equalsIgnoreCase(componentRoleName)) {
+                        log.info("====> Init Product Manager " + username + " of " + groupName + " on Airflow\n" +
+                                "====> bind role " + componentRoleName + " to " + username);
+                        airflowRemoteAuthService.bindRoleToUser(componentRoleName, username);
+                    }
                     break;
                 case SUPERSET_COMPONENT_NAME:
-                    log.info("====> Init Product Manager " + username + " of " + groupName + " on Superset...");
+                    log.info("====> Init Product Manager " + username + " of " + groupName + " on Superset\n" +
+                            "====> bind role " + componentRoleName + " to " + username);
                     supersetRemoteAuthService.bindRoleToUser(componentRoleName, username);
                     break;
                 case CLICK_HOUSE_COMPONENT_NAME:
                     // 铁达在 InitProduct 接口已经初始化了，所以这里啥也不干
-                    log.info("====> Init Product Manager " + username + " of " + groupName + " on ClickHouse...");
+                    log.info("====> Init Product Manager " + username + " of " + groupName + " on ClickHouse\n" +
+                            "====> bind role " + componentRoleName + " to " + username);
                     break;
                 default:
                     throw new IllegalArgumentException("UnSupport Component: " + componentName);
