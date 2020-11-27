@@ -44,8 +44,8 @@ public interface RoleMapper extends BaseMapper<Role> {
             "AND\n" +
             "   c.`name` = #{componentName}\n" +
             "LIMIT 1;")
-    RoleComponentVO getRoleComponentVOByName(@Param("componentName") String componentName,
-                                             @Param("roleName") String roleName);
+    RoleComponentVO getRoleComponentVOByName(@Param("roleName") String roleName,
+                                             @Param("componentName") String componentName);
 
 
 }

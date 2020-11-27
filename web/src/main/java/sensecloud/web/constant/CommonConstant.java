@@ -12,6 +12,8 @@ public class CommonConstant {
 
     public final static String AIRFLOW_COMPONENT_NAME = "airflow";
 
+    public final static String AIRFLOW_COMPONENT_GITLAB = "GitlabRepo";
+
     public final static String SUPERSET_COMPONENT_NAME = "superset";
 
     public final static String CLICK_HOUSE_COMPONENT_NAME = "clickhouse";
