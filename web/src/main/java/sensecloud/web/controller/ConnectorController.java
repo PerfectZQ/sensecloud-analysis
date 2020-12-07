@@ -60,26 +60,27 @@ public class ConnectorController {
     }
 
     @GetMapping
-    public ResultVO<ConnectorEntity> get(@RequestBody Long id) {
+    public ResultVO<ConnectorEntity> get(@RequestParam Long id) {
         ConnectorEntity entity = connectorService.getById(id);
         return ok(entity);
     }
 
     @GetMapping("/query")
     public ResultVO<List<ConnectorEntity>> query() {
-        User user = UserContextProvider.getContext().getCurrentUser();
-        if (user != null && StringUtils.isNotBlank(user.getUsername())) {
-            String username = user.getUsername();
+//        User user = UserContextProvider.getContext().getCurrentUser();
+//        if (user != null && StringUtils.isNotBlank(user.getUsername())) {
+//            String username = user.getUsername();
+//            String username = '';
             List<ConnectorEntity> result = connectorService.query()
                     .select("id", "name", "source_name", "source_type", "sink_name", "sink_type", "create_time")
-                    .eq("create_by", username)
+//                    .eq("create_by", username)
                     .and(q -> q.eq("deleted", false))
                     .list();
             return ok(result);
-        } else {
-            log.warn("Accept a request but current user is null or username is empty.");
-            return error("Not a login user.");
-        }
+//        } else {
+//            log.warn("Accept a request but current user is null or username is empty.");
+//            return error("Not a login user.");
+//        }
     }
 
 }
