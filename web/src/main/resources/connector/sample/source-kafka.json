@@ -3,7 +3,7 @@
     "bootstrap.servers": "kafka-kafka-outer-svc:9092",
     "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
     "value.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
-    "group.id": "dlink-sre.bigdata-clickhouse-test",
+    "group.id": "api-gateway-log-import-test-2",
     "auto.offset.reset": "earliest",
     "enable.auto.commit": false,
     "isolation.level": "read_committed",
@@ -30,7 +30,7 @@
         "name": "kubernetes",
         "type": "string"
       },{
-        "name": "time_local",
+        "name": "cast(time_local as timestamp)",
         "type": "string"
       },{
         "name": "remote_addr",
@@ -58,6 +58,9 @@
         "type": "string"
       },{
         "name": "time",
+        "type": "string"
+      },{
+        "name": "date_format(cast(time as timestamp), 'yyyy-MM-dd')",
         "type": "string"
       }]
     }

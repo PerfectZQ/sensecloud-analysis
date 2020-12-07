@@ -21,8 +21,8 @@
       "ref": "kubernetes"
     },{
       "field": "time_local",
-      "type": "Nullable(String)",
-      "ref": "time_local"
+      "type": "Nullable(DateTime('Asia/Shanghai'))",
+      "ref": "if(isnull(time_local), cast(time as timestamp), cast(time_local as timestamp))"
     },{
       "field": "remote_addr",
       "type": "Nullable(String)",
@@ -37,7 +37,7 @@
       "ref": "status"
     },{
       "field": "request_time",
-      "type": "Nullable(String)",
+      "type": "Nullable(Float64)",
       "ref": "request_time"
     },{
       "field": "connection_requests",
@@ -49,7 +49,7 @@
       "ref": "http_user_agent"
     },{
       "field": "dt",
-      "type": "Nullable(String)",
+      "type": "String",
       "ref": "date_format(cast(time as timestamp), 'yyyy-MM-dd')"
     },{
       "field": "service_name",
@@ -61,7 +61,7 @@
       "ref": "tag"
     },{
       "field": "time",
-      "type": "Int64",
+      "type": "DateTime('Asia/Shanghai')",
       "ref": "time"
     }]
   }],

@@ -116,7 +116,7 @@ submit = [
         --conf "spark.streaming.kafka.maxRetries=3" \
         --conf "spark.streaming.kafka.consumer.poll.ms=310000" \
         "local:///app/app.jar" \
-        --jobConfig "$JOB_CONFIG" && exit 1
+        --jobConfig "$JOB_CONFIG"
     """.format(app_name=app_name, image=image, oauthToken=oauthToken)
 ]
 
