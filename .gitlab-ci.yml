@@ -2,14 +2,14 @@ image: $IMAGE_REGISTRY/workplatform/mvn
 
 variables:
   DOCKER_DRIVER: overlay
-  NAMESPACE: dlink-test
+  NAMESPACE: dlink-prod
   SERVICE_NAME: sensecloud-analysis
   IMAGE_REGISTRY: registry.sensetime.com
   GIT_SUBMODULE_STRATEGY: recursive
   GIT_STRATEGY: clone
   GIT_CHECKOUT: "true"
   APP_IMAGE: $IMAGE_REGISTRY/plat-bigdata/$SERVICE_NAME
-  PREFIX_TAG: test_v1
+  PREFIX_TAG: aliyun_v1
 
 
 stages:
@@ -21,7 +21,7 @@ maven-build:
   image: $IMAGE_REGISTRY/workplatform/mvn
   stage: build
   only:
-    - test
+    - aliyun
   tags:
     - maven
   script:
@@ -31,10 +31,10 @@ maven-build:
       - ./web/target/*.jar
 
 docker-build:
-  image: docker:19.03.8
+  image: $IMAGE_REGISTRY/docker.io/docker:19.03.8
   stage: package
   only:
-    - test
+    - aliyun
   script:
     - export TAG=$PREFIX_TAG-${CI_COMMIT_SHA:0:8}
     - docker build -t $APP_IMAGE:$TAG ./
@@ -42,10 +42,10 @@ docker-build:
     - docker push $APP_IMAGE:$TAG
 
 k8s-deploy:
-  image: $IMAGE_REGISTRY/plat-bigdata/dlink-test-diamond-kube:latest
+  image: $IMAGE_REGISTRY/plat-bigdata/aliyun-hd1-kube-diamond:latest
   stage: deploy
   only:
-    - test
+    - aliyun
   dependencies: []
   script:
     - export TAG=$PREFIX_TAG-${CI_COMMIT_SHA:0:8}
