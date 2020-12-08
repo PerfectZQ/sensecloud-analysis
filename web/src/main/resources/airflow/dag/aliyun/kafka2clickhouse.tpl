@@ -7,8 +7,6 @@ from airflow.utils.dates import days_ago
 from base64 import b64encode, b64decode
 
 app_name = "{{ appName }}"
-kubernetes_context = "aliyun-hd1-diamond"
-kubernetes_namespace = "dlink-prod"
 
 job_config = """
 {{ config | raw }}
@@ -78,7 +76,7 @@ resources = {
 
 registry = "registry.sensetime.com"
 group = "plat-bigdata"
-app = "kafka2clickhouse"
+app = "{{ appName }}"
 tag = "master-3657e7c4"
 image = "%s/%s/%s:%s" % (registry, group, app, tag)
 
@@ -103,13 +101,13 @@ submit = [
         --files "local:///app/conf/kafka.truststore.jks,local:///app/conf/job.config" \
         --conf "spark.executor.instances=1" \
         --conf "spark.kubernetes.executor.limit.cores=1" \
-        --conf "spark.kubernetes.executor.limit.memory=2Gi" \
+        --conf "spark.kubernetes.executor.limit.memory=3Gi" \
         --conf "spark.jars.ivy=/tmp/.ivy" \
         --conf "spark.kubernetes.container.image={image}" \
         --conf "spark.kubernetes.container.image.pullPolicy=IfNotPresent" \
         --conf "spark.kubernetes.container.image.pullSecrets=sensetime" \
-        --conf "spark.kubernetes.context={kubernetes_context}" \
-        --conf "spark.kubernetes.namespace={kubernetes_namespace}" \
+        --conf "spark.kubernetes.context=bjidc-test-diamond" \
+        --conf "spark.kubernetes.namespace=dlink-test" \
         --conf "spark.kubernetes.authenticate.driver.serviceAccountName=dlink-spark" \
         --conf "spark.kubernetes.authenticate.submission.oauthToken={oauthToken}" \
         --conf "spark.streaming.concurrentJobs=1" \
