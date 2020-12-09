@@ -2,13 +2,16 @@ package sensecloud.web.bean;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import sensecloud.web.config.db.JSONObjectHandler;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-public class ConnectorBean {
+@TableName(autoResultMap = true)
+public class ConnectorBean implements Serializable {
 
     private Long id;
     private String name;
