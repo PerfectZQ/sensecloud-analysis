@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-@TableName(autoResultMap = true)
 public class ConnectorBean implements Serializable {
 
     private Long id;
