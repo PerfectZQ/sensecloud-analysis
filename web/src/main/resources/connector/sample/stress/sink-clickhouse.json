@@ -1,12 +1,12 @@
 {
-  "db": "bi_slink_base",
+  "db": "dlink",
   "db.type": "clickhouse",
   "jdbc.url": "jdbc:clickhouse://172.16.105.71:33334",
   "jdbc.user": "writer",
   "jdbc.password": "2c82mirS",
   "tables": [{
-    "table": "t_kafka_log",
-    "ref": "ApplicationLog",
+    "table": "stress_log",
+    "ref": "stress_test_1",
     "cols": [{
       "field": "stream",
       "type": "Nullable(String)",
@@ -19,6 +19,34 @@
       "field": "kubernetes",
       "type": "String",
       "ref": "kubernetes"
+    },{
+      "field": "time_local",
+      "type": "Nullable(DateTime('Asia/Shanghai'))",
+      "ref": "if(isnull(time_local), cast(time as timestamp), cast(time_local as timestamp))"
+    },{
+      "field": "remote_addr",
+      "type": "Nullable(String)",
+      "ref": "remote_addr"
+    },{
+      "field": "request",
+      "type": "Nullable(String)",
+      "ref": "request"
+    },{
+      "field": "status",
+      "type": "Nullable(String)",
+      "ref": "status"
+    },{
+      "field": "request_time",
+      "type": "Nullable(Float64)",
+      "ref": "request_time"
+    },{
+      "field": "connection_requests",
+      "type": "Nullable(String)",
+      "ref": "connection_requests"
+    },{
+      "field": "http_user_agent",
+      "type": "Nullable(String)",
+      "ref": "http_user_agent"
     },{
       "field": "dt",
       "type": "String",

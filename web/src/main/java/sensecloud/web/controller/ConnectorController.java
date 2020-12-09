@@ -31,7 +31,7 @@ public class ConnectorController {
         //  ...
         ConnectorEntity entity = new ConnectorEntity();
         BeanUtils.copyProperties(params, entity);
-        boolean success = connectorService.save(entity);
+        boolean success = connectorService.saveOrUpdate(entity);
         if(success) {
             success = connectorService.submit(entity);
         }

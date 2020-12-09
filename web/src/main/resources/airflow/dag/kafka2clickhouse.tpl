@@ -7,15 +7,15 @@ from airflow.utils.dates import days_ago
 from base64 import b64encode, b64decode
 
 app_name = "{{ appName }}"
-kubernetes_context = "aliyun-hd1-diamond"
-kubernetes_namespace = "dlink-prod"
+kubernetes_context = "{{ kubernetes_context }}"
+kubernetes_namespace = "{{ kubernetes_namespace }}"
 
 job_config = """
 {{ config | raw }}
 
 """
 
-oauthToken = "kubeconfig-u-2n2gk7efdi:tjg4ckq6nvps7xg6cdlg64fjvwqtdmrtnhkpjzhtshxrdlj4n7cf6b"
+oauthToken = "{{ kubernetes_oauth_token }}"
 
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
@@ -79,7 +79,7 @@ resources = {
 registry = "registry.sensetime.com"
 group = "plat-bigdata"
 app = "kafka2clickhouse"
-tag = "master-3657e7c4"
+tag = "latest"
 image = "%s/%s/%s:%s" % (registry, group, app, tag)
 
 base64_bytes = b64encode(bytes(job_config, encoding="utf-8"))
@@ -95,7 +95,7 @@ submit = [
     "sh", "-c",
     r"""
         /opt/spark/bin/spark-submit \
-        --master "k8s://https://mordor.sensetime.com/k8s/clusters/c-t5mbq" \
+        --master "k8s://https://mordor.sensetime.com/k8s/clusters/c-krfhf" \
         --deploy-mode cluster \
         --name "{app_name}" \
         --driver-cores 1 --driver-memory 1g \
@@ -108,8 +108,8 @@ submit = [
         --conf "spark.kubernetes.container.image={image}" \
         --conf "spark.kubernetes.container.image.pullPolicy=IfNotPresent" \
         --conf "spark.kubernetes.container.image.pullSecrets=sensetime" \
-        --conf "spark.kubernetes.context={kubernetes_context}" \
-        --conf "spark.kubernetes.namespace={kubernetes_namespace}" \
+        --conf "spark.kubernetes.context={{ kubernetes_context }}" \
+        --conf "spark.kubernetes.namespace={{ kubernetes_namespace }}" \
         --conf "spark.kubernetes.authenticate.driver.serviceAccountName=dlink-spark" \
         --conf "spark.kubernetes.authenticate.submission.oauthToken={oauthToken}" \
         --conf "spark.streaming.concurrentJobs=1" \
@@ -118,7 +118,7 @@ submit = [
         --conf "spark.streaming.kafka.maxRetries=3" \
         --conf "spark.streaming.kafka.consumer.poll.ms=310000" \
         "local:///app/app.jar" \
-        --jobConfig "$JOB_CONFIG"
+        --jobConfig "$JOB_CONFIG" \
     """.format(app_name=app_name, image=image, oauthToken=oauthToken)
 ]
 
@@ -126,9 +126,9 @@ spark_submit_operator = KubernetesPodOperator(
     name=app_name + "-submitter",
     task_id="spark-streaming-submit",
     in_cluster=False,
-    cluster_context='bjidc-test-diamond',
+    cluster_context=kubernetes_context,
     config_file='/opt/bitnami/airflow/.kube/config',
-    namespace='dlink-test',
+    namespace=kubernetes_namespace,
     image=image,
     image_pull_policy="Always",
     image_pull_secrets="sensetime",
