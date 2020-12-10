@@ -35,13 +35,13 @@ public class ProductController {
     @Autowired
     private ProductServiceServiceImpl productServiceService;
 
-    @ApiOperation(value = "根据服务名称获取服务ID")
+    @ApiOperation(value = "根据产品线名称获取服务ID")
     @GetMapping("getProductIdByName")
     public Integer getProductIdByName(@RequestParam String productName) {
         return productService.getOne(new QueryWrapper<>(new Product().setProductName(productName))).getId();
     }
 
-    @ApiOperation(value = "获取服务列表")
+    @ApiOperation(value = "分页获取产品线列表")
     @GetMapping("listProducts")
     public PageResult listProducts(
             @RequestParam(required = false) String owner,
@@ -66,7 +66,7 @@ public class ProductController {
                 .build();
     }
 
-    @ApiOperation(value = "添加或修改服务，修改必须带着ID")
+    @ApiOperation(value = "添加或修改产品线，修改必须带着ID")
     @PostMapping("saveOrUpdateProduct")
     public void saveOrUpdateProduct(@RequestBody Product product) {
         productService.saveOrUpdate(product);
