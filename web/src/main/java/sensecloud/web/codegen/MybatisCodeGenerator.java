@@ -26,9 +26,10 @@ public class MybatisCodeGenerator {
 //            "role",
 //            "web_componet_role_mapping",
 //            "user",
-//            "service",
+//            "product",
 //            "user_role",
-            "user_service"
+//            "user_product",
+            "product_service"
     };
 
     public static void main(String[] args) {

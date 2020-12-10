@@ -70,14 +70,14 @@ public class AuthorizeController {
 
         log.info("====> Init Product Service: " + productName + "...");
         Product product = new Product()
-                .setServiceName(productName)
+                .setProductName(productName)
                 .setOwner(username);
         product = productService.createProductIfNotExist(product);
 
         log.info("====> Init User Product Relation, bind " + username + " to " + productName + "...");
         UserProduct userProduct = new UserProduct()
                 .setUserId(manager.getId())
-                .setServiceId(product.getId());
+                .setProductId(product.getId());
         userProductService.createUserProductIfNotExist(userProduct);
 
         AbRole abRole = new AbRole().setName(productName);
@@ -136,7 +136,7 @@ public class AuthorizeController {
         }
 
         Product product = new Product()
-                .setServiceName(productName)
+                .setProductName(productName)
                 .setOwner(username);
         product = productService.getOne(new QueryWrapper<>(product));
         if (product == null) {
@@ -149,7 +149,7 @@ public class AuthorizeController {
         log.info("====> Init User Product Relation, bind " + username + " to " + productName + "...");
         UserProduct userProduct = new UserProduct()
                 .setUserId(user.getId())
-                .setServiceId(product.getId());
+                .setProductId(product.getId());
         userProductService.createUserProductIfNotExist(userProduct);
 
         log.info("====> Init " + rolename + " " + username + " of " + productName + "on Sense Cloud Analysis\n" +
@@ -186,7 +186,7 @@ public class AuthorizeController {
         }
 
         Product product = new Product()
-                .setServiceName(productName)
+                .setProductName(productName)
                 .setOwner(username);
         product = productService.getOne(new QueryWrapper<>(product));
         if (product == null) {
@@ -203,7 +203,7 @@ public class AuthorizeController {
         log.info("====> Delete User Product Relation, unbind " + username + " from " + productName + "...");
         UserProduct userProduct = new UserProduct()
                 .setUserId(user.getId())
-                .setServiceId(product.getId());
+                .setProductId(product.getId());
         userProductService.remove(new QueryWrapper<>(userProduct));
 
         log.info("====> Disable " + rolename + " " + username + " of " + productName + "on Sense Cloud Analysis\n" +

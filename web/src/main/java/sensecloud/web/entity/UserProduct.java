@@ -21,7 +21,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("user_service")
+@TableName("user_product")
 @ApiModel(value="UserProduct", description="")
 public class UserProduct implements Serializable {
 
@@ -32,7 +32,7 @@ public class UserProduct implements Serializable {
 
     private Integer userId;
 
-    private Integer serviceId;
+    private Integer productId;
 
 
 }
