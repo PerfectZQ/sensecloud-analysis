@@ -42,7 +42,7 @@ docker-build:
     - docker push $APP_IMAGE:$TAG
 
 k8s-deploy:
-  image: $IMAGE_REGISTRY/plat-bigdata/dlink-test-diamond-kube:latest
+  image: $IMAGE_REGISTRY/plat-bigdata/aliyun-hd1-kube-diamond:latest
   stage: deploy
   only:
     - aliyun
