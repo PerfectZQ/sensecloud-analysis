@@ -1,12 +1,12 @@
 {
   "db": "dlink",
   "db.type": "clickhouse",
-  "jdbc.url": "jdbc:clickhouse://10.53.7.100:33334",
+  "jdbc.url": "jdbc:clickhouse://172.16.105.71:33334",
   "jdbc.user": "writer",
   "jdbc.password": "2c82mirS",
   "tables": [{
-    "table": "api_gateway_log",
-    "ref": "api-gateway-log",
+    "table": "stress_log",
+    "ref": "stress_test_1",
     "cols": [{
       "field": "stream",
       "type": "Nullable(String)",

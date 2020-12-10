@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import sensecloud.web.bean.ConnectorBean;
 
-@Data @TableName("connector")
+@Data @TableName(value = "connector", autoResultMap = true)
 public class ConnectorEntity extends ConnectorBean {
+
+
 }

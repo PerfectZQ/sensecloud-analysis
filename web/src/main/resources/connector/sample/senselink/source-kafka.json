@@ -1,18 +1,18 @@
 {
   "kafka": {
-    "bootstrap.servers": "kafka-kafka-outer-svc:9092",
+    "bootstrap.servers": "kafka-kafka-outer-svc.senselink-log:9092",
     "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
     "value.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
-    "group.id": "api-gateway-log-import-test-2",
+    "group.id": "import-senselink-log-v2",
     "auto.offset.reset": "earliest",
     "enable.auto.commit": false,
     "isolation.level": "read_committed",
     "request.timeout.ms": "305000",
     "max.poll.interval.ms": "300000",
-    "max.poll.records": "100"
+    "max.poll.records": "1000"
   },
   "topics": [{
-    "name": "api-gateway-log",
+    "name": "ApplicationLog",
     "partitions": 5,
     "type": "json",
     "schema": {
@@ -30,25 +30,7 @@
         "name": "kubernetes",
         "type": "string"
       },{
-        "name": "cast(time_local as timestamp)",
-        "type": "string"
-      },{
-        "name": "remote_addr",
-        "type": "string"
-      },{
-        "name": "request",
-        "type": "string"
-      },{
-        "name": "status",
-        "type": "string"
-      },{
-        "name": "request_time",
-        "type": "string"
-      },{
-        "name": "connection_requests",
-        "type": "string"
-      },{
-        "name": "http_user_agent",
+        "name": "f_message",
         "type": "string"
       },{
         "name": "service_name",
@@ -58,10 +40,7 @@
         "type": "string"
       },{
         "name": "time",
-        "type": "string"
-      },{
-        "name": "date_format(cast(time as timestamp), 'yyyy-MM-dd')",
-        "type": "string"
+        "type": "long"
       }]
     }
   }]

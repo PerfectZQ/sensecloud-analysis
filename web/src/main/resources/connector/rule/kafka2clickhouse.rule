@@ -33,10 +33,10 @@
 {% for msg in topic.schema.message %}{% for col in table.cols %}{% if col.ref == msg.name %}
 
                 {
-                    "source.field": "{{ msg.name }}",
-                    "target.field": "{{ col.field }}",
-                    "source.field.type": "{{ msg.type }}",
-                    "target.field.type": "{{ col.type }}",
+                    "source.field": "{{ msg.name | raw }}",
+                    "target.field": "{{ col.field | raw }}",
+                    "source.field.type": "{{ msg.type | raw }}",
+                    "target.field.type": "{{ col.type | raw }}",
                     "remain": true
                 }{% if loop.last == false %},{%endif%}
 {% endif %}{% endfor %}{% endfor %}

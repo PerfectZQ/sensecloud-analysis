@@ -31,7 +31,7 @@ maven-build:
       - ./web/target/*.jar
 
 docker-build:
-  image: docker:19.03.8
+  image: $IMAGE_REGISTRY/docker.io/docker:19.03.8
   stage: package
   only:
     - test

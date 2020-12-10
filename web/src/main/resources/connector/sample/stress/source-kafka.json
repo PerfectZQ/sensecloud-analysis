@@ -1,9 +1,9 @@
 {
   "kafka": {
-    "bootstrap.servers": "kafka-kafka-outer-svc:9092",
+    "bootstrap.servers": "maxwell-kafka-svc:9092",
     "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
     "value.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
-    "group.id": "api-gateway-log-import-test-2",
+    "group.id": "stress-test-1",
     "auto.offset.reset": "earliest",
     "enable.auto.commit": false,
     "isolation.level": "read_committed",
@@ -12,8 +12,8 @@
     "max.poll.records": "100"
   },
   "topics": [{
-    "name": "api-gateway-log",
-    "partitions": 5,
+    "name": "stress_test_1",
+    "partitions": 3,
     "type": "json",
     "schema": {
       "key": {
