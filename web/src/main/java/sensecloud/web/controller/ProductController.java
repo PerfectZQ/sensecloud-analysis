@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import sensecloud.web.bean.common.PageResult;
 import sensecloud.web.entity.Product;
+import sensecloud.web.entity.ProductService;
 import sensecloud.web.service.impl.ProductServiceImpl;
+import sensecloud.web.service.impl.ProductServiceServiceImpl;
 
 import java.util.List;
 
@@ -30,9 +32,18 @@ public class ProductController {
     @Autowired
     private ProductServiceImpl productService;
 
+    @Autowired
+    private ProductServiceServiceImpl productServiceService;
+
+    @ApiOperation(value = "根据服务名称获取服务ID")
+    @GetMapping("getProductIdByName")
+    public Integer getProductIdByName(@RequestParam String productName) {
+        return productService.getOne(new QueryWrapper<>(new Product().setProductName(productName))).getId();
+    }
+
     @ApiOperation(value = "获取服务列表")
-    @GetMapping("getProductList")
-    public PageResult getProductList(
+    @GetMapping("listProducts")
+    public PageResult listProducts(
             @RequestParam(required = false) String owner,
             @RequestParam(required = false) String serviceName,
             @RequestParam(required = false) Boolean status,
@@ -40,7 +51,7 @@ public class ProductController {
             @RequestParam(required = false, defaultValue = "10") int pageSize) {
         Product query = new Product()
                 .setOwner(owner)
-                .setServiceName(serviceName)
+                .setProductName(serviceName)
                 .setStatus(status);
         QueryWrapper<Product> wrapper = new QueryWrapper<>(query);
         Page<Product> page = new Page<>(pageId, pageSize);
@@ -65,6 +76,29 @@ public class ProductController {
     @PostMapping("deleteProduct")
     public void deleteProduct(@RequestBody Product product) {
         productService.remove(new QueryWrapper<>(product));
+    }
+
+    @ApiOperation(value = "向产品线添加服务")
+    @PostMapping("addServiceToProduct")
+    public void addServiceToProduct(@RequestBody ProductService productService) {
+        QueryWrapper<ProductService> queryWrapper = new QueryWrapper<>(productService);
+        if (productServiceService.count(queryWrapper) == 0) {
+            productServiceService.save(productService);
+        }
+    }
+
+    @ApiOperation(value = "查询服务列表")
+    @GetMapping("listServices")
+    public List<ProductService> listServices(@RequestBody ProductService productService) {
+        QueryWrapper<ProductService> queryWrapper = new QueryWrapper<>(productService);
+        return productServiceService.list(queryWrapper);
+    }
+
+    @ApiOperation(value = "删除服务列表")
+    @GetMapping("deleteService")
+    public void deleteService(@RequestBody ProductService productService) {
+        QueryWrapper<ProductService> queryWrapper = new QueryWrapper<>(productService);
+        productServiceService.remove(queryWrapper);
     }
 
 }

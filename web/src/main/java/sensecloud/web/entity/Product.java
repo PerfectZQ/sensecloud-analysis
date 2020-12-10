@@ -21,7 +21,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("service")
+@TableName("product")
 @ApiModel(value="Product 对象", description="")
 public class Product implements Serializable {
 
@@ -32,7 +32,7 @@ public class Product implements Serializable {
 
     private String owner;
 
-    private String serviceName;
+    private String productName;
 
     private Boolean status;
 }
