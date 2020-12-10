@@ -20,7 +20,6 @@ import static sensecloud.web.constant.CommonConstant.*;
 @Service
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IRoleService {
 
-
     /**
      * 获取产品线管理员 RoleComponentVO
      *
@@ -46,7 +45,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
      * @return
      */
     public RoleComponentVO getRoleComponentVO(Integer roleId) {
-        return this.getBaseMapper().getRoleComponentVO(roleId);
+        return this.getBaseMapper().getRoleComponentVOById(roleId);
     }
 
     /**
@@ -71,10 +70,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     /**
      * 查看当前角色是否是 Web 角色
      *
-     * @param roleComponentVO
+     * @param roleName
      * @return
      */
-    public Boolean isWebRole(RoleComponentVO roleComponentVO) {
+    public Boolean isWebRole(String roleName) {
+        RoleComponentVO roleComponentVO = this.getBaseMapper().getRoleComponentVOByRoleName(roleName);
         return SENSE_ANALYSIS_WEB_COMPONENT_NAME.equalsIgnoreCase(roleComponentVO.getComponentName());
     }
 
