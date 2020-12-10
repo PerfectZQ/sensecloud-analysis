@@ -21,8 +21,8 @@ public interface IRoleService extends IService<Role> {
     /**
      * 查看当前角色是否是 Web 角色
      *
-     * @param roleComponentVO
+     * @param roleName
      * @return
      */
-    Boolean isWebRole(RoleComponentVO roleComponentVO);
+    Boolean isWebRole(String roleName);
 }

@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import sensecloud.web.App;
-import sensecloud.web.bean.InitGroup;
+import sensecloud.web.bean.InitProduct;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -34,8 +34,8 @@ public class AuthorizeControllerTest {
     @Test
     public void initGroupTest() throws Exception {
         RequestBuilder request;
-        String content = new GsonBuilder().create().toJson(new InitGroup()
-                .setGroupName("dlink_test")
+        String content = new GsonBuilder().create().toJson(new InitProduct()
+                .setProductName("dlink_test")
                 .setUsername("zhangqiang")
                 .setRepository("https://gitlab.bj.sensetime.com/plat-bigdata/sensecloud-analysis")
                 .setBranch("master")
