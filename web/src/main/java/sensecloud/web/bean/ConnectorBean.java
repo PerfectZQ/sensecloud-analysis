@@ -20,11 +20,16 @@ public class ConnectorBean implements Serializable {
 
     @TableField(typeHandler = FastjsonTypeHandler.class)
     private JSONObject sourceConf;
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private JSONObject sourceAccountConf;
+
     private String sinkName;
     private String sinkType;
 
     @TableField(typeHandler = FastjsonTypeHandler.class)
     private JSONObject sinkConf;
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private JSONObject sinkAccountConf;
 
     private String createBy;
     private LocalDateTime createTime;
