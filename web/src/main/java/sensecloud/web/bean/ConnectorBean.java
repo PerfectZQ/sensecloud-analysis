@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Data
 public class ConnectorBean implements Serializable {
 
-    private Long id;
+    private String id;
     private String name;
     private String sourceName;
     private String sourceType;

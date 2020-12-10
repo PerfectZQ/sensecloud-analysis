@@ -1,5 +1,6 @@
 package sensecloud.web.controller;
 
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -53,7 +54,7 @@ public class ConnectorController {
         //Todo: params validation
         //  ...
         ConnectorEntity entity = new ConnectorEntity();
-        entity.setId(id);
+        entity.setId(String.valueOf(id));
         entity.setDeleted(true);
         boolean deleteResult = connectorService.updateById(entity);
         return ok(deleteResult);
@@ -71,11 +72,15 @@ public class ConnectorController {
 //        if (user != null && StringUtils.isNotBlank(user.getUsername())) {
 //            String username = user.getUsername();
 //            String username = '';
-            List<ConnectorEntity> result = connectorService.query()
+            QueryChainWrapper<ConnectorEntity> query = connectorService.query()
                     .select("id", "name", "source_name", "source_type", "sink_name", "sink_type", "create_time")
 //                    .eq("create_by", username)
                     .and(q -> q.eq("deleted", false))
-                    .list();
+                    ;
+//            if(StringUtils.isNotBlank(connector)) {
+//                query.eq("name", connector);
+//            }
+            List<ConnectorEntity> result = query.list();
             return ok(result);
 //        } else {
 //            log.warn("Accept a request but current user is null or username is empty.");

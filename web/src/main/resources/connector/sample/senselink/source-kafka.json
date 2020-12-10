@@ -3,7 +3,7 @@
     "bootstrap.servers": "kafka-kafka-outer-svc.senselink-log:9092",
     "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
     "value.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
-    "group.id": "import-senselink-log-v1",
+    "group.id": "import-senselink-log-v2",
     "auto.offset.reset": "earliest",
     "enable.auto.commit": false,
     "isolation.level": "read_committed",
