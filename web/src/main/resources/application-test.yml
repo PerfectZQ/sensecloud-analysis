@@ -36,6 +36,8 @@ service:
       endpoints:
         userinfo: /userinfo
   connector:
+    upload:
+      path: /tmp/sensecloud
     rule:
       path: connector/rule
   submitter:
