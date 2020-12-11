@@ -25,7 +25,7 @@ maven-build:
   tags:
     - maven
   script:
-    - mvn clean package -Dmaven.prod.skip=true
+    - mvn clean package -Dmaven.test.skip=true
   artifacts:
     paths:
       - ./web/target/*.jar
