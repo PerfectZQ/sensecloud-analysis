@@ -11,8 +11,8 @@ import sensecloud.web.bean.AbRole;
  * @author zhangqiang
  * @since 2020/11/5 20:17
  */
-// @FeignClient(name = "supersetRemoteAuthService", url = "dlink-superset-auth:8088/")
-@FeignClient(name = "supersetRemoteAuthService", url = "10.53.5.134:57983/")
+@FeignClient(name = "supersetRemoteAuthService", url = "dlink-superset-auth:8088/")
+// @FeignClient(name = "supersetRemoteAuthService", url = "10.53.5.134:57983/")
 public interface SupersetRemoteAuthService {
 
     @PostMapping("/supersetAuth/createRole")
