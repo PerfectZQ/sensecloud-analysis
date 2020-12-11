@@ -1,0 +1,7 @@
+{
+  "security.enable": true,
+  "ssl.keystore.location": "/tmp/dlink/check_avro.txt",
+  "ssl.keystore.password": "dlink2020",
+  "ssl.truststore.location": "/tmp/dlink/check_avro.txt",
+  "ssl.truststore.password": "dlink2020"
+}

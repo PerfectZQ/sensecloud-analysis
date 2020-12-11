@@ -49,8 +49,10 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
             jobConf = this.connector.connectConf();
         }
 
-        String jobId = connectorName + "_" + bean.getId();
-        return this.submitter.submit(jobId, name, jobConf);
+        //Todo: Get current user's group from database
+        String group = "senselink";
+        String jobId = connectorName;
+        return this.submitter.submit(group, jobId, name, jobConf);
     }
 
 

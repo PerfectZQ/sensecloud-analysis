@@ -1,27 +1,27 @@
 package sensecloud.web.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import sensecloud.web.bean.AbRole;
-import sensecloud.web.bean.InitGroup;
+import sensecloud.web.bean.InitProduct;
 import sensecloud.web.bean.airflow.AirflowInitGroup;
 import sensecloud.web.bean.airflow.GitlabRepo;
-import sensecloud.web.bean.clickhouse.RequestBoundUser;
 import sensecloud.web.bean.clickhouse.RequestProduct;
-import sensecloud.web.entity.RoleComponentVO;
-import sensecloud.web.entity.WebComponentRoleMappingVO;
-import sensecloud.web.service.impl.RoleServiceImpl;
-import sensecloud.web.service.impl.WebComponentRoleMappingServiceImpl;
+import sensecloud.web.entity.*;
+import sensecloud.web.service.impl.*;
 import sensecloud.web.service.remote.AirflowRemoteAuthService;
 import sensecloud.web.service.remote.ClickHouseRemoteAuthService;
 import sensecloud.web.service.remote.SupersetRemoteAuthService;
 
 import java.util.List;
-
-import static sensecloud.web.constant.CommonConstant.*;
 
 /**
  * @author zhangqiang
@@ -33,9 +33,17 @@ import static sensecloud.web.constant.CommonConstant.*;
 public class AuthorizeController {
 
     @Autowired
+    private ProductServiceImpl productService;
+    @Autowired
+    private UserServiceImpl userService;
+    @Autowired
     private RoleServiceImpl roleService;
     @Autowired
     private WebComponentRoleMappingServiceImpl webComponentRoleMappingService;
+    @Autowired
+    private UserRoleServiceImpl userRoleService;
+    @Autowired
+    private UserProductServiceImpl userProductService;
 
     @Autowired
     private AirflowRemoteAuthService airflowRemoteAuthService;
@@ -45,43 +53,118 @@ public class AuthorizeController {
     private ClickHouseRemoteAuthService clickHouseRemoteAuthService;
 
     /**
+     * 初始化组，并设置当前用户为产品线管理员
+     *
+     * @param initProduct
+     */
+    @ApiOperation(value = "初始化产品线信息")
+    @PostMapping("initProductPermissions")
+    @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
+    public void initProductPermissions(@RequestBody InitProduct initProduct) {
+
+        String productName = initProduct.getProductName();
+        String username = initProduct.getUsername();
+
+        log.info("====> Init User: " + username + "...");
+        User manager = userService.createUserIfNotExist(new User().setName(username));
+
+        log.info("====> Init Product Service: " + productName + "...");
+        Product product = new Product()
+                .setProductName(productName)
+                .setOwner(username);
+        product = productService.createProductIfNotExist(product);
+
+        log.info("====> Init User Product Relation, bind " + username + " to " + productName + "...");
+        UserProduct userProduct = new UserProduct()
+                .setUserId(manager.getId())
+                .setProductId(product.getId());
+        userProductService.createUserProductIfNotExist(userProduct);
+
+        AbRole abRole = new AbRole().setName(productName);
+        log.info("====> Init Airflow of " + productName + "...");
+        airflowRemoteAuthService.initGroupRole(new AirflowInitGroup()
+                .setAbRole(abRole)
+                .setGitlabRepo(new GitlabRepo()
+                        .setRepository(initProduct.getRepository())
+                        .setBranch(initProduct.getBranch())
+                )
+        );
+        log.info("====> Init Superset of " + productName + "...");
+        supersetRemoteAuthService.initGroupRole(abRole);
+        log.info("====> Init ClickHouse of " + productName + "...");
+        clickHouseRemoteAuthService.initProduct(new RequestProduct()
+                .setUserName(username)
+                .setProductLine(productName)
+        );
+
+        log.info("====> Init Product Manager " + username + " of " + productName + "on Sense Cloud Analysis\n" +
+                "====> assign ProductManger to " + username + "...");
+        RoleComponentVO roleComponentVO = roleService.getProductManager();
+        UserRole userRole = new UserRole()
+                .setUserId(manager.getId())
+                .setRoleId(roleComponentVO.getRoleId());
+        userRoleService.createUserRoleIfNotExist(userRole);
+
+        List<WebComponentRoleMappingVO> webComponentRoleMappingVOList = webComponentRoleMappingService
+                .getBaseMapper().getWebComponentRoleMappingVOByWebRoleId(roleComponentVO.getRoleId());
+        webComponentRoleMappingVOList.forEach(webComponentRoleMappingVO ->
+                webComponentRoleMappingService.enableWebComponentRoleMapping(
+                        username, productName, webComponentRoleMappingVO)
+        );
+
+        log.info("====> Update product service status to true.");
+        product.setStatus(true);
+        productService.updateProductStatus(product);
+    }
+
+    /**
      * 管理员添加用户到组，并赋予角色
      *
      * @param username
-     * @param rolename  sensecloud-analysis web role name, not component role name
-     * @param groupName
+     * @param rolename    sensecloud-analysis web role name, not component role name
+     * @param productName
      */
-    @PostMapping("boundUserRoleToGroup")
-    public void boundUserRoleToGroup(@RequestParam String username,
-                                     @RequestParam String rolename,
-                                     @RequestParam String groupName) {
+    @PostMapping("bindUserRoleToProduct")
+    @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
+    public void bindUserRoleToProduct(@RequestParam String username,
+                                      @RequestParam String rolename,
+                                      @RequestParam String productName) {
+
         RoleComponentVO roleComponentVO = roleService.getSenseAnalysisRoleComponentVO(rolename);
+        if (roleComponentVO == null) {
+            throw new IllegalArgumentException(rolename + " is not a sensecloud-analysis web role!");
+        }
+
+        Product product = new Product()
+                .setProductName(productName)
+                .setOwner(username);
+        product = productService.getOne(new QueryWrapper<>(product));
+        if (product == null) {
+            throw new IllegalArgumentException("Product " + productName + " is not exist! bind " + username + ", " + rolename + " failed");
+        }
+
+        log.info("====> Init User: " + username + "...");
+        User user = userService.createUserIfNotExist(new User().setName(username));
+
+        log.info("====> Init User Product Relation, bind " + username + " to " + productName + "...");
+        UserProduct userProduct = new UserProduct()
+                .setUserId(user.getId())
+                .setProductId(product.getId());
+        userProductService.createUserProductIfNotExist(userProduct);
+
+        log.info("====> Init " + rolename + " " + username + " of " + productName + "on Sense Cloud Analysis\n" +
+                "====> assign " + rolename + " to " + username + "...");
+        UserRole userRole = new UserRole()
+                .setUserId(user.getId())
+                .setRoleId(roleComponentVO.getRoleId());
+        userRoleService.createUserRoleIfNotExist(userRole);
+
         List<WebComponentRoleMappingVO> webComponentRoleMappingVOList = webComponentRoleMappingService
                 .getBaseMapper().getWebComponentRoleMappingVOByWebRoleId(roleComponentVO.getRoleId());
-        webComponentRoleMappingVOList.forEach(webComponentRoleMappingVO -> {
-            String componentName = webComponentRoleMappingVO.getComponentRoleComponentName().toLowerCase();
-            String componentRoleName = webComponentRoleMappingVO.getComponentRoleName();
-            componentRoleName = AIRFLOW_SUPERSET_GROUP_ROLE_NAME.equals(componentRoleName) ? groupName : componentRoleName;
-            switch (componentName) {
-                case AIRFLOW_COMPONENT_NAME:
-                    if (!AIRFLOW_COMPONENT_GITLAB.equalsIgnoreCase(componentRoleName)) {
-                        airflowRemoteAuthService.bindRoleToUser(componentRoleName, username);
-                    }
-                    break;
-                case SUPERSET_COMPONENT_NAME:
-                    supersetRemoteAuthService.bindRoleToUser(componentRoleName, username);
-                    break;
-                case CLICK_HOUSE_COMPONENT_NAME:
-                    RequestBoundUser requestBoundUser = new RequestBoundUser()
-                            .setUserName(username)
-                            .setProductLine(groupName)
-                            .setRoleName(rolename);
-                    clickHouseRemoteAuthService.boundUserRoleToGroup(requestBoundUser);
-                    break;
-                default:
-                    throw new IllegalArgumentException("UnSupport Component: " + componentName);
-            }
-        });
+        webComponentRoleMappingVOList.forEach(webComponentRoleMappingVO ->
+                webComponentRoleMappingService.enableWebComponentRoleMapping(
+                        username, productName, webComponentRoleMappingVO)
+        );
     }
 
     /**
@@ -89,95 +172,53 @@ public class AuthorizeController {
      *
      * @param username
      * @param rolename
-     * @param groupName
+     * @param productName
      */
-    @PostMapping("unboundUserRoleFromGroup")
-    public void unboundUserRoleFromGroup(@RequestParam String username,
-                                         @RequestParam String rolename,
-                                         @RequestParam String groupName) {
-        RoleComponentVO roleComponentVO = roleService.getSenseAnalysisRoleComponentVO(rolename);
-        List<WebComponentRoleMappingVO> webComponentRoleMappingVOList = webComponentRoleMappingService
-                .getBaseMapper().getWebComponentRoleMappingVOByWebRoleId(roleComponentVO.getRoleId());
-        webComponentRoleMappingVOList.forEach(webComponentRoleMappingVO -> {
-            String componentName = webComponentRoleMappingVO.getComponentRoleComponentName().toLowerCase();
-            String componentRoleName = webComponentRoleMappingVO.getComponentRoleName();
-            componentRoleName = AIRFLOW_SUPERSET_GROUP_ROLE_NAME.equals(componentRoleName) ? groupName : componentRoleName;
-            switch (componentName) {
-                case AIRFLOW_COMPONENT_NAME:
-                    if (!AIRFLOW_COMPONENT_GITLAB.equalsIgnoreCase(componentRoleName)) {
-                        airflowRemoteAuthService.unbindRoleToUser(componentRoleName, username);
-                    }
-                    break;
-                case SUPERSET_COMPONENT_NAME:
-                    supersetRemoteAuthService.unbindRoleToUser(componentRoleName, username);
-                    break;
-                case CLICK_HOUSE_COMPONENT_NAME:
-                    RequestBoundUser requestBoundUser = new RequestBoundUser()
-                            .setUserName(username)
-                            .setProductLine(groupName)
-                            .setRoleName(rolename);
-                    clickHouseRemoteAuthService.unboundUserRoleFromGroup(requestBoundUser);
-                    break;
-                default:
-                    throw new IllegalArgumentException("UnSupport Component: " + componentName);
-            }
-        });
-    }
+    @PostMapping("unbindUserRoleFromProduct")
+    @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
+    public void unbindUserRoleFromProduct(@RequestParam String username,
+                                          @RequestParam String rolename,
+                                          @RequestParam String productName) {
 
-    /**
-     * 初始化组，并设置当前用户为产品线管理员
-     *
-     * @param initGroup
-     */
-    @PostMapping("initGroup")
-    public void initGroup(@RequestBody InitGroup initGroup) {
-        String groupName = initGroup.getGroupName();
-        String username = initGroup.getUsername();
-        RoleComponentVO roleComponentVO = roleService.getProductManager();
-        AbRole abRole = new AbRole().setName(groupName);
-        log.info("====> Init Airflow of " + groupName + "...");
-        airflowRemoteAuthService.initGroupRole(new AirflowInitGroup()
-                .setAbRole(abRole)
-                .setGitlabRepo(new GitlabRepo()
-                        .setRepository(initGroup.getRepository())
-                        .setBranch(initGroup.getBranch())
-                )
-        );
-        log.info("====> Init Superset of " + groupName + "...");
-        supersetRemoteAuthService.initGroupRole(abRole);
-        log.info("====> Init ClickHouse of " + groupName + "...");
-        clickHouseRemoteAuthService.initProduct(new RequestProduct()
-                .setUserName(username)
-                .setProductLine(groupName)
-        );
-        log.info("====> Init Product Manager " + username + " of " + groupName + "...");
+        RoleComponentVO roleComponentVO = roleService.getSenseAnalysisRoleComponentVO(rolename);
+        if (roleComponentVO == null) {
+            throw new IllegalArgumentException(rolename + " is not a sensecloud-analysis web role!");
+        }
+
+        Product product = new Product()
+                .setProductName(productName)
+                .setOwner(username);
+        product = productService.getOne(new QueryWrapper<>(product));
+        if (product == null) {
+            throw new IllegalArgumentException("Product " + productName + " is not exist! bind " + username + ", " +
+                    rolename + " to " + productName + " failed");
+        }
+
+        User user = userService.getOne(new QueryWrapper<>(new User().setName(username)));
+        if (user == null) {
+            throw new IllegalArgumentException("User " + username + " is not exist! bind " + username + ", " +
+                    rolename + " to " + productName + " failed");
+        }
+
+        log.info("====> Delete User Product Relation, unbind " + username + " from " + productName + "...");
+        UserProduct userProduct = new UserProduct()
+                .setUserId(user.getId())
+                .setProductId(product.getId());
+        userProductService.remove(new QueryWrapper<>(userProduct));
+
+        log.info("====> Disable " + rolename + " " + username + " of " + productName + "on Sense Cloud Analysis\n" +
+                "====> Delete " + rolename + " from " + username + "...");
+        UserRole userRole = new UserRole()
+                .setUserId(user.getId())
+                .setRoleId(roleComponentVO.getRoleId());
+        userRoleService.remove(new QueryWrapper<>(userRole));
+
         List<WebComponentRoleMappingVO> webComponentRoleMappingVOList = webComponentRoleMappingService
                 .getBaseMapper().getWebComponentRoleMappingVOByWebRoleId(roleComponentVO.getRoleId());
-        webComponentRoleMappingVOList.forEach(webComponentRoleMappingVO -> {
-            String componentName = webComponentRoleMappingVO.getComponentRoleComponentName().toLowerCase();
-            String componentRoleName = webComponentRoleMappingVO.getComponentRoleName();
-            componentRoleName = AIRFLOW_SUPERSET_GROUP_ROLE_NAME.equals(componentRoleName) ? groupName : componentRoleName;
-            switch (componentName) {
-                case AIRFLOW_COMPONENT_NAME:
-                    if (!AIRFLOW_COMPONENT_GITLAB.equalsIgnoreCase(componentRoleName)) {
-                        log.info("====> Init Product Manager " + username + " of " + groupName + " on Airflow\n" +
-                                "====> bind role " + componentRoleName + " to " + username);
-                        airflowRemoteAuthService.bindRoleToUser(componentRoleName, username);
-                    }
-                    break;
-                case SUPERSET_COMPONENT_NAME:
-                    log.info("====> Init Product Manager " + username + " of " + groupName + " on Superset\n" +
-                            "====> bind role " + componentRoleName + " to " + username);
-                    supersetRemoteAuthService.bindRoleToUser(componentRoleName, username);
-                    break;
-                case CLICK_HOUSE_COMPONENT_NAME:
-                    // 铁达在 InitProduct 接口已经初始化了，所以这里啥也不干
-                    log.info("====> Init Product Manager " + username + " of " + groupName + " on ClickHouse\n" +
-                            "====> bind role " + componentRoleName + " to " + username);
-                    break;
-                default:
-                    throw new IllegalArgumentException("UnSupport Component: " + componentName);
-            }
-        });
+        webComponentRoleMappingVOList.forEach(webComponentRoleMappingVO ->
+                webComponentRoleMappingService.disableWebComponentRoleMapping(
+                        username, productName, webComponentRoleMappingVO)
+        );
     }
+    
 }

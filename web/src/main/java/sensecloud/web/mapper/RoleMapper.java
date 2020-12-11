@@ -28,7 +28,21 @@ public interface RoleMapper extends BaseMapper<Role> {
             "where\n" +
             "   r.id = #{roleId}\n" +
             "LIMIT 1;")
-    RoleComponentVO getRoleComponentVO(@Param("roleId") Integer roleId);
+    RoleComponentVO getRoleComponentVOById(@Param("roleId") Integer roleId);
+
+    @Select("select\n" +
+            "   r.id role_id,\n" +
+            "   r.name role_name,\n" +
+            "   r.component_id component_id,\n" +
+            "   c.name component_name\n" +
+            "from\n" +
+            "   `role` r\n" +
+            "left join component c on\n" +
+            "   r.component_id = c.id\n" +
+            "where\n" +
+            "   r.`name` = #{roleName}\n" +
+            "LIMIT 1;")
+    RoleComponentVO getRoleComponentVOByRoleName(@Param("roleName") String roleName);
 
     @Select("SELECT\n" +
             "   r.id role_id,\n" +

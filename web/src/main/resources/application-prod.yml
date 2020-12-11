@@ -36,6 +36,8 @@ service:
       endpoints:
         userinfo: /userinfo
   connector:
+    upload:
+      path: /tmp/sensecloud
     rule:
       path: connector/rule
   submitter:
@@ -50,8 +52,11 @@ service:
         password: Dlink@6666
         remoteBranch: test
         remote: origin
-      k8s:
-        namespace: dlink-test
+    env:
+      k8s.context: bjidc-prod-diamond
+      k8s.namespace: dlink-prod
+      k8s.oauth_token: kubeconfig-u-2n2gk7efdi:tjg4ckq6nvps7xg6cdlg64fjvwqtdmrtnhkpjzhtshxrdlj4n7cf6b
+      k8s.api_server: k8s://https://mordor.sensetime.com/k8s/clusters/c-krfhf
 
 remote:
   rest:

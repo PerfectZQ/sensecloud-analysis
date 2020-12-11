@@ -16,15 +16,20 @@ import java.util.List;
 public class MybatisCodeGenerator {
 
     private final static String driverName = "com.mysql.jdbc.Driver";
-    private final static String url = "jdbc:mysql://bj.paas.sensetime.com:34832/sensecloud?useUnicode=true&characterEncoding=utf-8&useSSL=false";
+    private final static String url = "jdbc:mysql://sh.paas.sensetime.com:34004/sensecloud?useUnicode=true&characterEncoding=utf-8&useSSL=false";
     private final static String username = "9mmyxokq";
     // 改成正确的密码，不要提交到 gitlab 否则会报安全漏洞
     private final static String passwd = "bxzqx4f5";
     private final static String moduleName = "web";
     private final static String[] includeTables = new String[]{
-            "component",
-            "role",
-            "web_componet_role_mapping"
+//            "component",
+//            "role",
+//            "web_componet_role_mapping",
+//            "user",
+//            "product",
+//            "user_role",
+//            "user_product",
+            "product_service"
     };
 
     public static void main(String[] args) {
