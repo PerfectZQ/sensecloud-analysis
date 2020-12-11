@@ -20,7 +20,7 @@ public class ConnectorBean implements Serializable {
 
     @TableField(typeHandler = FastjsonTypeHandler.class)
     private JSONObject sourceConf;
-    @TableField(typeHandler = FastjsonTypeHandler.class)
+    @TableField(value = "source_account_conf", typeHandler = FastjsonTypeHandler.class)
     private JSONObject sourceAccountConf;
 
     private String sinkName;

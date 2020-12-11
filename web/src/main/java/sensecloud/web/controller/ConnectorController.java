@@ -1,10 +1,13 @@
 package sensecloud.web.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -12,15 +15,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sensecloud.web.bean.ConnectorAttachmentBean;
 import sensecloud.web.bean.vo.ConnectorVO;
 import sensecloud.web.bean.vo.ResultVO;
+import sensecloud.web.constant.AttachmentCatalog;
+import sensecloud.web.entity.ConnectorAttachmentEntity;
 import sensecloud.web.entity.ConnectorEntity;
+import sensecloud.web.service.impl.ConnectorAttachmentServiceImpl;
 import sensecloud.web.service.impl.ConnectorServiceImpl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static sensecloud.web.bean.vo.ResultVO.*;
@@ -36,16 +42,53 @@ public class ConnectorController {
     @Autowired
     private ConnectorServiceImpl connectorService;
 
+    @Autowired
+    private ConnectorAttachmentServiceImpl connectorAttachmentService;
+
     @PostMapping
     public ResultVO<Boolean> add(@RequestBody ConnectorVO params) {
         //Todo: params validation
         //  ...
         ConnectorEntity entity = new ConnectorEntity();
         BeanUtils.copyProperties(params, entity);
+
         boolean success = connectorService.saveOrUpdate(entity);
-        if(success) {
-            success = connectorService.submit(entity);
+
+        if ("KAFKA".equalsIgnoreCase(params.getSourceType())) {
+            JSONObject sourceAccountConf = params.getSourceAccountConf();
+            Boolean securityEnable = sourceAccountConf.getBoolean("security.enable");
+
+            if (securityEnable != null && securityEnable.booleanValue()) {
+                String keystoreLocation = sourceAccountConf.getString("ssl.keystore.location");
+                String truststoreLocation = sourceAccountConf.getString("ssl.truststore.location");
+                List<ConnectorAttachmentEntity> entities = new ArrayList<>();
+
+                if(StringUtils.isNotBlank(keystoreLocation)) {
+                    ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
+                    String catalog = AttachmentCatalog.KAFKA_KEYSTORE.name();
+                    attachmentEntity.setCatalog(catalog);
+                    attachmentEntity.setContent(this.readAttachment(keystoreLocation));
+                    attachmentEntity.setConnectorId(entity.getId());
+
+                    entities.add(attachmentEntity);
+                }
+
+                if(StringUtils.isNotBlank(truststoreLocation)) {
+                    ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
+                    String catalog = AttachmentCatalog.KAFKA_TRUSTSTORE.name();
+                    attachmentEntity.setCatalog(catalog);
+                    attachmentEntity.setContent(this.readAttachment(truststoreLocation));
+                    attachmentEntity.setConnectorId(entity.getId());
+                    entities.add(attachmentEntity);
+                }
+
+                success = connectorAttachmentService.saveBatch(entities);
+            }
         }
+
+//        if(success) {
+//            success = connectorService.submit(entity);
+//        }
         return ok(success);
     }
 
@@ -161,4 +204,16 @@ public class ConnectorController {
         }
         return error("Exception occurred.");
     }
+
+
+    private byte[] readAttachment(String location) {
+        byte[] res = null;
+        try (FileInputStream in = new FileInputStream(new File(location))) {
+            res = IOUtils.toByteArray(in);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
 }
