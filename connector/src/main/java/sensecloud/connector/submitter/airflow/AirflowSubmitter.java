@@ -36,6 +36,9 @@ public class AirflowSubmitter {
     @Value("${service.submitter.env.k8s.oauth_token}")
     private String env_kubernetes_oauth_token;
 
+    @Value("${service.submitter.env.k8s.api_server}")
+    private String env_kubernetes_api_server;
+
     private GitClient gitClient;
 
     private void init () {
@@ -67,6 +70,7 @@ public class AirflowSubmitter {
         context.put("kubernetes_context", env_kubernetes_context);
         context.put("kubernetes_namespace", env_kubernetes_namespace);
         context.put("kubernetes_oauth_token", env_kubernetes_oauth_token);
+        context.put("env_kubernetes_api_server", env_kubernetes_api_server);
         context.put("config", jobConf);
         String code = this.airflowDAGProvider.dag(name, context);
 

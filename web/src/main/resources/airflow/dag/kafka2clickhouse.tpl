@@ -95,7 +95,7 @@ submit = [
     "sh", "-c",
     r"""
         /opt/spark/bin/spark-submit \
-        --master "k8s://https://mordor.sensetime.com/k8s/clusters/c-kzszr" \
+        --master "{{ env_kubernetes_api_server }}" \
         --deploy-mode cluster \
         --name "{app_name}" \
         --driver-cores 1 --driver-memory 1g \

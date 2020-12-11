@@ -53,9 +53,10 @@ service:
         remoteBranch: test
         remote: origin
     env:
-      k8s.context: bjidc-prod-diamond
+      k8s.context: aliyun-hd1-diamond
       k8s.namespace: dlink-prod
       k8s.oauth_token: kubeconfig-u-2n2gk7efdi:tjg4ckq6nvps7xg6cdlg64fjvwqtdmrtnhkpjzhtshxrdlj4n7cf6b
+      k8s.api_server: k8s://https://mordor.sensetime.com/k8s/clusters/c-kzszr
 
 remote:
   rest:
