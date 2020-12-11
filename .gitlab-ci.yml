@@ -25,13 +25,13 @@ maven-build:
   tags:
     - maven
   script:
-    - mvn clean package -Dmaven.prod.skip=true
+    - mvn clean package -Dmaven.test.skip=true
   artifacts:
     paths:
       - ./web/target/*.jar
 
 docker-build:
-  image: $IMAGE_REGISTRY/docker.io/docker:19.03.8
+  image: docker:19.03.8
   stage: package
   only:
     - prod
