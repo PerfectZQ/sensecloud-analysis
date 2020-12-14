@@ -43,7 +43,8 @@ public class CustomWebSecurityConfig extends WebSecurityConfigurerAdapter {
         // http.addFilterBefore(verifyCodeFilter, UsernamePasswordAuthenticationFilter.class);
         http.authorizeRequests() // 开启认证配置
                 .antMatchers("/").permitAll()
-                .antMatchers("/amchart/**",
+                .antMatchers("/connector",
+                        "/connector/**",
                         "/bootstrap/**",
                         "/build/**",
                         "/css/**",
