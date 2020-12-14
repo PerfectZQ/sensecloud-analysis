@@ -22,6 +22,11 @@ import org.springframework.security.core.GrantedAuthority;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class CustomGlobalMethodSecurity extends GlobalMethodSecurityConfiguration {
 
+    /**
+     * 配置 AccessDecisionManager
+     *
+     * @return
+     */
     protected AccessDecisionManager accessDecisionManager() {
         AffirmativeBased accessDecisionManager = (AffirmativeBased) super.accessDecisionManager();
         // Remove the `ROLE_` prefix from RoleVoter for @Secured and hasRole checks on methods
