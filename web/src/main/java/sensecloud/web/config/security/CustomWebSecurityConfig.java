@@ -45,6 +45,9 @@ public class CustomWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/").permitAll()
                 .antMatchers("/connector",
                         "/connector/**",
+                        "/authorize/**",
+                        "/product/**",
+                        "/userRole/**",
                         "/bootstrap/**",
                         "/build/**",
                         "/css/**",
