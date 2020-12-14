@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.expression.SecurityExpressionRoot;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +26,11 @@ import sensecloud.web.service.remote.SupersetRemoteAuthService;
 import java.util.List;
 
 /**
+ * Spring Security 提供了 Spring EL 表达式，允许我们在定义 URL 路径访问(@RequestMapping)的方法上面添加注解，来控制访问权限。
+ * Spring Security可用表达式对象的基类是 {@link SecurityExpressionRoot}
+ *
  * @author zhangqiang
+ * @see <a href="https://my.oschina.net/zimug/blog/3132076">使用 Spring EL 控制系统功能访问权限</a>
  * @since 2020/11/5 16:17
  */
 @RestController
@@ -53,12 +59,13 @@ public class AuthorizeController {
     private ClickHouseRemoteAuthService clickHouseRemoteAuthService;
 
     /**
-     * 初始化组，并设置当前用户为产品线管理员
+     * 初始化组，并设置当前用户为ProductAdmin
      *
      * @param initProduct
      */
     @ApiOperation(value = "初始化产品线信息")
     @PostMapping("initProductPermissions")
+    @PreAuthorize("hasRole('PlatformAdmin')")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
     public void initProductPermissions(@RequestBody InitProduct initProduct) {
 
@@ -125,6 +132,7 @@ public class AuthorizeController {
      * @param productName
      */
     @PostMapping("bindUserRoleToProduct")
+    @PreAuthorize("hasAnyRole('ProductAdmin', 'PlatformAdmin')")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
     public void bindUserRoleToProduct(@RequestParam String username,
                                       @RequestParam String rolename,
@@ -175,6 +183,7 @@ public class AuthorizeController {
      * @param productName
      */
     @PostMapping("unbindUserRoleFromProduct")
+    @PreAuthorize("hasAnyRole('ProductAdmin', 'PlatformAdmin')")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
     public void unbindUserRoleFromProduct(@RequestParam String username,
                                           @RequestParam String rolename,
@@ -220,5 +229,5 @@ public class AuthorizeController {
                         username, productName, webComponentRoleMappingVO)
         );
     }
-    
+
 }

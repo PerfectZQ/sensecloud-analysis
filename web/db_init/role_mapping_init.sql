@@ -25,10 +25,10 @@ CREATE TABLE `role` (
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO sensecloud.`role` (id,name,component_id) VALUES
-	 (1,'数据开发人员',1),
-	 (2,'分析人员',1),
-	 (3,'平台管理员',1),
-	 (4,'产品线管理员',1),
+	 (1,'DataDeveloper',1),
+	 (2,'DataAnalyst',1),
+	 (3,'PlatformAdmin',1),
+	 (4,'ProductAdmin',1),
 	 (5,'GitlabRepo',2),
 	 (6,'Public',2),
 	 (7,'Admin',2),

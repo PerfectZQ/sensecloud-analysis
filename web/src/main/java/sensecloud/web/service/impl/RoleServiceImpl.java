@@ -21,7 +21,7 @@ import static sensecloud.web.constant.CommonConstant.*;
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IRoleService {
 
     /**
-     * 获取产品线管理员 RoleComponentVO
+     * 获取 ProductAdmin RoleComponentVO
      *
      * @return
      */
@@ -30,7 +30,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     }
 
     /**
-     * 获取平台管理员 RoleComponentVO
+     * 获取 PlatformAdmin RoleComponentVO
      *
      * @return
      */

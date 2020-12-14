@@ -11,3 +11,9 @@ server:
     key-store: classpath:.keystore
     key-store-password: 123456
     key-store-type: JKS
+
+# 指定 Spring Security 默认的用户名和密码
+security:
+  user:
+    name: admin
+    password: admin
