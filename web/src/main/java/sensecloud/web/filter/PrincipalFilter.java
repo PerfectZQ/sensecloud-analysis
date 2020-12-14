@@ -36,15 +36,15 @@ import java.io.IOException;
  * 指定过滤器执行顺序: @Order 值越小，越先执行
  * <p>
  * 使用 @WebFilter 需要在 SpringBoot 的入口处加注解 @ServletComponentScan, 如果不指定，默认 url-pattern
- * 是 `/*`, 过滤所有请求
+ * 是 `/*`, 所有请求都会执行过滤
  *
  * @author zhangqiang
  * @since 2020/12/14 15:44
  */
 @Order(1)
-@WebFilter(filterName = "loginFilter", urlPatterns = {"/*"})
+@WebFilter(filterName = "principalFilter", urlPatterns = {"/*"})
 @Slf4j
-public class LoginFilter implements Filter {
+public class PrincipalFilter implements Filter {
 
 
     @Override
