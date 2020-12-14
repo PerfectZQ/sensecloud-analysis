@@ -2,6 +2,8 @@ package sensecloud.web.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -21,5 +23,16 @@ public class CustomCommonConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Allows providing defaults for {@link GrantedAuthority}
+     *
+     * @return 授权的默认配置
+     */
+    @Bean
+    GrantedAuthorityDefaults grantedAuthorityDefaults() {
+        // Remove the `ROLE_` prefix for @PreAuthorize
+        return new GrantedAuthorityDefaults("");
     }
 }

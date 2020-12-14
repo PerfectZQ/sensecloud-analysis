@@ -23,7 +23,11 @@ import org.springframework.security.core.GrantedAuthority;
 public class CustomGlobalMethodSecurity extends GlobalMethodSecurityConfiguration {
 
     /**
-     * 配置 AccessDecisionManager
+     * 配置 AccessDecisionManager, Spring 提供了 3 个决策管理器：
+     * <p>
+     * 1. AffirmativeBased：一票通过，只要有一个投票器通过就允许访问
+     * 2. ConsensusBased：有一半以上投票器通过才允许访问资源
+     * 3. UnanimousBased：所有投票器都通过才允许访问
      *
      * @return
      */
@@ -37,14 +41,4 @@ public class CustomGlobalMethodSecurity extends GlobalMethodSecurityConfiguratio
         return accessDecisionManager;
     }
 
-    /**
-     * Allows providing defaults for {@link GrantedAuthority}
-     *
-     * @return 授权的默认配置
-     */
-    @Bean
-    GrantedAuthorityDefaults grantedAuthorityDefaults() {
-        // Remove the `ROLE_` prefix for @PreAuthorize
-        return new GrantedAuthorityDefaults("");
-    }
 }

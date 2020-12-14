@@ -97,22 +97,23 @@ public class CustomWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 平台管理员
                 .withUser("platform_admin")
                 .password(passwordEncoder.encode("platform_admin"))
-                .roles("PlatformAdmin")
+                .authorities("PlatformAdmin")
                 .and()
                 // 产品线管理员
                 .withUser("product_admin")
                 .password(passwordEncoder.encode("product_admin"))
-                .roles("ProductAdmin")
+                // roles() 默认会添加 `ROLE_` 前缀
+                .authorities("ProductAdmin")
                 .and()
                 // 数据开发人员
                 .withUser("data_developer")
                 .password(passwordEncoder.encode("data_developer"))
-                .roles("DataDeveloper")
+                .authorities("DataDeveloper")
                 .and()
                 // 数据分析师
                 .withUser("data_analyst")
                 .password(passwordEncoder.encode("data_analyst"))
-                .roles("DataAnalyst");
+                .authorities("DataAnalyst");
     }
 
 }
