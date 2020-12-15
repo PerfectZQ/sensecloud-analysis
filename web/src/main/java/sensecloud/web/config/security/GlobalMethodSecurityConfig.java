@@ -1,14 +1,11 @@
 package sensecloud.web.config.security;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
-import org.springframework.security.config.core.GrantedAuthorityDefaults;
-import org.springframework.security.core.GrantedAuthority;
 
 /**
  * 开启 Security 的注解: @EnableGlobalMethodSecurity(prePostEnabled = true)，这样我们就可以在需要
@@ -20,7 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
  */
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
-public class CustomGlobalMethodSecurity extends GlobalMethodSecurityConfiguration {
+public class GlobalMethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     /**
      * 配置 AccessDecisionManager, Spring 提供了 3 个决策管理器：

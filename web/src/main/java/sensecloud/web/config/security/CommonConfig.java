@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @since 2020/12/14 17:20
  */
 @Configuration
-public class CustomCommonConfig {
+public class CommonConfig {
     /**
      * Spring Security 中提供了 BCryptPasswordEncoder 密码编码工具，可以非常方便的
      * 实现密码的加密加盐，相同明文加密出来的结果总是不同，这样就不需要用户去额外保存盐

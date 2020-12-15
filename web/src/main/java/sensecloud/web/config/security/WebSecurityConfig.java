@@ -1,8 +1,10 @@
 package sensecloud.web.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.SecurityExpressionOperations;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -13,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebSecurityExpressionRoot;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import sensecloud.web.service.impl.SenseCloudUserDetailsServiceImpl;
 
 /**
  * @author zhangqiang
@@ -20,15 +24,27 @@ import org.springframework.security.web.access.expression.WebSecurityExpressionR
  */
 @Configuration
 @EnableWebSecurity
-public class CustomWebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private SenseCloudUserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Bean
+    public DaoAuthenticationProvider dbAuthenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
+        authenticationProvider.setHideUserNotFoundExceptions(false);
+        return authenticationProvider;
+    }
+
     @Override
-    public void configure(WebSecurity webSecurity) throws Exception {
+    public void configure(WebSecurity web) throws Exception {
         // Configure Spring EL Handler
-        webSecurity.expressionHandler(new DefaultWebSecurityExpressionHandler() {
+        web.expressionHandler(new DefaultWebSecurityExpressionHandler() {
             @Override
             protected SecurityExpressionOperations createSecurityExpressionRoot(Authentication authentication, FilterInvocation fi) {
                 WebSecurityExpressionRoot root = (WebSecurityExpressionRoot) super.createSecurityExpressionRoot(authentication, fi);
@@ -41,40 +57,37 @@ public class CustomWebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // http.addFilterBefore(verifyCodeFilter, UsernamePasswordAuthenticationFilter.class);
-        http.authorizeRequests() // 开启认证配置
-                .antMatchers("/").permitAll()
-                .antMatchers("/connector",
+        http
+                .requestMatchers() // 直接访问的请求
+                .antMatchers("/oauth/**", "/login/**", "/logout/**")
+            .and()
+                .authorizeRequests() // 授权的请求
+                .antMatchers("/",
+                        "/connector",
                         "/connector/**",
                         "/authorize/**",
                         "/product/**",
-                        "/userRole/**",
-                        "/bootstrap/**",
-                        "/build/**",
-                        "/css/**",
-                        "/dist/**",
-                        "/documentation/**",
-                        "/fonts/**",
-                        "/js/**",
-                        "/pages/**",
-                        "/plugins/**"
-                ) // 白名单路径
-                .permitAll()
-                .anyRequest().authenticated()
-                .and()
+                        "/userRole/**"
+                )
+                .permitAll() // 放行，白名单路径
+                .anyRequest()
+                .authenticated() // 任何其他的请求都需要认证
+            .and()
                 /*
                 .formLogin()
                 .loginPage("/login") // 指定登录页面 URL 路径
                 .defaultSuccessUrl("/httpapi") // 指定登录成功跳转 URL 路径
                 .permitAll()
-                .and()
+            .and()
                 .logout()
                 .logoutSuccessUrl("/") // 退出成功后的默认跳转 URL 页面
                 .permitAll()
-                .and()
+            .and()
                  */
                 .httpBasic()
-                .and()
-                .csrf().disable();
+            .and()
+                .csrf()
+                .disable();
 
     }
 
@@ -87,6 +100,7 @@ public class CustomWebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         configureTestUsersInMemory(auth);
+        // auth.authenticationProvider(dbAuthenticationProvider());
     }
 
     /**

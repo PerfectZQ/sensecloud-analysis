@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sensecloud.web.entity.Role;
 import sensecloud.web.entity.User;
@@ -22,7 +23,10 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class SenseCloudUserDetailServiceImpl implements UserDetailsService {
+public class SenseCloudUserDetailsServiceImpl implements UserDetailsService {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserServiceImpl userService;
@@ -47,6 +51,7 @@ public class SenseCloudUserDetailServiceImpl implements UserDetailsService {
                 })
                 .map(userRole -> new SimpleGrantedAuthority(roleService.getById(userRole.getRoleId()).getName()))
                 .collect(Collectors.toList());
-        return new org.springframework.security.core.userdetails.User(username, user.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(username,
+                passwordEncoder.encode(user.getPassword()), authorities);
     }
 }
