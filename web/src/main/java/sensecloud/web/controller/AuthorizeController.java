@@ -143,9 +143,7 @@ public class AuthorizeController {
             throw new IllegalArgumentException(rolename + " is not a sensecloud-analysis web role!");
         }
 
-        Product product = new Product()
-                .setProductName(productName)
-                .setOwner(username);
+        Product product = new Product().setProductName(productName);
         product = productService.getOne(new QueryWrapper<>(product));
         if (product == null) {
             throw new IllegalArgumentException("Product " + productName + " is not exist! bind " + username + ", " + rolename + " failed");
