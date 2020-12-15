@@ -58,9 +58,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // http.addFilterBefore(verifyCodeFilter, UsernamePasswordAuthenticationFilter.class);
         http
-                .requestMatchers() // 直接访问的请求
-                .antMatchers("/oauth/**", "/login/**", "/logout/**")
-            .and()
+//                .requestMatchers() // 直接访问的请求
+//                .antMatchers("/oauth/**", "/login/**", "/logout/**")
+//            .and()
                 .authorizeRequests() // 授权的请求
                 .antMatchers("/",
                         "/connector",
