@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
@@ -49,7 +50,7 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
      *                                             determine if authentication is required. Cannot be null.
      */
     protected TokenAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
-        super(requiresAuthenticationRequestMatcher);
+        super(new AntPathRequestMatcher("/**"));
     }
 
     /**
