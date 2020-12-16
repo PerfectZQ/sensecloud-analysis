@@ -8,19 +8,6 @@ spring:
     username: 9mmyxokq
     password: bxzqx4f5
 
-# SSO Configuration
-auth-server: https://openconnect.sensetime.com/
-security:
-  oauth2:
-    client:
-      client-id: sheep1
-      client-secret: 123456
-      user-authorization-uri: ${auth-server}/oauth2/auth
-      access-token-uri: ${auth-server}/oauth2/token
-    resource:
-      jwt:
-        key-uri: ${auth-server}/.well-known/jwks.json
-
 mybatis-plus:
   typeAliasesPackage: sensecloud.sso.entity
   configuration:
@@ -41,9 +28,9 @@ service:
     domain: bigdata
     id_token_header: X-Id-Token
     access_token_header: access_token
-    no_auth_redirect_url: https://iam-sc-dev.sensetime.com/login
+    no_auth_redirect_url: https://sensecloud-dev.sensetimetech.cn/login
     logout_uri: /logout
-    logout_redirect_url: https://iam-sc-dev.sensetime.com/logout?redirect_uri=https://bigdata-dev.sensetimetech.cn
+    logout_redirect_url: https://sensecloud-dev.sensetimetech.cn/logout?redirect_uri=https://bigdata-dev.sensetimetech.cn
     rest-api:
       url: https://sso-sc-dev.sensetime.com
       endpoints:
