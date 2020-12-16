@@ -41,14 +41,7 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
     @Autowired
     private HttpServletResponse response;
 
-
-    /**
-     * Creates a new instance
-     *
-     * @param requiresAuthenticationRequestMatcher the {@link RequestMatcher} used to
-     *                                             determine if authentication is required. Cannot be null.
-     */
-    protected TokenAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
+    protected TokenAuthenticationFilter() {
         super(new AntPathRequestMatcher("/**"));
     }
 
