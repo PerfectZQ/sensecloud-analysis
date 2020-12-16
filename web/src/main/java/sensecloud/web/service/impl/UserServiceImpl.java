@@ -1,7 +1,7 @@
 package sensecloud.web.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import sensecloud.web.entity.User;
+import sensecloud.web.entity.UserEntity;
 import sensecloud.web.mapper.UserMapper;
 import sensecloud.web.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
  * @since 2020-12-08
  */
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements IUserService {
 
-    public User createUserIfNotExist(User user) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>(user);
+    public UserEntity createUserIfNotExist(UserEntity user) {
+        QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>(user);
         if (count(queryWrapper) == 0) {
             save(user);
         }

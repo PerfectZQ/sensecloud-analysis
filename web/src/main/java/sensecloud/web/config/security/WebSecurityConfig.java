@@ -1,9 +1,11 @@
 package sensecloud.web.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.SecurityExpressionOperations;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,7 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebSecurityExpressionRoot;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import sensecloud.web.filter.TokenAuthenticationFilter;
 import sensecloud.web.service.impl.SenseCloudUserDetailsServiceImpl;
 
 /**
@@ -32,8 +35,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Bean
-    public DaoAuthenticationProvider dbAuthenticationProvider() {
+    @Autowired
+    @Qualifier("tokenAuthenticationProvider")
+    private AuthenticationProvider tokenAuthenticationProvider;
+
+    @Autowired
+    private TokenAuthenticationFilter tokenAuthenticationFilter;
+
+    /**
+     * 自定义认证
+     *
+     * @return
+     */
+    @Bean("dbAuthenticationProvider")
+    public AuthenticationProvider dbAuthenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder);
@@ -56,31 +71,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // http.addFilterBefore(verifyCodeFilter, UsernamePasswordAuthenticationFilter.class);
-        http
-//                .requestMatchers() // 直接访问的请求
-//                .antMatchers("/oauth/**", "/login/**", "/logout/**")
-//            .and()
-                .authorizeRequests() // 授权的请求
-                .antMatchers("/",
-                        "/connector",
-                        "/connector/**",
-                        "/authorize/**",
-                        "/product/**",
-                        "/userRole/**"
-                )
-                .permitAll() // 放行，白名单路径
+        http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeRequests()
+                .antMatchers("/login/**", "/logout/**")
+                .permitAll() // Specify that URLs are allowed by anyone(includes anonymous user).
                 .anyRequest()
-                .authenticated() // 任何其他的请求都需要认证
+                .authenticated() // Specify that URLs are allowed by any authenticated user.
             .and()
                 /*
                 .formLogin()
-                .loginPage("/login") // 指定登录页面 URL 路径
-                .defaultSuccessUrl("/httpapi") // 指定登录成功跳转 URL 路径
+                .loginPage("/login") // Indicate login URL
+                .defaultSuccessUrl("/api") // Indicate login success URL
                 .permitAll()
             .and()
                 .logout()
-                .logoutSuccessUrl("/") // 退出成功后的默认跳转 URL 页面
+                .logoutSuccessUrl("/") // Indicate logout success URL
                 .permitAll()
             .and()
                  */
@@ -88,7 +93,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
                 .csrf()
                 .disable();
-
     }
 
     /**
@@ -99,8 +103,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        configureTestUsersInMemory(auth);
-        // auth.authenticationProvider(dbAuthenticationProvider());
+        // configureTestUsersInMemory(auth);
+        auth.authenticationProvider(dbAuthenticationProvider());
+        auth.authenticationProvider(tokenAuthenticationProvider);
     }
 
     /**

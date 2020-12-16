@@ -41,7 +41,7 @@ import java.io.IOException;
  * @author zhangqiang
  * @since 2020/12/14 15:44
  */
-@Order(1)
+@Order(2)
 @WebFilter(filterName = "principalFilter", urlPatterns = {"/*"})
 @Slf4j
 public class PrincipalFilter implements Filter {

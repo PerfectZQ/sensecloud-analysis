@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 
 @Data
-public class User {
+public class UserInfo {
 
     private String username;
     private String domain;

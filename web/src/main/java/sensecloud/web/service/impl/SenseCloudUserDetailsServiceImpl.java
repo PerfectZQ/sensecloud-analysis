@@ -5,13 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sensecloud.web.entity.Role;
-import sensecloud.web.entity.User;
+import sensecloud.web.entity.UserEntity;
 import sensecloud.web.entity.UserRole;
 
 import java.util.List;
@@ -35,11 +36,18 @@ public class SenseCloudUserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserRoleServiceImpl userRoleService;
 
+    /**
+     * 从数据库加载用户详细信息
+     *
+     * @param username
+     * @return
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.getOne(new QueryWrapper<>(new User().setUsername(username)));
-        if (user == null) throw new UsernameNotFoundException(username + " not found");
-        List<UserRole> userRoles = userRoleService.list(new QueryWrapper<>(new UserRole().setUserId(user.getId())));
+        UserEntity userEntity = userService.getOne(new QueryWrapper<>(new UserEntity().setUsername(username)));
+        if (userEntity == null) throw new UsernameNotFoundException(username + " not found");
+        List<UserRole> userRoles = userRoleService.list(new QueryWrapper<>(new UserRole().setUserId(userEntity.getId())));
         List<SimpleGrantedAuthority> authorities = userRoles.stream()
                 .filter(userRole -> {
                     Role role = roleService.getById(userRole.getRoleId());
@@ -51,7 +59,6 @@ public class SenseCloudUserDetailsServiceImpl implements UserDetailsService {
                 })
                 .map(userRole -> new SimpleGrantedAuthority(roleService.getById(userRole.getRoleId()).getName()))
                 .collect(Collectors.toList());
-        return new org.springframework.security.core.userdetails.User(username,
-                passwordEncoder.encode(user.getPassword()), authorities);
+        return new User(username, passwordEncoder.encode(userEntity.getPassword()), authorities);
     }
 }

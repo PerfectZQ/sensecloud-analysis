@@ -73,7 +73,7 @@ public class AuthorizeController {
         String username = initProduct.getUsername();
 
         log.info("====> Init User: " + username + "...");
-        User manager = userService.createUserIfNotExist(new User().setName(username));
+        UserEntity manager = userService.createUserIfNotExist(new UserEntity().setName(username));
 
         log.info("====> Init Product Service: " + productName + "...");
         Product product = new Product()
@@ -150,7 +150,7 @@ public class AuthorizeController {
         }
 
         log.info("====> Init User: " + username + "...");
-        User user = userService.createUserIfNotExist(new User().setName(username));
+        UserEntity user = userService.createUserIfNotExist(new UserEntity().setName(username));
 
         log.info("====> Init User Product Relation, bind " + username + " to " + productName + "...");
         UserProduct userProduct = new UserProduct()
@@ -201,7 +201,7 @@ public class AuthorizeController {
                     rolename + " to " + productName + " failed");
         }
 
-        User user = userService.getOne(new QueryWrapper<>(new User().setName(username)));
+        UserEntity user = userService.getOne(new QueryWrapper<>(new UserEntity().setName(username)));
         if (user == null) {
             throw new IllegalArgumentException("User " + username + " is not exist! bind " + username + ", " +
                     rolename + " to " + productName + " failed");

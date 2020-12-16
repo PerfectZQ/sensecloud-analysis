@@ -10,7 +10,7 @@ public class TokenExt {
 
     private List<Role> roles;
     private List<Permission> permissions;
-    private User identity;
+    private UserInfo identity;
     private Map<String, Object> rs;
 
 }
