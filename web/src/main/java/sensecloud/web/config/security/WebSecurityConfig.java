@@ -2,6 +2,7 @@ package sensecloud.web.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.SecurityExpressionOperations;
@@ -19,6 +20,8 @@ import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebSecurityExpressionRoot;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import sensecloud.auth2.config.SSOConfiguration;
 import sensecloud.web.filter.TokenAuthenticationFilter;
 import sensecloud.web.service.impl.SenseCloudUserDetailsServiceImpl;
 
@@ -32,16 +35,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private SenseCloudUserDetailsServiceImpl userDetailsService;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     @Autowired
     @Qualifier("tokenAuthenticationProvider")
     private AuthenticationProvider tokenAuthenticationProvider;
-
+    @Value("${spring.security.auth.postOnly:false}")
+    private Boolean postOnly;
     @Autowired
-    private TokenAuthenticationFilter tokenAuthenticationFilter;
+    private SSOConfiguration configuration;
 
     /**
      * 自定义认证
@@ -72,6 +74,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        TokenAuthenticationFilter tokenAuthenticationFilter = new TokenAuthenticationFilter(
+                postOnly, configuration, new AntPathRequestMatcher("/**"));
         tokenAuthenticationFilter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
         // tokenAuthenticationFilter.setAuthenticationSuccessHandler();
         // tokenAuthenticationFilter.setAuthenticationFailureHandler();

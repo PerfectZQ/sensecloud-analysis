@@ -31,18 +31,15 @@ import java.io.IOException;
  * @since 2020/12/16 11:47
  */
 @Slf4j
-@Component
 public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    @Value("${spring.security.auth.postOnly:false}")
     private Boolean postOnly;
-    @Autowired
     private SSOConfiguration configuration;
-    @Autowired
-    private HttpServletResponse response;
 
-    protected TokenAuthenticationFilter() {
-        super(new AntPathRequestMatcher("/**"));
+    public TokenAuthenticationFilter(Boolean postOnly, SSOConfiguration configuration, RequestMatcher requestMatcher) {
+        super(requestMatcher);
+        this.postOnly = postOnly;
+        this.configuration = configuration;
     }
 
     /**
