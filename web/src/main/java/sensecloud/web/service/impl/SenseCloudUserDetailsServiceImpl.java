@@ -63,7 +63,8 @@ public class SenseCloudUserDetailsServiceImpl implements UserDetailsService {
                 })
                 .map(userRole -> new SimpleGrantedAuthority(roleService.getById(userRole.getRoleId()).getName()))
                 .collect(Collectors.toList());
-        String password = userEntity.getPassword() == null ? null : passwordEncoder.encode(userEntity.getPassword());
+        String password = userEntity.getPassword() == null ?
+                passwordEncoder.encode("") : passwordEncoder.encode(userEntity.getPassword());
         return new User(username, password, authorities);
     }
 }
