@@ -15,11 +15,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebSecurityExpressionRoot;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import sensecloud.auth2.config.SSOConfiguration;
@@ -46,6 +49,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private Boolean postOnly;
     @Autowired
     private SSOConfiguration configuration;
+    @Autowired
+    private AuthenticationSuccessHandler tokenAuthenticationSuccessHandler;
+    @Autowired
+    private AuthenticationFailureHandler tokenAuthenticationFailureHandler;
 
     /**
      * 自定义认证
@@ -99,8 +106,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         TokenAuthenticationFilter tokenAuthenticationFilter = new TokenAuthenticationFilter(
                 postOnly, configuration, new AntPathRequestMatcher("/api/**"));
         tokenAuthenticationFilter.setAuthenticationManager(authenticationManagerBean());
-        // tokenAuthenticationFilter.setAuthenticationSuccessHandler();
-        // tokenAuthenticationFilter.setAuthenticationFailureHandler();
+        tokenAuthenticationFilter.setAuthenticationSuccessHandler(tokenAuthenticationSuccessHandler);
+        tokenAuthenticationFilter.setAuthenticationFailureHandler(tokenAuthenticationFailureHandler);
         http.addFilterAfter(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/**/api-docs/**")
@@ -122,7 +129,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                 .and()
                 .csrf()
-                .disable();
+                .disable()
+                // 前后端分离是无状态的，所以不用 Session，将登陆信息保存在 Token 中。
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     /**
