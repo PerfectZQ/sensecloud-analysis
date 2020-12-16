@@ -56,7 +56,7 @@ public class PrincipalFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpSession session = ((HttpServletRequest) request).getSession();
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        log.info("====> Principal: " + JSON.toJSONString(principal, SerializerFeature.PrettyFormat));
+        log.info("====> RequestURL: {}, Principal: {}", ((HttpServletRequest) request).getRequestURL(), JSON.toJSONString(principal, SerializerFeature.PrettyFormat));
         String username;
         if (principal instanceof UserDetails) {
             username = ((UserDetails) principal).getUsername();

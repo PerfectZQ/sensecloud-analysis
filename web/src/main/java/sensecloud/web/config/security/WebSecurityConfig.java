@@ -67,7 +67,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // configureTestUsersInMemory(auth);
+        configureTestUsersInMemory(auth);
         auth.authenticationProvider(dbAuthenticationProvider());
         auth.authenticationProvider(tokenAuthenticationProvider);
     }
@@ -88,28 +88,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         TokenAuthenticationFilter tokenAuthenticationFilter = new TokenAuthenticationFilter(
-                postOnly, configuration, new AntPathRequestMatcher("/**"));
+                postOnly, configuration, new AntPathRequestMatcher("/api/**"));
         tokenAuthenticationFilter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
         // tokenAuthenticationFilter.setAuthenticationSuccessHandler();
         // tokenAuthenticationFilter.setAuthenticationFailureHandler();
         http.addFilterAfter(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
+                .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/**/api-docs/**")
+                .permitAll() // Access resources as `anonymousUser`
                 .antMatchers("/login/**", "/logout/**")
                 .permitAll() // Specify that URLs are allowed by anyone(includes anonymous user).
                 .anyRequest()
                 .authenticated() // Specify that URLs are allowed by any authenticated user.
+                // .and()
+                // .formLogin()
+                // .loginPage("/login") // Indicate login URL
+                // .defaultSuccessUrl("/api") // Indicate login success URL
+                // .permitAll()
                 .and()
-                /*
-                .formLogin()
-                .loginPage("/login") // Indicate login URL
-                .defaultSuccessUrl("/api") // Indicate login success URL
-                .permitAll()
-            .and()
                 .logout()
                 .logoutSuccessUrl("/") // Indicate logout success URL
                 .permitAll()
-            .and()
-                 */
+                .and()
                 .httpBasic()
                 .and()
                 .csrf()

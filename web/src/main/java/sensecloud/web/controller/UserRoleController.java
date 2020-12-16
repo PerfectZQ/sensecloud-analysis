@@ -19,7 +19,7 @@ import java.util.List;
  * @since 2020/11/5 16:17
  */
 @RestController
-@RequestMapping("/userRole")
+@RequestMapping("/api/v1/userRole")
 @Slf4j
 public class UserRoleController {
 

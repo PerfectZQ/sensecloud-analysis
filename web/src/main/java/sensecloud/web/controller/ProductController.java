@@ -25,7 +25,7 @@ import java.util.List;
  * @since 2020/11/5 16:17
  */
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/api/v1/product")
 @Slf4j
 public class ProductController {
 

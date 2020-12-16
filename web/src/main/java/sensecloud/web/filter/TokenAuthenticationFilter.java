@@ -1,6 +1,7 @@
 package sensecloud.web.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +61,13 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
      * @param xIdToken
      * @return
      */
-    private void checkToken(String xIdToken) {
+    private Boolean checkToken(String xIdToken) {
         if (StringUtils.isEmpty(xIdToken)) {
+            log.error("====> Authentication failed, header {} is blank.", configuration.getId_token_header());
             throw new AuthenticationServiceException("Authentication failed, header " + configuration.getId_token_header() + " is blank.");
+            // return false;
         }
+        return true;
     }
 
     /**
@@ -80,18 +84,19 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
      */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        log.info("====> TokenAuthenticationFilter attemptAuthentication, SSOConfiguration: {}", this.configuration);
+        log.info("====> Attempt to authentication, SSO configuration: {}", this.configuration);
         if (postOnly && !request.getMethod().equals(HttpMethod.POST.name())) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }
         String xIdToken = request.getHeader(configuration.getId_token_header());
-        checkToken(xIdToken);
+        if (!checkToken(xIdToken)) return null;
         UserInfo userInfo = getUserInfo(xIdToken);
+        log.info("====> RequestURL: {}, UserInfo: {}", request.getRequestURL(), JSON.toJSONString(userInfo, SerializerFeature.PrettyFormat));
         // Todo 拿产品线管理员信息
         SenseCloudAuthenticationToken authenticationToken =
                 new SenseCloudAuthenticationToken(userInfo.getUsername());
         authenticationToken.setDetails(authenticationDetailsSource.buildDetails(request));
-        log.info("====> TokenAuthenticationFilter attemptAuthentication, authenticationToken.getName(): {}", authenticationToken.getName());
+        log.info("====> Attempt to authentication, authenticationToken.getName(): {}", authenticationToken.getName());
         return getAuthenticationManager().authenticate(authenticationToken);
     }
 }

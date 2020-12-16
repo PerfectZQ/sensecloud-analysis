@@ -34,7 +34,7 @@ import java.util.List;
  * @since 2020/11/5 16:17
  */
 @RestController
-@RequestMapping("/authorize")
+@RequestMapping("/api/v1/authorize")
 @Slf4j
 public class AuthorizeController {
 
@@ -73,7 +73,7 @@ public class AuthorizeController {
         String username = initProduct.getUsername();
 
         log.info("====> Init User: " + username + "...");
-        UserEntity manager = userService.createUserIfNotExist(new UserEntity().setName(username));
+        UserEntity manager = userService.createUserIfNotExist(new UserEntity().setUsername(username));
 
         log.info("====> Init Product Service: " + productName + "...");
         Product product = new Product()
@@ -150,7 +150,7 @@ public class AuthorizeController {
         }
 
         log.info("====> Init User: " + username + "...");
-        UserEntity user = userService.createUserIfNotExist(new UserEntity().setName(username));
+        UserEntity user = userService.createUserIfNotExist(new UserEntity().setUsername(username));
 
         log.info("====> Init User Product Relation, bind " + username + " to " + productName + "...");
         UserProduct userProduct = new UserProduct()
@@ -201,7 +201,7 @@ public class AuthorizeController {
                     rolename + " to " + productName + " failed");
         }
 
-        UserEntity user = userService.getOne(new QueryWrapper<>(new UserEntity().setName(username)));
+        UserEntity user = userService.getOne(new QueryWrapper<>(new UserEntity().setUsername(username)));
         if (user == null) {
             throw new IllegalArgumentException("User " + username + " is not exist! bind " + username + ", " +
                     rolename + " to " + productName + " failed");

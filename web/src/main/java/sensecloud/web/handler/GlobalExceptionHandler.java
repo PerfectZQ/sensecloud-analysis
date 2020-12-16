@@ -1,11 +1,11 @@
 package sensecloud.web.handler;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import sensecloud.auth2.config.SSOConfiguration;
 import sensecloud.web.bean.vo.ResultVO;
 
@@ -16,8 +16,8 @@ import java.io.IOException;
 /**
  * 注意
  */
-@ControllerAdvice
-@Log4j2
+@RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @Autowired
@@ -34,8 +34,8 @@ public class GlobalExceptionHandler {
     @ResponseBody
     // @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "AuthenticationException")
     public ResultVO<Object> exceptionHandler(HttpServletRequest req, HttpServletResponse response, AuthenticationException e) throws IOException {
-        log.error("AuthenticationException: ", e);
-        response.sendRedirect(this.configuration.getLogout_redirect_url());
+        log.error("====> GlobalExceptionHandler AuthenticationException: ", e);
+        // response.sendRedirect(this.configuration.getNo_auth_redirect_url());
         return ResultVO.error(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
     }
 
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Throwable.class)
     @ResponseBody
     public ResultVO<Object> exceptionHandler(HttpServletRequest req, HttpServletResponse response, Throwable e) throws IOException {
-        log.error("ServerInternalException: ", e);
+        log.error("====> GlobalExceptionHandler ServerInternalException: ", e);
         return ResultVO.error(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
