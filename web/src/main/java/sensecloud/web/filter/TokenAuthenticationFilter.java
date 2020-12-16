@@ -80,7 +80,7 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
      */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        log.info("====> SSOConfiguration: {}", this.configuration);
+        log.info("====> TokenAuthenticationFilter attemptAuthentication, SSOConfiguration: {}", this.configuration);
         if (postOnly && !request.getMethod().equals(HttpMethod.POST.name())) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }
@@ -91,7 +91,7 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         SenseCloudAuthenticationToken authenticationToken =
                 new SenseCloudAuthenticationToken(userInfo.getUsername());
         authenticationToken.setDetails(authenticationDetailsSource.buildDetails(request));
-        log.info("====> attemptAuthentication, authenticationToken.getName(): {}", authenticationToken.getName());
+        log.info("====> TokenAuthenticationFilter attemptAuthentication, authenticationToken.getName(): {}", authenticationToken.getName());
         return getAuthenticationManager().authenticate(authenticationToken);
     }
 }

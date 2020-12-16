@@ -7,7 +7,7 @@ import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import sensecloud.web.security.SenseCloudAuthenticationProvider;
+import sensecloud.web.security.TokenAuthenticationProvider;
 import sensecloud.web.security.SenseCloudAuthenticationToken;
 
 /**
@@ -47,7 +47,7 @@ public class CommonConfig {
      */
     @Bean("tokenAuthenticationProvider")
     AuthenticationProvider tokenAuthenticationProvider() {
-        return new SenseCloudAuthenticationProvider();
+        return new TokenAuthenticationProvider();
     }
 
 }

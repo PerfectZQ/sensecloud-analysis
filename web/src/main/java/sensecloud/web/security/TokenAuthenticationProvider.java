@@ -2,9 +2,7 @@ package sensecloud.web.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +13,7 @@ import sensecloud.web.service.impl.SenseCloudUserDetailsServiceImpl;
  * @since 2020/12/16 13:32
  */
 @Slf4j
-public class SenseCloudAuthenticationProvider implements AuthenticationProvider {
+public class TokenAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
     private SenseCloudUserDetailsServiceImpl userDetailsService;
@@ -30,12 +28,12 @@ public class SenseCloudAuthenticationProvider implements AuthenticationProvider 
         }
         Object credentials = attemptAuthentication.getCredentials();
         String username = attemptAuthentication.getPrincipal().toString();
+        log.info("====> TokenAuthenticationProvider Authenticate username: {}", username);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         if (userDetails == null) {
             // throw new InternalAuthenticationServiceException("Unable to obtain user information");
             log.error("====> Unable to obtain user information of {} from db", username);
         }
-        log.info("====> Authenticated {}", username);
         SenseCloudAuthenticationToken authentication = new SenseCloudAuthenticationToken(
                 userDetails, userDetails.getAuthorities());
         authentication.setDetails(attemptAuthentication.getDetails());

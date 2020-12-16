@@ -59,6 +59,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return authenticationProvider;
     }
 
+    /**
+     * 认证登录用户
+     *
+     * @param auth
+     * @throws Exception
+     */
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        // configureTestUsersInMemory(auth);
+        auth.authenticationProvider(dbAuthenticationProvider());
+        auth.authenticationProvider(tokenAuthenticationProvider);
+    }
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         // Configure Spring EL Handler
@@ -79,7 +92,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         tokenAuthenticationFilter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
         // tokenAuthenticationFilter.setAuthenticationSuccessHandler();
         // tokenAuthenticationFilter.setAuthenticationFailureHandler();
-        http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        http.addFilterAfter(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/login/**", "/logout/**")
                 .permitAll() // Specify that URLs are allowed by anyone(includes anonymous user).
@@ -101,19 +114,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf()
                 .disable();
-    }
-
-    /**
-     * 认证登录用户
-     *
-     * @param auth
-     * @throws Exception
-     */
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // configureTestUsersInMemory(auth);
-        auth.authenticationProvider(dbAuthenticationProvider());
-        auth.authenticationProvider(tokenAuthenticationProvider);
     }
 
     /**

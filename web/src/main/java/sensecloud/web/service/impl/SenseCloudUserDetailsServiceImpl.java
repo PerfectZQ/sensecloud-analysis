@@ -45,6 +45,7 @@ public class SenseCloudUserDetailsServiceImpl implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.info("====> LoadUserByUsername {}", username);
         UserEntity userEntity = userService.getOne(new QueryWrapper<>(new UserEntity().setUsername(username)));
         if (userEntity == null) throw new UsernameNotFoundException(username + " not found");
         List<UserRole> userRoles = userRoleService.list(new QueryWrapper<>(new UserRole().setUserId(userEntity.getId())));
