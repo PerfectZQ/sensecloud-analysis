@@ -45,9 +45,12 @@ public class SenseCloudUserDetailsServiceImpl implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.info("====> LoadUserByUsername {}", username);
+        log.info("====> Load user by username {}", username);
         UserEntity userEntity = userService.getOne(new QueryWrapper<>(new UserEntity().setUsername(username)));
-        if (userEntity == null) throw new UsernameNotFoundException(username + " not found");
+        if (userEntity == null) {
+            log.error("====> User {} not found", username);
+            throw new UsernameNotFoundException(username + " not found");
+        }
         List<UserRole> userRoles = userRoleService.list(new QueryWrapper<>(new UserRole().setUserId(userEntity.getId())));
         List<SimpleGrantedAuthority> authorities = userRoles.stream()
                 .filter(userRole -> {
@@ -60,6 +63,7 @@ public class SenseCloudUserDetailsServiceImpl implements UserDetailsService {
                 })
                 .map(userRole -> new SimpleGrantedAuthority(roleService.getById(userRole.getRoleId()).getName()))
                 .collect(Collectors.toList());
-        return new User(username, passwordEncoder.encode(userEntity.getPassword()), authorities);
+        String password = userEntity.getPassword() == null ? null : passwordEncoder.encode(userEntity.getPassword());
+        return new User(username, password, authorities);
     }
 }

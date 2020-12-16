@@ -4,16 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
 import sensecloud.auth2.config.SSOConfiguration;
 import sensecloud.auth2.model.SSOToken;
@@ -91,7 +87,7 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         String xIdToken = request.getHeader(configuration.getId_token_header());
         if (!checkToken(xIdToken)) return null;
         UserInfo userInfo = getUserInfo(xIdToken);
-        log.info("====> RequestURL: {}, UserInfo: {}", request.getRequestURL(), JSON.toJSONString(userInfo, SerializerFeature.PrettyFormat));
+        log.info("====> RequestURL: {}, UserInfo: \n{}", request.getRequestURL(), JSON.toJSONString(userInfo, SerializerFeature.PrettyFormat));
         // Todo 拿产品线管理员信息
         SenseCloudAuthenticationToken authenticationToken =
                 new SenseCloudAuthenticationToken(userInfo.getUsername());

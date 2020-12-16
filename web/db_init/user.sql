@@ -8,3 +8,6 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_UN` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+insert into sensecloud.`user` (username) values ('dlink');
+insert into sensecloud.`user` (username) values ('sre.bigdata');

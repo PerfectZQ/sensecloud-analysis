@@ -28,7 +28,7 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
         }
         Object credentials = attemptAuthentication.getCredentials();
         String username = attemptAuthentication.getPrincipal().toString();
-        log.info("====> TokenAuthenticationProvider Authenticate username: {}", username);
+        log.info("====> Authenticating username: {}", username);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         if (userDetails == null) {
             // throw new InternalAuthenticationServiceException("Unable to obtain user information");
@@ -37,6 +37,7 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
         SenseCloudAuthenticationToken authentication = new SenseCloudAuthenticationToken(
                 userDetails, userDetails.getAuthorities());
         authentication.setDetails(attemptAuthentication.getDetails());
+        log.info("====> Authenticate username: {} succeed!", username);
         return authentication;
     }
 

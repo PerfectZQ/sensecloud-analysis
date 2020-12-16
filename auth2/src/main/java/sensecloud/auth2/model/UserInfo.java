@@ -1,12 +1,14 @@
 package sensecloud.auth2.model;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 
 
 @Data
+@Accessors(chain = true)
 public class UserInfo {
 
     private String username;
@@ -29,7 +31,4 @@ public class UserInfo {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
 }
