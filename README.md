@@ -50,10 +50,10 @@
 ## 2. /bigdata-admin​/api​/v1​/authorize​/bindUserRoleToProduct
 ```shell
 // =================================================================================================================
-// Test Case 1:  dlink 向产品线 dlink 添加新用户 dlink-test-1 并授权 平台管理员 
+// Test Case 1:  dlink 向产品线 dlink 添加新用户 user_3 并授权 平台管理员 
 // =====================================================================================================================
 // dlink Token:  eyJleHQiOnsiaWRlbnRpdHkiOnsidXNlcm5hbWUiOiJkbGluayJ9fSwiaWF0IjowfQ==
-// username:     dlink-test-1
+// username:     user_3
 // rolename:     PlatformAdmin
 // productName:  dlink 
 // =====================================================================================================================
@@ -62,10 +62,10 @@
 
 
 // =================================================================================================================
-// Test Case 2:  dlink 向产品线 dlink 添加新用户 dlink-test-2 并授权 产品线管理员 
+// Test Case 2:  dlink 向产品线 dlink 添加新用户 user_3 并授权 产品线管理员 
 // =====================================================================================================================
 // dlink Token:  eyJleHQiOnsiaWRlbnRpdHkiOnsidXNlcm5hbWUiOiJkbGluayJ9fSwiaWF0IjowfQ==
-// username:     dlink-test-2
+// username:     user_3
 // rolename:     ProductAdmin
 // productName:  dlink 
 // =====================================================================================================================
@@ -74,10 +74,10 @@
 
 
 // =================================================================================================================
-// Test Case 3:  dlink 向产品线 dlink 添加新用户 dlink-test-3 并授权 数据分析师 
+// Test Case 3:  dlink 向产品线 dlink 添加新用户 user_4 并授权 数据分析师 
 // =====================================================================================================================
 // dlink Token:  eyJleHQiOnsiaWRlbnRpdHkiOnsidXNlcm5hbWUiOiJkbGluayJ9fSwiaWF0IjowfQ==
-// username:     dlink-test-3
+// username:     user_4
 // rolename:     DataAnalyst
 // productName:  dlink 
 // =====================================================================================================================
@@ -86,10 +86,10 @@
 
 
 // =================================================================================================================
-// Test Case 4: sre.bigdata 向产品线 dlink 添加新用户 dlink-test-4 并授权 平台管理员 
+// Test Case 4: sre.bigdata 向产品线 dlink 添加新用户 user_5 并授权 平台管理员 
 // =====================================================================================================================
 // sre.bigdata Token: eyJleHQiOnsiaWRlbnRpdHkiOnsidXNlcm5hbWUiOiJzcmUuYmlnZGF0YSJ9fSwiaWF0IjowfQ==
-// username:          dlink-test-4
+// username:          user_5
 // rolename:          PlatformAdmin
 // productName:       dlink
 // =====================================================================================================================
@@ -100,10 +100,10 @@
 ## 3. /bigdata-admin​/api​/v1​/authorize​/unbindUserRoleFromProduct
 ```shell
 // =================================================================================================================
-// Test Case 1:  dlink 解绑用户 dlink-test-3 在产品线 dlink 的 数据分析师 角色
+// Test Case 1:  dlink 解绑用户 user_4 在产品线 dlink 的 数据分析师 角色
 // =====================================================================================================================
 // dlink Token:  eyJleHQiOnsiaWRlbnRpdHkiOnsidXNlcm5hbWUiOiJkbGluayJ9fSwiaWF0IjowfQ==
-// username:     dlink-test-3
+// username:     user_4
 // rolename:     DataAnalyst
 // productName:  dlink 
 // =====================================================================================================================
@@ -112,10 +112,10 @@
 
 
 // =================================================================================================================
-// Test Case 2:  dlink 解绑用户 dlink-test-4 在产品线 dlink 的 平台管理员 角色
+// Test Case 2:  dlink 解绑用户 user_5 在产品线 dlink 的 平台管理员 角色
 // =====================================================================================================================
 // dlink Token:  eyJleHQiOnsiaWRlbnRpdHkiOnsidXNlcm5hbWUiOiJkbGluayJ9fSwiaWF0IjowfQ==
-// username:     dlink-test-4
+// username:     user_5
 // rolename:     PlatformAdmin
 // productName:  dlink 
 // =====================================================================================================================
@@ -124,10 +124,10 @@
 
 
 // =================================================================================================================
-// Test Case 3:  sre.bigdata 解绑用户 dlink-test-4 在产品线 dlink 的 平台管理员 角色
+// Test Case 3:  sre.bigdata 解绑用户 user_5 在产品线 dlink 的 平台管理员 角色
 // =====================================================================================================================
 // sre.bigdata Token:  eyJleHQiOnsiaWRlbnRpdHkiOnsidXNlcm5hbWUiOiJzcmUuYmlnZGF0YSJ9fSwiaWF0IjowfQ==
-// username:           dlink-test-4
+// username:           user_5
 // rolename:           PlatformAdmin
 // productName:        dlink 
 // =====================================================================================================================
