@@ -59,10 +59,10 @@ public class SenseCloudUserDetailsServiceImpl implements UserDetailsService {
                         new UserAuthorityVO().setUserId(userEntity.getId()));
         List<SimpleGrantedAuthority> authorities = userAuthorities.stream()
                 .filter(userAuthority -> {
-                    boolean isFiltered = StringUtils.isEmpty(userAuthority.getRoleName());
-                    if (isFiltered)
+                    boolean filter = !StringUtils.isEmpty(userAuthority.getRoleName());
+                    if (!filter)
                         log.error(username + ":　null or empty role " + userAuthority.getRoleId() + " is filtered");
-                    return isFiltered;
+                    return filter;
                 })
                 .map(userAuthority -> {
                     String roleName = userAuthority.getRoleName();
