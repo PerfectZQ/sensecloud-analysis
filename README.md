@@ -3,6 +3,20 @@
 ## 1. /bigdata-admin/api/v1/authorize/initProductPermissions
 ```shell 
 // =================================================================================================================
+// Test Case 0:  sre.bigdata 初始化产品线 dlink 添加新用户 dlink 并授权 平台管理员 
+// =====================================================================================================================
+// sre.bigdata Token: eyJleHQiOnsiaWRlbnRpdHkiOnsidXNlcm5hbWUiOiJzcmUuYmlnZGF0YSJ9fSwiaWF0IjowfQ==
+{
+    "productName": "dlink",
+    "username": "dlink",
+    "branch": "master",
+    "repository": "https://gitlab.bj.sensetime.com/plat-bigdata/sensecloud-analysis"
+}
+// =====================================================================================================================
+// Expectation： 200 成功
+// =====================================================================================================================
+
+// =================================================================================================================
 // Test Case 1:  dlink 初始化产品线 product_1 添加新用户 user_1 并授权 平台管理员 
 // =====================================================================================================================
 // dlink Token:  eyJleHQiOnsiaWRlbnRpdHkiOnsidXNlcm5hbWUiOiJkbGluayJ9fSwiaWF0IjowfQ==
