@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/auth2/auth2.iml" filepath="$PROJECT_DIR$/auth2/auth2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/connector/connector.iml" filepath="$PROJECT_DIR$/connector/connector.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sensecloud-analysis.iml" filepath="$PROJECT_DIR$/sensecloud-analysis.iml" />
+      <module fileurl="file://$PROJECT_DIR$/web/web.iml" filepath="$PROJECT_DIR$/web/web.iml" />
+    </modules>
+  </component>
+</project>

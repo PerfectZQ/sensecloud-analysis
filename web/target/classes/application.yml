@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: sensecloud-analysis
+  profiles:
+    active: test
+
+server:
+  port: 8443
+  ssl:
+    protocol: TLS
+    key-store: classpath:.keystore
+    key-store-password: 123456
+    key-store-type: JKS
+  servlet:
+    context-path: /bigdata-admin
+
+# 指定 Spring Security 默认的用户名和密码
+security:
+  user:
+    name: admin
+    password: admin

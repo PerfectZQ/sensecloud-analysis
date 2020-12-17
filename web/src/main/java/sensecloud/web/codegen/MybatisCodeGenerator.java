@@ -22,13 +22,12 @@ public class MybatisCodeGenerator {
     private final static String passwd = "bxzqx4f5";
     private final static String moduleName = "web";
     private final static String[] includeTables = new String[]{
-//            "component",
-//            "role",
-//            "web_componet_role_mapping",
-//            "user",
-//            "product",
-//            "user_role",
-//            "user_product",
+            "component",
+            "role",
+            "web_componet_role_mapping",
+            "user",
+            "product",
+            "user_authority",
             "product_service"
     };
 

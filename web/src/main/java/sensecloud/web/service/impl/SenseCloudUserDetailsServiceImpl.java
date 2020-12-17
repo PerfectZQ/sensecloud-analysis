@@ -1,22 +1,23 @@
 package sensecloud.web.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import sensecloud.web.entity.Role;
+import org.springframework.util.StringUtils;
+import sensecloud.web.bean.vo.UserAuthorityVO;
 import sensecloud.web.entity.UserEntity;
-import sensecloud.web.entity.UserRole;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static sensecloud.web.constant.CommonConstant.SENSE_ANALYSIS_ADMIN_NAME;
 
 /**
  * @author zhangqiang
@@ -34,7 +35,7 @@ public class SenseCloudUserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private RoleServiceImpl roleService;
     @Autowired
-    private UserRoleServiceImpl userRoleService;
+    private UserAuthorityServiceImpl userRoleProductService;
 
     /**
      * 从数据库加载用户详细信息
@@ -51,20 +52,32 @@ public class SenseCloudUserDetailsServiceImpl implements UserDetailsService {
             log.error("====> User {} not found", username);
             throw new UsernameNotFoundException(username + " not found");
         }
-        List<UserRole> userRoles = userRoleService.list(new QueryWrapper<>(new UserRole().setUserId(userEntity.getId())));
-        List<SimpleGrantedAuthority> authorities = userRoles.stream()
-                .filter(userRole -> {
-                    Role role = roleService.getById(userRole.getRoleId());
-                    boolean isFiltered = !(role == null || StringUtils.isEmpty(role.getName()));
-                    if (isFiltered) {
-                        log.error(username + ":　null or empty role " + userRole.getRoleId() + " is filtered");
-                    }
+        // Get all roles info of this user
+        List<UserAuthorityVO> userAuthorities = userRoleProductService.getBaseMapper()
+                .listUserAuthorityVOPage(
+                        new Page<>(1, Integer.MAX_VALUE),
+                        new UserAuthorityVO().setUserId(userEntity.getId()));
+        List<SimpleGrantedAuthority> authorities = userAuthorities.stream()
+                .filter(userAuthority -> {
+                    boolean isFiltered = StringUtils.isEmpty(userAuthority.getRoleName());
+                    if (isFiltered)
+                        log.error(username + ":　null or empty role " + userAuthority.getRoleId() + " is filtered");
                     return isFiltered;
                 })
-                .map(userRole -> new SimpleGrantedAuthority(roleService.getById(userRole.getRoleId()).getName()))
+                .map(userAuthority -> {
+                    String roleName = userAuthority.getRoleName();
+                    String productName = userAuthority.getProductName();
+                    String suffix = SENSE_ANALYSIS_ADMIN_NAME.equalsIgnoreCase(roleName) ||
+                            StringUtils.isEmpty(productName) ? ""
+                            :
+                            ":" + productName;
+                    String authority = roleName + suffix;
+                    return new SimpleGrantedAuthority(authority);
+                })
                 .collect(Collectors.toList());
         String password = userEntity.getPassword() == null ?
-                passwordEncoder.encode("") : passwordEncoder.encode(userEntity.getPassword());
-        return new User(username, password, authorities);
+                passwordEncoder.encode("") :
+                passwordEncoder.encode(userEntity.getPassword());
+        return new org.springframework.security.core.userdetails.User(username, password, authorities);
     }
 }
