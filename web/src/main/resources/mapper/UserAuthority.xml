@@ -22,7 +22,7 @@
                 AND ua.user_id = #{query.userId}
             </if>
             <if test="query.username!=null">
-                AND u.name = #{query.username}
+                AND u.username = #{query.username}
             </if>
             <if test="query.roleId!=null">
                 AND ua.role_id = #{query.roleId}
