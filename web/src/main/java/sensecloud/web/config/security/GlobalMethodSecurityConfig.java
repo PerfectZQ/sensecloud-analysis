@@ -15,8 +15,7 @@ import org.springframework.security.config.annotation.method.configuration.Globa
  * @see <a href="https://stackoverflow.com/questions/38134121/how-do-i-remove-the-role-prefix-from-spring-security-with-javaconfig/46817507#46817507">How do I remove the ROLE_ prefix from Spring Security with JavaConfig?</a>
  * @since 2020/12/14 15:07
  */
-@Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true, proxyTargetClass = true)
 public class GlobalMethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     /**

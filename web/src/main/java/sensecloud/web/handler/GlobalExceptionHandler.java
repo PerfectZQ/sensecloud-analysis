@@ -1,7 +1,9 @@
 package sensecloud.web.handler;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -31,12 +33,17 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(value = AuthenticationException.class)
-    @ResponseBody
     // @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "AuthenticationException")
     public ResultVO<Object> exceptionHandler(HttpServletRequest req, HttpServletResponse response, AuthenticationException e) throws IOException {
         log.error("====> GlobalExceptionHandler AuthenticationException: ", e);
         // response.sendRedirect(this.configuration.getNo_auth_redirect_url());
         return ResultVO.error(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+    }
+
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResultVO<Object> exceptionHandler(HttpServletRequest req, HttpServletResponse response, AccessDeniedException e) throws IOException {
+        log.error("====> GlobalExceptionHandler AccessDeniedException: ", e);
+        return ResultVO.error(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
     }
 
     /**

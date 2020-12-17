@@ -6,9 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Base64Utils;
 import sensecloud.auth2.config.SSOConfiguration;
@@ -16,6 +19,7 @@ import sensecloud.auth2.model.SSOToken;
 import sensecloud.auth2.model.UserInfo;
 import sensecloud.web.security.SenseCloudAuthenticationToken;
 
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,7 +73,9 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
     /**
      * 提取所需请求参数数据，生成一个未认证的 {@link AbstractAuthenticationToken} 传递给
      * {@link AuthenticationManager} 认证，其中 {@link ProviderManager} 会依次尝试调用
-     * {@link AuthenticationProvider#authenticate(Authentication)} 去认证
+     * {@link AuthenticationProvider#authenticate(Authentication)} 去认证。 当认证成功，
+     * 执行 {@link AbstractAuthenticationProcessingFilter#successfulAuthentication(HttpServletRequest,
+     * HttpServletResponse, FilterChain, Authentication)}
      *
      * @param request
      * @param response
@@ -88,11 +94,41 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         if (!checkToken(xIdToken)) return null;
         UserInfo userInfo = getUserInfo(xIdToken);
         log.info("====> RequestURL: {}, UserInfo: \n{}", request.getRequestURL(), JSON.toJSONString(userInfo, SerializerFeature.PrettyFormat));
-        // Todo 拿产品线管理员信息
         SenseCloudAuthenticationToken authenticationToken =
                 new SenseCloudAuthenticationToken(userInfo.getUsername());
         authenticationToken.setDetails(authenticationDetailsSource.buildDetails(request));
         log.info("====> Attempt to authentication, authenticationToken.getName(): {}", authenticationToken.getName());
         return getAuthenticationManager().authenticate(authenticationToken);
     }
+
+
+    /**
+     * Invoke {@link AuthenticationSuccessHandler#onAuthenticationSuccess(HttpServletRequest, HttpServletResponse,
+     * FilterChain, Authentication)} instead of {@link AuthenticationSuccessHandler#onAuthenticationSuccess(HttpServletRequest,
+     * HttpServletResponse, Authentication)}
+     *
+     * @param request
+     * @param response
+     * @param chain
+     * @param authResult
+     * @throws IOException
+     * @throws ServletException
+     */
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Authentication success. Updating SecurityContextHolder to contain: "
+                    + authResult);
+        }
+        log.info("====> successfulAuthentication user: {}", authResult.getName());
+        SecurityContextHolder.getContext().setAuthentication(authResult);
+        getRememberMeServices().loginSuccess(request, response, authResult);
+        // Fire event
+        if (this.eventPublisher != null) {
+            eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(
+                    authResult, this.getClass()));
+        }
+        getSuccessHandler().onAuthenticationSuccess(request, response, chain, authResult);
+    }
+
 }

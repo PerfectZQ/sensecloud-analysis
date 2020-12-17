@@ -5,12 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.SecurityExpressionOperations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebSecurityExpressionRoot;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -30,10 +31,16 @@ import sensecloud.web.filter.TokenAuthenticationFilter;
 import sensecloud.web.service.impl.SenseCloudUserDetailsServiceImpl;
 
 /**
+ * 开启安全认证: @EnableWebSecurity
+ * <p>
+ * 开启方法级别的权限管理: @EnableGlobalMethodSecurity
+ * 1. prePostEnabled: 确定 Spring Security 前置注释 [@PreAuthorize, @PostAuthorize, ..] 是否启用
+ * 2. secureEnabled:  确定 Spring Security 安全注释 [@Secured] 是否启用
+ * 3. jsr250Enabled:  确定 JSR-250注释 [@RolesAllowed..] 是否启用
+ *
  * @author zhangqiang
  * @since 2020/12/14 13:57
  */
-@Configuration
 @EnableWebSecurity
 @Slf4j
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -69,6 +76,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return authenticationProvider;
     }
 
+    /**
+     * 注入 {@link AuthenticationManager}，不然在 {@link AbstractAuthenticationProcessingFilter#getAuthenticationManager()}
+     * 的时候报空指针
+     *
+     * @return
+     * @throws Exception
+     */
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
