@@ -3,7 +3,7 @@
 <mapper namespace="sensecloud.web.mapper.UserAuthorityMapper">
 
     <select id="listUserAuthorityVOPage" resultType="sensecloud.web.bean.vo.UserAuthorityVO">
-        SELECT ua.id, ua.user_id, u.name username, ua.role_id, r.name role_name, ua.product_id, p.product_name
+        SELECT ua.id, ua.user_id, u.username, ua.role_id, r.name role_name, ua.product_id, p.product_name
         FROM user_authority ua
         JOIN user u ON ua.user_id = u.id
         JOIN role r ON ua.role_id = r.id
