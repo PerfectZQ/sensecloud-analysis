@@ -3,12 +3,12 @@
 ## 1. /bigdata-admin/api/v1/authorize/initProductPermissions
 ```shell 
 // =================================================================================================================
-// Test Case 1:  dlink 初始化产品线 product_1 添加新用户 user_1-product_1 并授权 平台管理员 
+// Test Case 1:  dlink 初始化产品线 product_1 添加新用户 user_1 并授权 平台管理员 
 // =====================================================================================================================
 // dlink Token:  eyJleHQiOnsiaWRlbnRpdHkiOnsidXNlcm5hbWUiOiJkbGluayJ9fSwiaWF0IjowfQ==
 {
     "productName": "product_1",
-    "username": "user_1-product_1",
+    "username": "user_1",
     "branch": "master",
     "repository": "https://gitlab.bj.sensetime.com/plat-bigdata/sensecloud-analysis"
 }
@@ -18,12 +18,12 @@
 
 
 // =================================================================================================================
-// Test Case 2:  sre.bigdata 初始化产品线 product_1 添加新用户 user_1-product_1 并授权 平台管理员 
+// Test Case 2:  sre.bigdata 初始化产品线 product_1 添加新用户 user_1 并授权 平台管理员 
 // =====================================================================================================================
 // sre.bigdata Token: eyJleHQiOnsiaWRlbnRpdHkiOnsidXNlcm5hbWUiOiJzcmUuYmlnZGF0YSJ9fSwiaWF0IjowfQ==
 {
     "productName": "product_1",
-    "username": "user_1-product_1",
+    "username": "user_1",
     "branch": "master",
     "repository": "https://gitlab.bj.sensetime.com/plat-bigdata/sensecloud-analysis"
 }
@@ -33,12 +33,12 @@
 
 
 // =================================================================================================================
-// Test Case 3:  sre.bigdata 初始化产品线 product_2 添加新用户 user_1-product_2 并授权 平台管理员 
+// Test Case 3:  sre.bigdata 初始化产品线 product_2 添加新用户 user_2 并授权 平台管理员 
 // =====================================================================================================================
 // sre.bigdata Token: eyJleHQiOnsiaWRlbnRpdHkiOnsidXNlcm5hbWUiOiJzcmUuYmlnZGF0YSJ9fSwiaWF0IjowfQ==
 {
     "productName": "product_2",
-    "username": "user_1-product_2",
+    "username": "user_2",
     "branch": "master",
     "repository": "https://gitlab.bj.sensetime.com/plat-bigdata/sensecloud-analysis"
 }
