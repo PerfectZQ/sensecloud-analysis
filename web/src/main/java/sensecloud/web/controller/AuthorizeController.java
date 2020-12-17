@@ -184,8 +184,7 @@ public class AuthorizeController {
         }
 
         Product product = new Product()
-                .setProductName(productName)
-                .setOwner(username);
+                .setProductName(productName);
         product = productService.getOne(new QueryWrapper<>(product));
         if (product == null) {
             throw new IllegalArgumentException("Product " + productName + " is not exist! bind " + username + ", " +
