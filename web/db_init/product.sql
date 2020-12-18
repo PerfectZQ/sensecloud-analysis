@@ -8,3 +8,6 @@ CREATE TABLE `product` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `product_UN` (`product_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+insert into sensecloud.product (id, product_name) values (1, 'bigdata');
+insert into sensecloud.product (id, product_name) values (2, 'dlink');

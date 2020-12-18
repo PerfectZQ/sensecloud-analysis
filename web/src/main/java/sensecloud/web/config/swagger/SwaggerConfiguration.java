@@ -38,21 +38,20 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
     @Bean
     public Docket createRestApi() {
         return new Docket(DocumentationType.OAS_30).pathMapping("/")
-
-                // 定义是否开启swagger，false为关闭，可以通过变量控制
+                // 定义是否开启 Swagger
                 .enable(swaggerProperties.getEnable())
                 // 将api的元信息设置为包含在json ResourceListing响应中。
                 .apiInfo(apiInfo())
                 // 接口调试地址
                 .host(swaggerProperties.getTryHost())
-                // 选择哪些接口作为swagger的doc发布
+                // 选择哪些接口作为 Swagger 的 Doc 发布
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
                 .build()
                 // 支持的通讯协议集合
                 .protocols(newHashSet("https", "http"))
-                // 授权信息设置，必要的header token等认证信息
+                // 授权信息设置，必要的 header token 等认证信息
                 .securitySchemes(securitySchemes())
                 // 授权信息全局应用
                 .securityContexts(securityContexts());
@@ -73,8 +72,9 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
      * 设置授权信息
      */
     private List<SecurityScheme> securitySchemes() {
-        ApiKey apiKey = new ApiKey("BASE_TOKEN", "token", In.HEADER.toValue());
-        return Collections.singletonList(apiKey);
+        ApiKey xIdKey = new ApiKey("X-Id-Token", "X-Id-Token", In.HEADER.toValue());
+        ApiKey accessKey = new ApiKey("access_token", "access_token", In.HEADER.toValue());
+        return Arrays.asList(xIdKey, accessKey);
     }
 
     /**
@@ -84,11 +84,13 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
         return Collections.singletonList(
                 SecurityContext.builder()
                         .securityReferences(
-                                Collections.singletonList(
-                                        new SecurityReference("BASE_TOKEN",
+                                Arrays.asList(
+                                        new SecurityReference("X-Id-Token",
                                                 new AuthorizationScope[]{
-                                                        new AuthorizationScope("global", "")}
-                                        )
+                                                        new AuthorizationScope("global", "")}),
+                                        new SecurityReference("access_token",
+                                                new AuthorizationScope[]{
+                                                        new AuthorizationScope("global", "")})
                                 )
                         )
                         .build()
@@ -104,7 +106,7 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
     }
 
     /**
-     * 通用拦截器排除swagger设置，所有拦截器都会自动加swagger相关的资源排除信息
+     * 通用拦截器排除 Swagger 设置，所有拦截器都会自动加 Swagger 相关的资源排除信息
      */
     @SuppressWarnings("unchecked")
     @Override

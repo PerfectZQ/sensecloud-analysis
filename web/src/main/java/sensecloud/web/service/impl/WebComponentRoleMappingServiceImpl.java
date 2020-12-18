@@ -53,7 +53,7 @@ public class WebComponentRoleMappingServiceImpl extends ServiceImpl<WebComponent
         switch (componentName) {
             case AIRFLOW_COMPONENT_NAME:
                 if (!AIRFLOW_COMPONENT_GITLAB.equalsIgnoreCase(componentRoleName)) {
-                    log.info("====> Init " + webRoleName + " " + username + "of" + productName + "on Airflow\n" +
+                    log.info("====> Init " + webRoleName + " " + username + " of " + productName + " on Airflow\n" +
                             "====> assign role " + componentRoleName + " to " + username);
                     airflowRemoteAuthService.bindRoleToUser(componentRoleName, username);
                 }

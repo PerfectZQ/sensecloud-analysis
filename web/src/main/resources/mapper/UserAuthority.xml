@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sensecloud.web.mapper.UserAuthorityMapper">
+
+    <select id="listUserAuthorityVOPage" resultType="sensecloud.web.bean.vo.UserAuthorityVO">
+        SELECT ua.id, ua.user_id, u.username, ua.role_id, r.name role_name, ua.product_id, p.product_name
+        FROM user_authority ua
+        JOIN user u ON ua.user_id = u.id
+        JOIN role r ON ua.role_id = r.id
+        JOIN product p ON ua.product_id = p.id
+        <where>
+            <if test="query.id!=null">
+                AND ua.id = #{query.id}
+            </if>
+            <if test="query.productId!=null">
+                AND ua.product_id = #{query.productId}
+            </if>
+            <if test="query.productName!=null">
+                AND p.product_name = #{query.productName}
+            </if>
+            <if test="query.userId!=null">
+                AND ua.user_id = #{query.userId}
+            </if>
+            <if test="query.username!=null">
+                AND u.username = #{query.username}
+            </if>
+            <if test="query.roleId!=null">
+                AND ua.role_id = #{query.roleId}
+            </if>
+            <if test="query.roleName!=null">
+                AND r.name = #{query.roleName}
+            </if>
+        </where>
+        ORDER BY u.name DESC
+    </select>
+
+</mapper>

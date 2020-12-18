@@ -57,7 +57,7 @@ public class AuthorizeControllerTest {
         request = post("/authorize/boundUserRoleToGroup")
                 // .header("", "")
                 .param("username", "zhangqiang")
-                .param("rolename", "数据开发人员")
+                .param("rolename", "DataDeveloper")
                 .param("groupName", "dlink_test")
                 .accept(MediaType.APPLICATION_JSON);
         mvc.perform(request)
@@ -71,7 +71,7 @@ public class AuthorizeControllerTest {
         request = post("/authorize/unboundUserRoleFromGroup")
                 // .header("", "")
                 .param("username", "zhangqiang")
-                .param("rolename", "数据开发人员")
+                .param("rolename", "DataDeveloper")
                 .param("groupName", "dlink_test")
                 .accept(MediaType.APPLICATION_JSON);
         mvc.perform(request)

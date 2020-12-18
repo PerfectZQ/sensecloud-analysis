@@ -5,6 +5,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.expression.SecurityExpressionRoot;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,11 +27,15 @@ import sensecloud.web.service.remote.SupersetRemoteAuthService;
 import java.util.List;
 
 /**
+ * Spring Security 提供了 Spring EL 表达式，允许我们在定义 URL 路径访问(@RequestMapping)的方法上面添加注解，来控制访问权限。
+ * Spring Security可用表达式对象的基类是 {@link SecurityExpressionRoot}
+ *
  * @author zhangqiang
+ * @see <a href="https://my.oschina.net/zimug/blog/3132076">使用 Spring EL 控制系统功能访问权限</a>
  * @since 2020/11/5 16:17
  */
 @RestController
-@RequestMapping("/authorize")
+@RequestMapping("/api/v1/authorize")
 @Slf4j
 public class AuthorizeController {
 
@@ -41,9 +48,7 @@ public class AuthorizeController {
     @Autowired
     private WebComponentRoleMappingServiceImpl webComponentRoleMappingService;
     @Autowired
-    private UserRoleServiceImpl userRoleService;
-    @Autowired
-    private UserProductServiceImpl userProductService;
+    private UserAuthorityServiceImpl userRoleProductService;
 
     @Autowired
     private AirflowRemoteAuthService airflowRemoteAuthService;
@@ -53,12 +58,13 @@ public class AuthorizeController {
     private ClickHouseRemoteAuthService clickHouseRemoteAuthService;
 
     /**
-     * 初始化组，并设置当前用户为产品线管理员
+     * 初始化组，并设置当前用户为ProductAdmin
      *
      * @param initProduct
      */
     @ApiOperation(value = "初始化产品线信息")
     @PostMapping("initProductPermissions")
+    @PreAuthorize("hasRole('PlatformAdmin')")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
     public void initProductPermissions(@RequestBody InitProduct initProduct) {
 
@@ -66,7 +72,7 @@ public class AuthorizeController {
         String username = initProduct.getUsername();
 
         log.info("====> Init User: " + username + "...");
-        User manager = userService.createUserIfNotExist(new User().setName(username));
+        UserEntity manager = userService.createUserIfNotExist(new UserEntity().setUsername(username));
 
         log.info("====> Init Product Service: " + productName + "...");
         Product product = new Product()
@@ -74,11 +80,14 @@ public class AuthorizeController {
                 .setOwner(username);
         product = productService.createProductIfNotExist(product);
 
-        log.info("====> Init User Product Relation, bind " + username + " to " + productName + "...");
-        UserProduct userProduct = new UserProduct()
+        RoleComponentVO roleComponentVO = roleService.getProductManager();
+
+        log.info("====> Init User Role Product Relation, binding `ProductAdmin` to {} of {} on SenseCloud Analysis Platform...", username, productName);
+        UserAuthority userRoleProduct = new UserAuthority()
                 .setUserId(manager.getId())
-                .setProductId(product.getId());
-        userProductService.createUserProductIfNotExist(userProduct);
+                .setProductId(product.getId())
+                .setRoleId(roleComponentVO.getRoleId());
+        userRoleProductService.createUserProductIfNotExist(userRoleProduct);
 
         AbRole abRole = new AbRole().setName(productName);
         log.info("====> Init Airflow of " + productName + "...");
@@ -96,14 +105,6 @@ public class AuthorizeController {
                 .setUserName(username)
                 .setProductLine(productName)
         );
-
-        log.info("====> Init Product Manager " + username + " of " + productName + "on Sense Cloud Analysis\n" +
-                "====> assign ProductManger to " + username + "...");
-        RoleComponentVO roleComponentVO = roleService.getProductManager();
-        UserRole userRole = new UserRole()
-                .setUserId(manager.getId())
-                .setRoleId(roleComponentVO.getRoleId());
-        userRoleService.createUserRoleIfNotExist(userRole);
 
         List<WebComponentRoleMappingVO> webComponentRoleMappingVOList = webComponentRoleMappingService
                 .getBaseMapper().getWebComponentRoleMappingVOByWebRoleId(roleComponentVO.getRoleId());
@@ -125,39 +126,35 @@ public class AuthorizeController {
      * @param productName
      */
     @PostMapping("bindUserRoleToProduct")
+    @PreAuthorize("hasRole('PlatformAdmin') || (hasRole('ProductAdmin:'.concat(#productName)) && !'PlatformAdmin'.equals(#rolename))")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
     public void bindUserRoleToProduct(@RequestParam String username,
                                       @RequestParam String rolename,
                                       @RequestParam String productName) {
+
 
         RoleComponentVO roleComponentVO = roleService.getSenseAnalysisRoleComponentVO(rolename);
         if (roleComponentVO == null) {
             throw new IllegalArgumentException(rolename + " is not a sensecloud-analysis web role!");
         }
 
-        Product product = new Product()
-                .setProductName(productName)
-                .setOwner(username);
+        Product product = new Product().setProductName(productName);
         product = productService.getOne(new QueryWrapper<>(product));
         if (product == null) {
             throw new IllegalArgumentException("Product " + productName + " is not exist! bind " + username + ", " + rolename + " failed");
         }
 
         log.info("====> Init User: " + username + "...");
-        User user = userService.createUserIfNotExist(new User().setName(username));
+        UserEntity user = userService.createUserIfNotExist(new UserEntity().setUsername(username));
 
-        log.info("====> Init User Product Relation, bind " + username + " to " + productName + "...");
-        UserProduct userProduct = new UserProduct()
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("====> Init User Role Product Relation, binding `{}` to {} of {}  by `ProductAdmin` {} on SenseCloud Analysis Platform...",
+                rolename, username, productName, currentUsername);
+        UserAuthority userRoleProduct = new UserAuthority()
                 .setUserId(user.getId())
-                .setProductId(product.getId());
-        userProductService.createUserProductIfNotExist(userProduct);
-
-        log.info("====> Init " + rolename + " " + username + " of " + productName + "on Sense Cloud Analysis\n" +
-                "====> assign " + rolename + " to " + username + "...");
-        UserRole userRole = new UserRole()
-                .setUserId(user.getId())
+                .setProductId(product.getId())
                 .setRoleId(roleComponentVO.getRoleId());
-        userRoleService.createUserRoleIfNotExist(userRole);
+        userRoleProductService.createUserProductIfNotExist(userRoleProduct);
 
         List<WebComponentRoleMappingVO> webComponentRoleMappingVOList = webComponentRoleMappingService
                 .getBaseMapper().getWebComponentRoleMappingVOByWebRoleId(roleComponentVO.getRoleId());
@@ -175,6 +172,7 @@ public class AuthorizeController {
      * @param productName
      */
     @PostMapping("unbindUserRoleFromProduct")
+    @PreAuthorize("hasRole('PlatformAdmin') OR (hasRole('ProductAdmin:'.concat(#productName)) AND !'PlatformAdmin'.equals(#rolename))")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
     public void unbindUserRoleFromProduct(@RequestParam String username,
                                           @RequestParam String rolename,
@@ -186,32 +184,27 @@ public class AuthorizeController {
         }
 
         Product product = new Product()
-                .setProductName(productName)
-                .setOwner(username);
+                .setProductName(productName);
         product = productService.getOne(new QueryWrapper<>(product));
         if (product == null) {
             throw new IllegalArgumentException("Product " + productName + " is not exist! bind " + username + ", " +
                     rolename + " to " + productName + " failed");
         }
 
-        User user = userService.getOne(new QueryWrapper<>(new User().setName(username)));
+        UserEntity user = userService.getOne(new QueryWrapper<>(new UserEntity().setUsername(username)));
         if (user == null) {
             throw new IllegalArgumentException("User " + username + " is not exist! bind " + username + ", " +
                     rolename + " to " + productName + " failed");
         }
 
-        log.info("====> Delete User Product Relation, unbind " + username + " from " + productName + "...");
-        UserProduct userProduct = new UserProduct()
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("====> Delete User Role Product Relation, unbinding `{}` of {} from {}  by `ProductAdmin` {} on SenseCloud Analysis Platform...",
+                rolename, username, productName, currentUsername);
+        UserAuthority userRoleProduct = new UserAuthority()
                 .setUserId(user.getId())
-                .setProductId(product.getId());
-        userProductService.remove(new QueryWrapper<>(userProduct));
-
-        log.info("====> Disable " + rolename + " " + username + " of " + productName + "on Sense Cloud Analysis\n" +
-                "====> Delete " + rolename + " from " + username + "...");
-        UserRole userRole = new UserRole()
-                .setUserId(user.getId())
+                .setProductId(product.getId())
                 .setRoleId(roleComponentVO.getRoleId());
-        userRoleService.remove(new QueryWrapper<>(userRole));
+        userRoleProductService.remove(new QueryWrapper<>(userRoleProduct));
 
         List<WebComponentRoleMappingVO> webComponentRoleMappingVOList = webComponentRoleMappingService
                 .getBaseMapper().getWebComponentRoleMappingVOByWebRoleId(roleComponentVO.getRoleId());
@@ -220,5 +213,5 @@ public class AuthorizeController {
                         username, productName, webComponentRoleMappingVO)
         );
     }
-    
+
 }

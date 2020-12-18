@@ -33,7 +33,7 @@ import static sensecloud.web.bean.vo.ResultVO.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/connector")
+@RequestMapping("/api/v1/connector")
 public class ConnectorController {
 
     @Value("${service.connector.upload.path}")

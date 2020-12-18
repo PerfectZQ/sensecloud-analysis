@@ -18,8 +18,8 @@ public class CommonConstant {
 
     public final static String CLICK_HOUSE_COMPONENT_NAME = "clickhouse";
 
-    public final static String SENSE_ANALYSIS_PRODUCT_MANAGER_NAME = "产品线管理员";
+    public final static String SENSE_ANALYSIS_PRODUCT_MANAGER_NAME = "ProductAdmin";
 
-    public final static String SENSE_ANALYSIS_ADMIN_NAME = "平台管理员";
+    public final static String SENSE_ANALYSIS_ADMIN_NAME = "PlatformAdmin";
 
 }

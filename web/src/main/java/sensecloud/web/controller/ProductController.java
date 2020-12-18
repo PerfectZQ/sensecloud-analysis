@@ -25,7 +25,7 @@ import java.util.List;
  * @since 2020/11/5 16:17
  */
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/api/v1/product")
 @Slf4j
 public class ProductController {
 
@@ -88,14 +88,14 @@ public class ProductController {
     }
 
     @ApiOperation(value = "查询服务列表")
-    @GetMapping("listServices")
+    @PostMapping("listServices")
     public List<ProductService> listServices(@RequestBody ProductService productService) {
         QueryWrapper<ProductService> queryWrapper = new QueryWrapper<>(productService);
         return productServiceService.list(queryWrapper);
     }
 
     @ApiOperation(value = "删除服务列表")
-    @GetMapping("deleteService")
+    @PostMapping("deleteService")
     public void deleteService(@RequestBody ProductService productService) {
         QueryWrapper<ProductService> queryWrapper = new QueryWrapper<>(productService);
         productServiceService.remove(queryWrapper);
