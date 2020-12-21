@@ -21,8 +21,10 @@ public class Connector<R extends IRule> {
 
     private String name;
     private SourceType sourceType;
+    private JSONObject sourceAccountConf;
     private JSONObject sourceConf;
     private SinkType sinkType;
+    private JSONObject sinkAccountConf;
     private JSONObject sinkConf;
 
     private R rule;
@@ -60,7 +62,9 @@ public class Connector<R extends IRule> {
 
         JSONObject data = new JSONObject();
         data.put("source", sourceConf);
+        data.put("sourceAccount", sourceAccountConf);
         data.put("sink", sinkConf);
+        data.put("sinkAccount", sinkAccountConf);
 
         String plan = this.enforcer.enforce(rule, data);
         log.info(">>> plan : {}", plan);

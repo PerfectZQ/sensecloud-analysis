@@ -40,6 +40,8 @@ service:
       path: /tmp/sensecloud
     rule:
       path: connector/rule
+    clickhouse:
+      url: jdbc:clickhouse://10.53.7.100:33334
   submitter:
     airflow:
       conf:
