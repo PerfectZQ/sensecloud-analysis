@@ -6,5 +6,5 @@ import sensecloud.web.entity.ConnectorEntity;
 
 public interface IConnectorService extends IService<ConnectorEntity> {
 
-    boolean submit(ConnectorBean bean);
+    boolean submitKafkaJob(ConnectorBean bean);
 }

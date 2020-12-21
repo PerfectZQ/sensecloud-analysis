@@ -22,6 +22,8 @@ import sensecloud.web.service.IConnectorService;
 @Service
 public class ConnectorAttachmentServiceImpl extends ServiceImpl<ConnectorAttachmentMapper, ConnectorAttachmentEntity> {
 
-
+    public boolean deleteAll(String connectorId) {
+        return this.getBaseMapper().deleteAll(connectorId);
+    }
 
 }

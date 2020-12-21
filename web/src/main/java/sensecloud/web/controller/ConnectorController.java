@@ -1,13 +1,11 @@
 package sensecloud.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPath;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sensecloud.web.bean.ConnectorAttachmentBean;
 import sensecloud.web.bean.vo.ConnectorVO;
 import sensecloud.web.bean.vo.ResultVO;
 import sensecloud.web.constant.AttachmentCatalog;
@@ -84,11 +81,14 @@ public class ConnectorController {
 
                 success = connectorAttachmentService.saveBatch(entities);
             }
+
+            if(success) {
+                success = connectorService.submitKafkaJob(entity);
+            }
+        } else if ("MYSQL_CDC".equalsIgnoreCase(params.getSourceType())) {
+            success = connectorService.addMysqlCDC(entity);
         }
 
-//        if(success) {
-//            success = connectorService.submit(entity);
-//        }
         return ok(success);
     }
 
@@ -99,6 +99,43 @@ public class ConnectorController {
         ConnectorEntity entity = new ConnectorEntity();
         BeanUtils.copyProperties(params, entity);
         boolean updateResult = connectorService.updateById(entity);
+        if ("KAFKA".equalsIgnoreCase(params.getSourceType())) {
+            JSONObject sourceAccountConf = params.getSourceAccountConf();
+            Boolean securityEnable = sourceAccountConf.getBoolean("security.enable");
+
+            if (securityEnable != null && securityEnable.booleanValue()) {
+                String keystoreLocation = sourceAccountConf.getString("ssl.keystore.location");
+                String truststoreLocation = sourceAccountConf.getString("ssl.truststore.location");
+                List<ConnectorAttachmentEntity> entities = new ArrayList<>();
+
+                if (StringUtils.isNotBlank(keystoreLocation)) {
+                    ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
+                    String catalog = AttachmentCatalog.KAFKA_KEYSTORE.name();
+                    attachmentEntity.setCatalog(catalog);
+                    attachmentEntity.setContent(this.readAttachment(keystoreLocation));
+                    attachmentEntity.setConnectorId(entity.getId());
+
+                    entities.add(attachmentEntity);
+                }
+
+                if (StringUtils.isNotBlank(truststoreLocation)) {
+                    ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
+                    String catalog = AttachmentCatalog.KAFKA_TRUSTSTORE.name();
+                    attachmentEntity.setCatalog(catalog);
+                    attachmentEntity.setContent(this.readAttachment(truststoreLocation));
+                    attachmentEntity.setConnectorId(entity.getId());
+                    entities.add(attachmentEntity);
+                }
+
+                updateResult = connectorAttachmentService.updateBatchById(entities, entities.size());
+            }
+
+            if(updateResult) {
+                updateResult = connectorService.submitKafkaJob(entity);
+            }
+        } else if ("MYSQL_CDC".equalsIgnoreCase(params.getSourceType())) {
+            updateResult = connectorService.updateMysqlCDC(entity);
+        }
         return ok(updateResult);
     }
 
@@ -106,10 +143,23 @@ public class ConnectorController {
     public ResultVO<Boolean> delete(@RequestParam Long id) {
         //Todo: params validation
         //  ...
-        ConnectorEntity entity = new ConnectorEntity();
-        entity.setId(String.valueOf(id));
+        ConnectorEntity entity = connectorService.getById(id);
         entity.setDeleted(true);
+
         boolean deleteResult = connectorService.updateById(entity);
+
+        if(deleteResult && "KAFKA".equalsIgnoreCase(entity.getSourceType())) {
+            JSONObject sourceAccountConf = entity.getSourceAccountConf();
+            Boolean securityEnable = sourceAccountConf.getBoolean("security.enable");
+
+            if (securityEnable != null && securityEnable.booleanValue()) {
+                deleteResult = connectorAttachmentService.deleteAll(entity.getId());
+            }
+
+        } else if ("MYSQL_CDC".equalsIgnoreCase(entity.getSourceType())) {
+            deleteResult = connectorService.deleteMysqlCDC(entity);
+        }
+
         return ok(deleteResult);
     }
 
