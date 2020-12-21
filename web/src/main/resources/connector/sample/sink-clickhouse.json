@@ -66,5 +66,6 @@
     }]
   }],
   "partitions": ["service_name", "dt"],
-  "orders": ["time"]
+  "orders": ["time"],
+  "sample": ["time"]
 }

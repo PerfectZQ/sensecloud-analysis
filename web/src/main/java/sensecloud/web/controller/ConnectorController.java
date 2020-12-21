@@ -11,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sensecloud.web.bean.vo.ConnectorVO;
@@ -20,9 +23,12 @@ import sensecloud.web.entity.ConnectorAttachmentEntity;
 import sensecloud.web.entity.ConnectorEntity;
 import sensecloud.web.service.impl.ConnectorAttachmentServiceImpl;
 import sensecloud.web.service.impl.ConnectorServiceImpl;
+import sensecloud.web.service.impl.UserAuthorityServiceImpl;
 
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,12 +48,23 @@ public class ConnectorController {
     @Autowired
     private ConnectorAttachmentServiceImpl connectorAttachmentService;
 
+    @Autowired
+    private UserAuthorityServiceImpl userAuthorityService;
+
     @PostMapping
     public ResultVO<Boolean> add(@RequestBody ConnectorVO params) {
         //Todo: params validation
         //  ...
+
+        Authentication user = this.currentUser();
+        if (user == null || StringUtils.isBlank(user.getName())) {
+            return error("Not a login user.");
+        }
+
         ConnectorEntity entity = new ConnectorEntity();
         BeanUtils.copyProperties(params, entity);
+
+        entity.setCreateBy(user.getName());
 
         boolean success = connectorService.saveOrUpdate(entity);
 
@@ -96,8 +113,16 @@ public class ConnectorController {
     public ResultVO<Boolean> update(@RequestBody ConnectorVO params) {
         //Todo: params validation
         //  ...
+
+        Authentication user = this.currentUser();
+        if (user == null || StringUtils.isBlank(user.getName())) {
+            return error("Not a login user.");
+        }
+
         ConnectorEntity entity = new ConnectorEntity();
         BeanUtils.copyProperties(params, entity);
+
+        entity.setUpdateBy(user.getName());
         boolean updateResult = connectorService.updateById(entity);
         if ("KAFKA".equalsIgnoreCase(params.getSourceType())) {
             JSONObject sourceAccountConf = params.getSourceAccountConf();
@@ -143,9 +168,15 @@ public class ConnectorController {
     public ResultVO<Boolean> delete(@RequestParam Long id) {
         //Todo: params validation
         //  ...
+        Authentication user = this.currentUser();
+        if (user == null || StringUtils.isBlank(user.getName())) {
+            return error("Not a login user.");
+        }
+
         ConnectorEntity entity = connectorService.getById(id);
         entity.setDeleted(true);
-
+        entity.setDeleteBy(user.getName());
+        entity.setDeleteTime(LocalDateTime.now());
         boolean deleteResult = connectorService.updateById(entity);
 
         if(deleteResult && "KAFKA".equalsIgnoreCase(entity.getSourceType())) {
@@ -170,17 +201,16 @@ public class ConnectorController {
     }
 
     @GetMapping("/query")
-    public ResultVO<IPage<ConnectorEntity>> query(
+    public ResultVO<IPage<ConnectorEntity>> query (
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long page,
             @RequestParam(required = false) Long size
     ) {
-//        User user = UserContextProvider.getContext().getCurrentUser();
-//        if (user != null && StringUtils.isNotBlank(user.getUsername())) {
-//            String username = user.getUsername();
-//            String username = '';
+        Authentication user = this.currentUser();
+        if (user != null && StringUtils.isNotBlank(user.getName())) {
+            String username = user.getName();
             QueryChainWrapper<ConnectorEntity> query = connectorService.query()
-//                    .eq("create_by", username)
+                    .eq("create_by", username)
                     .and(q -> q.eq("deleted", false));
             if(StringUtils.isNotBlank(name)) {
                 query.and(q -> q.eq("name", name));
@@ -198,10 +228,10 @@ public class ConnectorController {
             long total = query.count();
             IPage<ConnectorEntity> result = query.page(new Page<ConnectorEntity>(pageNum, pageSize, total));
             return ok(result);
-//        } else {
-//            log.warn("Accept a request but current user is null or username is empty.");
-//            return error("Not a login user.");
-//        }
+        } else {
+            log.warn("Accept a request but current user is null or username is empty.");
+            return error("Not a login user.");
+        }
     }
 
 
@@ -265,5 +295,11 @@ public class ConnectorController {
         }
         return res;
     }
+
+    private Authentication currentUser() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        return context.getAuthentication();
+    }
+
 
 }

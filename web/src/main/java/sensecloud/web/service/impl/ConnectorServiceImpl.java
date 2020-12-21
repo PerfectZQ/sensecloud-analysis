@@ -37,8 +37,8 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
     public boolean submitKafkaJob(ConnectorBean bean) {
         String connectorName = bean.getName();
 
-        String name = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
-        String ruleExpr = ruleProvider.getRuleExpression(name);
+        String ruleName = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
+        String ruleExpr = ruleProvider.getRuleExpression(ruleName);
         PebbleExpRule rule = new PebbleExpRule().expression(ruleExpr);
 
         this.connector = new Connector()
@@ -55,9 +55,8 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         }
 
         //Todo: Get current user's group from database
-        String group = "senselink";
         String jobId = connectorName;
-        return this.submitter.submit(group, jobId, name, jobConf);
+        return this.submitter.submit(jobId, ruleName, jobConf);
     }
 
     public boolean addMysqlCDC (ConnectorBean bean) {

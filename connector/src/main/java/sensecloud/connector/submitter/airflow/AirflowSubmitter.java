@@ -62,7 +62,7 @@ public class AirflowSubmitter {
      * @param jobConf Configurations for the job
      * @return Return true if submission success
      */
-    public boolean submit(String group, String jobId, String name, JSONObject jobConf) {
+    public boolean submit(String jobId, String name, JSONObject jobConf) {
         this.init();
 
         JSONObject context = new JSONObject();
@@ -75,7 +75,7 @@ public class AirflowSubmitter {
         String code = this.airflowDAGProvider.dag(name, context);
 
         this.gitClient.pull(this.gitConf.getRemoteBranch());
-        File codeFile = this.writeCode(group, jobId, code);
+        File codeFile = this.writeCode(jobId, code);
         this.gitClient.addFile(codeFile);
         this.gitClient.commit("Submit a DAG[" + jobId + "]  at " + DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"));
         this.gitClient.push(this.gitConf.getRemoteBranch());
@@ -98,8 +98,8 @@ public class AirflowSubmitter {
         return true;
     }
 
-    private File writeCode (String group, String runId, String code) {
-        File dir = new File(this.gitConf.getLocalRepo() + "/" + this.gitConf.getProject() + "/" +group);
+    private File writeCode (String runId, String code) {
+        File dir = new File(this.gitConf.getLocalRepo() + "/" + this.gitConf.getProject());
         if(!dir.exists()){
             dir.mkdirs();
         }
