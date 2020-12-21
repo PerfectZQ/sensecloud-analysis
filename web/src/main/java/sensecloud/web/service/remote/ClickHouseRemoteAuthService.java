@@ -11,8 +11,8 @@ import sensecloud.web.bean.clickhouse.RequestProduct;
  * @author zhangqiang
  * @since 2020/11/5 20:17
  */
-@FeignClient(name = "clickHouseRemoteAuthService", url = "clickhouse-access:8080/access/role")
-// @FeignClient(name = "clickHouseRemoteAuthService", url = "10.53.7.100:38080/access/role")
+@FeignClient(name = "clickHouseRemoteAuthService", url = "clickhouse-access:8080/bigdata-admin/api/v1/access/role")
+// @FeignClient(name = "clickHouseRemoteAuthService", url = "10.53.7.100:38080/bigdata-admin/api/v1/access/role")
 public interface ClickHouseRemoteAuthService {
 
     @PostMapping("initproduct")
