@@ -15,7 +15,7 @@ import javax.websocket.server.PathParam;
  * @author zhangqiang
  * @since 2020/11/5 20:17
  */
-@FeignClient(name = "clickHouseRemoteAuthService", url = "clickhouse-access:8080/access")
+@FeignClient(name = "clickHouseRemoteService", url = "clickhouse-access:8080/access")
 public interface ClickHouseRemoteService {
 
     @GetMapping("/user/{username}")
