@@ -127,13 +127,15 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
             int code = callback.getInteger("code");
             String message = callback.getString("msg");
             if (code == 0) {
-                JSONObject data = result.getJSONObject("data");
+                JSONObject data = callback.getJSONObject("data");
+                result.putAll(data);
                 log.debug("Callback data: {}", data);
             } else {
                 log.error("Error occurred while calling getClickHouseUser: {}", message);
                 result = null;
             }
         }
+        log.debug("Call [getClickHouseUser] and return : {}", result);
         return result;
     }
 
@@ -153,8 +155,13 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         params.put("targerDb", sourceConf.getString("database"));
 
         JSONArray tables = sourceConf.getJSONArray("tables");
-        params.put("table", tables);
 
+        JSONArray tbs = new JSONArray();
+        for (int i = 0 ; i < tables.size() ; i ++) {
+            JSONObject table = tables.getJSONObject(i);
+            tbs.add(table.getString("table"));
+        }
+        params.put("table", tbs);
         return params;
     }
 
