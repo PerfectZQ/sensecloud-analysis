@@ -27,8 +27,8 @@
             {% if sink.samples is not null %}"target.sample.fields": [{% for sample in sink.samples %}"{{ sample }}"{% if loop.last == false %},{%endif%}{% endfor %}], {% endif %}
 
             "target.url": "{{ sink["jdbc.url"] }}",
-            "target.db.username": "{{ sink["jdbc.user"] }}",
-            "target.db.password": "{{ sink["jdbc.password"] }}",
+            "target.db.username": "{{ sinkAccount["jdbc.user"] }}",
+            "target.db.password": "{{ sinkAccount["jdbc.password"] }}",
             "kafka.mapping.value": [
 {% for msg in topic.schema.message %}{% for col in table.cols %}{% if col.ref == msg.name %}
 

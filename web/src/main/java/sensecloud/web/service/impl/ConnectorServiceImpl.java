@@ -17,6 +17,7 @@ import sensecloud.web.bean.ConnectorBean;
 import sensecloud.web.entity.ConnectorEntity;
 import sensecloud.web.mapper.ConnectorMapper;
 import sensecloud.web.service.IConnectorService;
+import sensecloud.web.service.remote.ClickHouseRemoteService;
 import sensecloud.web.service.remote.MysqlCDCService;
 
 @Slf4j
@@ -34,6 +35,9 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
     @Autowired
     private MysqlCDCService mysqlCDCService;
 
+    @Autowired
+    private ClickHouseRemoteService clickHouseRemoteService;
+
     public boolean submitKafkaJob(ConnectorBean bean) {
         String connectorName = bean.getName();
 
@@ -44,8 +48,10 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         this.connector = new Connector()
                                 .name(connectorName)
                                 .sourceType(SourceType.valueOf(bean.getSourceType().toUpperCase()))
+                                .sourceAccountConf(bean.getSourceAccountConf())
                                 .sourceConf(bean.getSourceConf())
                                 .sinkType(SinkType.valueOf(bean.getSinkType().toUpperCase()))
+                                .sinkAccountConf(bean.getSinkAccountConf())
                                 .sinkConf(bean.getSinkConf())
                                 .rule(rule);
 
@@ -62,19 +68,89 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
     public boolean addMysqlCDC (ConnectorBean bean) {
         JSONObject params = this.buildMysqlCDCServiceParams(bean);
         JSONObject callback = this.mysqlCDCService.add(params);
-        return false;
+
+        boolean result = false;
+        if(callback != null) {
+            int code = callback.getInteger("code");
+            String message = callback.getString("msg");
+            if (code == 0) {
+                result = true;
+            } else {
+                log.error("Error occurred while calling getClickHouseUser: {}", message);
+                result = false;
+            }
+        }
+
+        return result;
     }
 
     public boolean updateMysqlCDC(ConnectorBean bean) {
         JSONObject params = this.buildMysqlCDCServiceParams(bean);
         JSONObject callback = this.mysqlCDCService.update(params);
-        return false;
+        boolean result = false;
+        if(callback != null) {
+            int code = callback.getInteger("code");
+            String message = callback.getString("msg");
+            if (code == 0) {
+                result = true;
+            } else {
+                log.error("Error occurred while calling getClickHouseUser: {}", message);
+                result = false;
+            }
+        }
+
+        return result;
     }
 
     public boolean deleteMysqlCDC(ConnectorBean bean) {
         JSONObject callback = this.mysqlCDCService.delete(bean.getId());
-        return false;
+        boolean result = false;
+        if(callback != null) {
+            int code = callback.getInteger("code");
+            String message = callback.getString("msg");
+            if (code == 0) {
+                result = true;
+            } else {
+                log.error("Error occurred while calling getClickHouseUser: {}", message);
+                result = false;
+            }
+        }
+
+        return result;
     }
+
+    public JSONObject getClickHouseUser(String username) {
+        log.info("Fetch username = {} to call getClickHouseUser", username);
+        JSONObject callback = null;
+        try {
+            callback = this.clickHouseRemoteService.getClickHouseUser(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        JSONObject result = new JSONObject();
+
+        if(callback != null) {
+            int code = callback.getInteger("code");
+            String message = callback.getString("msg");
+            if (code == 0) {
+                JSONObject data = callback.getJSONObject("data");
+                result.putAll(data);
+                log.debug("Callback data: {}", data);
+            } else {
+                log.error("Error occurred while calling getClickHouseUser: {}", message);
+                result = null;
+            }
+        } else {
+            result.put("id", 10);
+            result.put("ckUser", "writer");
+            result.put("ckPassword", "2c82mirS");
+            result.put("userType", "admin");
+        }
+        log.debug("Call [getClickHouseUser] and return : {}", result);
+        return result;
+    }
+
+
 
 
     private JSONObject buildMysqlCDCServiceParams(ConnectorBean bean) {
@@ -90,8 +166,13 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         params.put("targerDb", sourceConf.getString("database"));
 
         JSONArray tables = sourceConf.getJSONArray("tables");
-        params.put("table", tables);
 
+        JSONArray tbs = new JSONArray();
+        for (int i = 0 ; i < tables.size() ; i ++) {
+            JSONObject table = tables.getJSONObject(i);
+            tbs.add(table.getString("table"));
+        }
+        params.put("table", tbs);
         return params;
     }
 

@@ -24,6 +24,7 @@ import sensecloud.web.entity.ConnectorEntity;
 import sensecloud.web.service.impl.ConnectorAttachmentServiceImpl;
 import sensecloud.web.service.impl.ConnectorServiceImpl;
 import sensecloud.web.service.impl.UserAuthorityServiceImpl;
+import sensecloud.web.service.remote.ClickHouseRemoteService;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -41,6 +42,9 @@ public class ConnectorController {
 
     @Value("${service.connector.upload.path}")
     private String uploadPath;
+
+    @Value("${service.connector.clickhouse.url}")
+    private String clickHouseJDBCUrl;
 
     @Autowired
     private ConnectorServiceImpl connectorService;
@@ -100,6 +104,7 @@ public class ConnectorController {
             }
 
             if(success) {
+                this.assembleClickHouseConf(user.getName(), entity);
                 success = connectorService.submitKafkaJob(entity);
             }
         } else if ("MYSQL_CDC".equalsIgnoreCase(params.getSourceType())) {
@@ -156,6 +161,7 @@ public class ConnectorController {
             }
 
             if(updateResult) {
+                this.assembleClickHouseConf(user.getName(), entity);
                 updateResult = connectorService.submitKafkaJob(entity);
             }
         } else if ("MYSQL_CDC".equalsIgnoreCase(params.getSourceType())) {
@@ -190,7 +196,6 @@ public class ConnectorController {
         } else if ("MYSQL_CDC".equalsIgnoreCase(entity.getSourceType())) {
             deleteResult = connectorService.deleteMysqlCDC(entity);
         }
-
         return ok(deleteResult);
     }
 
@@ -299,6 +304,13 @@ public class ConnectorController {
     private Authentication currentUser() {
         SecurityContext context = SecurityContextHolder.getContext();
         return context.getAuthentication();
+    }
+
+    private void assembleClickHouseConf(String username, ConnectorEntity entity) {
+        JSONObject chConf = connectorService.getClickHouseUser(username);
+        entity.getSourceAccountConf().put("jdbc.url", clickHouseJDBCUrl);
+        entity.getSourceAccountConf().put("jdbc.user", chConf.getString("ckUser"));
+        entity.getSourceAccountConf().put("jdbc.password", chConf.getString("ckPassword"));
     }
 
 
