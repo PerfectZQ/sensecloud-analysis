@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,14 +73,19 @@ public class AuthorizeController {
         String productName = initProduct.getProductName();
         String username = initProduct.getUsername();
 
-        log.info("====> Init User: " + username + "...");
-        UserEntity manager = userService.createUserIfNotExist(new UserEntity().setUsername(username));
+        if (productService.count(new QueryWrapper<>(new Product().setProductName(productName))) != 0) {
+            return ResultVO.error(2020, "产品线已存在");
+        }
 
         log.info("====> Init Product Service: " + productName + "...");
         Product product = new Product()
                 .setProductName(productName)
                 .setOwner(username);
         product = productService.createProductIfNotExist(product);
+
+        log.info("====> Init User: " + username + "...");
+        UserEntity manager = userService.createUserIfNotExist(new UserEntity().setUsername(username));
+
 
         RoleComponentVO roleComponentVO = roleService.getProductManager();
 
@@ -131,8 +137,8 @@ public class AuthorizeController {
     @PreAuthorize("hasRole('PlatformAdmin') || (hasRole('ProductAdmin:'.concat(#productName)) && !'PlatformAdmin'.equals(#rolename))")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
     public ResultVO<String> bindUserRoleToProduct(@RequestParam String username,
-                                      @RequestParam String rolename,
-                                      @RequestParam String productName) {
+                                                  @RequestParam String rolename,
+                                                  @RequestParam String productName) {
 
 
         RoleComponentVO roleComponentVO = roleService.getSenseAnalysisRoleComponentVO(rolename);
@@ -156,7 +162,13 @@ public class AuthorizeController {
                 .setUserId(user.getId())
                 .setProductId(product.getId())
                 .setRoleId(roleComponentVO.getRoleId());
-        userRoleProductService.createUserProductIfNotExist(userRoleProduct);
+
+        QueryWrapper<UserAuthority> queryWrapper = new QueryWrapper<>(userRoleProduct);
+        if (userRoleProductService.count(queryWrapper) == 0) {
+            userRoleProductService.save(userRoleProduct);
+        } else {
+            return ResultVO.error(2020, "UserAuthority is exist");
+        }
 
         List<WebComponentRoleMappingVO> webComponentRoleMappingVOList = webComponentRoleMappingService
                 .getBaseMapper().getWebComponentRoleMappingVOByWebRoleId(roleComponentVO.getRoleId());
@@ -179,8 +191,8 @@ public class AuthorizeController {
     @PreAuthorize("hasRole('PlatformAdmin') OR (hasRole('ProductAdmin:'.concat(#productName)) AND !'PlatformAdmin'.equals(#rolename))")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
     public ResultVO<String> unbindUserRoleFromProduct(@RequestParam String username,
-                                          @RequestParam String rolename,
-                                          @RequestParam String productName) {
+                                                      @RequestParam String rolename,
+                                                      @RequestParam String productName) {
 
         RoleComponentVO roleComponentVO = roleService.getSenseAnalysisRoleComponentVO(rolename);
         if (roleComponentVO == null) {

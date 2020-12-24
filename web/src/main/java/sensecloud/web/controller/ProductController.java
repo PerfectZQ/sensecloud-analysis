@@ -91,8 +91,9 @@ public class ProductController {
         QueryWrapper<ProductService> queryWrapper = new QueryWrapper<>(productService);
         if (productServiceService.count(queryWrapper) == 0) {
             productServiceService.save(productService);
+            return ResultVO.ok("");
         }
-        return ResultVO.ok("");
+        return ResultVO.error(2020, "ProductService is exists.");
     }
 
     @ApiOperation(value = "查询服务列表")
