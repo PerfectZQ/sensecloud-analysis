@@ -18,6 +18,7 @@ import sensecloud.web.bean.InitProduct;
 import sensecloud.web.bean.airflow.AirflowInitGroup;
 import sensecloud.web.bean.airflow.GitlabRepo;
 import sensecloud.web.bean.clickhouse.RequestProduct;
+import sensecloud.web.bean.vo.ResultVO;
 import sensecloud.web.entity.*;
 import sensecloud.web.service.impl.*;
 import sensecloud.web.service.remote.AirflowRemoteAuthService;
@@ -66,7 +67,7 @@ public class AuthorizeController {
     @PostMapping("initProductPermissions")
     @PreAuthorize("hasRole('PlatformAdmin')")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
-    public void initProductPermissions(@RequestBody InitProduct initProduct) {
+    public ResultVO<Object> initProductPermissions(@RequestBody InitProduct initProduct) {
 
         String productName = initProduct.getProductName();
         String username = initProduct.getUsername();
@@ -116,6 +117,7 @@ public class AuthorizeController {
         log.info("====> Update product service status to true.");
         product.setStatus(true);
         productService.updateProductStatus(product);
+        return ResultVO.ok(new Object());
     }
 
     /**
@@ -128,7 +130,7 @@ public class AuthorizeController {
     @PostMapping("bindUserRoleToProduct")
     @PreAuthorize("hasRole('PlatformAdmin') || (hasRole('ProductAdmin:'.concat(#productName)) && !'PlatformAdmin'.equals(#rolename))")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
-    public void bindUserRoleToProduct(@RequestParam String username,
+    public ResultVO<Object> bindUserRoleToProduct(@RequestParam String username,
                                       @RequestParam String rolename,
                                       @RequestParam String productName) {
 
@@ -162,6 +164,8 @@ public class AuthorizeController {
                 webComponentRoleMappingService.enableWebComponentRoleMapping(
                         username, productName, webComponentRoleMappingVO)
         );
+
+        return ResultVO.ok(new Object());
     }
 
     /**
@@ -174,7 +178,7 @@ public class AuthorizeController {
     @PostMapping("unbindUserRoleFromProduct")
     @PreAuthorize("hasRole('PlatformAdmin') OR (hasRole('ProductAdmin:'.concat(#productName)) AND !'PlatformAdmin'.equals(#rolename))")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
-    public void unbindUserRoleFromProduct(@RequestParam String username,
+    public ResultVO<Object> unbindUserRoleFromProduct(@RequestParam String username,
                                           @RequestParam String rolename,
                                           @RequestParam String productName) {
 
@@ -212,6 +216,8 @@ public class AuthorizeController {
                 webComponentRoleMappingService.disableWebComponentRoleMapping(
                         username, productName, webComponentRoleMappingVO)
         );
+
+        return ResultVO.ok(new Object());
     }
 
 }

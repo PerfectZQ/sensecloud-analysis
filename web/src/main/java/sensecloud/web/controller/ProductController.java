@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import sensecloud.web.bean.common.PageResult;
+import sensecloud.web.bean.vo.ResultVO;
 import sensecloud.web.entity.Product;
 import sensecloud.web.entity.ProductService;
 import sensecloud.web.service.impl.ProductServiceImpl;
@@ -68,23 +69,30 @@ public class ProductController {
 
     @ApiOperation(value = "添加或修改产品线，修改必须带着ID")
     @PostMapping("saveOrUpdateProduct")
-    public void saveOrUpdateProduct(@RequestBody Product product) {
-        productService.saveOrUpdate(product);
+    public ResultVO<Object> saveOrUpdateProduct(@RequestBody Product product) {
+        if (productService.saveOrUpdate(product))
+            return ResultVO.ok(new Object());
+        else
+            return ResultVO.error("Failed");
     }
 
     @ApiOperation(value = "删除 Product")
     @PostMapping("deleteProduct")
-    public void deleteProduct(@RequestBody Product product) {
-        productService.remove(new QueryWrapper<>(product));
+    public ResultVO<Object> deleteProduct(@RequestBody Product product) {
+        if (productService.remove(new QueryWrapper<>(product)))
+            return ResultVO.ok(new Object());
+        else
+            return ResultVO.error("Failed");
     }
 
     @ApiOperation(value = "向产品线添加服务")
     @PostMapping("addServiceToProduct")
-    public void addServiceToProduct(@RequestBody ProductService productService) {
+    public ResultVO<Object> addServiceToProduct(@RequestBody ProductService productService) {
         QueryWrapper<ProductService> queryWrapper = new QueryWrapper<>(productService);
         if (productServiceService.count(queryWrapper) == 0) {
             productServiceService.save(productService);
         }
+        return ResultVO.ok(new Object());
     }
 
     @ApiOperation(value = "查询服务列表")
@@ -96,9 +104,10 @@ public class ProductController {
 
     @ApiOperation(value = "删除服务列表")
     @PostMapping("deleteService")
-    public void deleteService(@RequestBody ProductService productService) {
+    public ResultVO<Object> deleteService(@RequestBody ProductService productService) {
         QueryWrapper<ProductService> queryWrapper = new QueryWrapper<>(productService);
         productServiceService.remove(queryWrapper);
+        return ResultVO.ok(new Object());
     }
 
 }

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sensecloud.web.bean.common.PageResult;
+import sensecloud.web.bean.vo.ResultVO;
 import sensecloud.web.bean.vo.UserAuthorityVO;
 import sensecloud.web.entity.UserAuthority;
 import sensecloud.web.service.impl.UserAuthorityServiceImpl;
@@ -44,8 +45,11 @@ public class UserAuthorityController {
 
     @ApiOperation(value = "Delete UserAuthority")
     @PostMapping("deleteUserAuthority")
-    public void deleteUserAuthority(@RequestBody UserAuthority userAuthority) {
-        userAuthorityService.remove(new QueryWrapper<>(userAuthority));
+    public ResultVO<Object> deleteUserAuthority(@RequestBody UserAuthority userAuthority) {
+        if (userAuthorityService.remove(new QueryWrapper<>(userAuthority)))
+            return ResultVO.ok(new Object());
+        else
+            return ResultVO.error("删除失败");
     }
 
 }
