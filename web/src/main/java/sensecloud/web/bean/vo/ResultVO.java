@@ -21,7 +21,7 @@ public class ResultVO<E> {
 
     public static <E> ResultVO<E> ok(E data) {
         ResultVO<E> result = new ResultVO<E>();
-        result.code = 0;
+        result.code = 200;
         result.msg = "success";
         result.data = data;
         return result;
