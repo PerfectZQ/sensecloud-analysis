@@ -67,7 +67,7 @@ public class AuthorizeController {
     @PostMapping("initProductPermissions")
     @PreAuthorize("hasRole('PlatformAdmin')")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
-    public ResultVO<Object> initProductPermissions(@RequestBody InitProduct initProduct) {
+    public ResultVO<String> initProductPermissions(@RequestBody InitProduct initProduct) {
 
         String productName = initProduct.getProductName();
         String username = initProduct.getUsername();
@@ -117,7 +117,7 @@ public class AuthorizeController {
         log.info("====> Update product service status to true.");
         product.setStatus(true);
         productService.updateProductStatus(product);
-        return ResultVO.ok(new Object());
+        return ResultVO.ok("");
     }
 
     /**
@@ -130,7 +130,7 @@ public class AuthorizeController {
     @PostMapping("bindUserRoleToProduct")
     @PreAuthorize("hasRole('PlatformAdmin') || (hasRole('ProductAdmin:'.concat(#productName)) && !'PlatformAdmin'.equals(#rolename))")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
-    public ResultVO<Object> bindUserRoleToProduct(@RequestParam String username,
+    public ResultVO<String> bindUserRoleToProduct(@RequestParam String username,
                                       @RequestParam String rolename,
                                       @RequestParam String productName) {
 
@@ -165,7 +165,7 @@ public class AuthorizeController {
                         username, productName, webComponentRoleMappingVO)
         );
 
-        return ResultVO.ok(new Object());
+        return ResultVO.ok("");
     }
 
     /**
@@ -178,7 +178,7 @@ public class AuthorizeController {
     @PostMapping("unbindUserRoleFromProduct")
     @PreAuthorize("hasRole('PlatformAdmin') OR (hasRole('ProductAdmin:'.concat(#productName)) AND !'PlatformAdmin'.equals(#rolename))")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
-    public ResultVO<Object> unbindUserRoleFromProduct(@RequestParam String username,
+    public ResultVO<String> unbindUserRoleFromProduct(@RequestParam String username,
                                           @RequestParam String rolename,
                                           @RequestParam String productName) {
 
@@ -217,7 +217,7 @@ public class AuthorizeController {
                         username, productName, webComponentRoleMappingVO)
         );
 
-        return ResultVO.ok(new Object());
+        return ResultVO.ok("");
     }
 
 }

@@ -69,30 +69,30 @@ public class ProductController {
 
     @ApiOperation(value = "添加或修改产品线，修改必须带着ID")
     @PostMapping("saveOrUpdateProduct")
-    public ResultVO<Object> saveOrUpdateProduct(@RequestBody Product product) {
+    public ResultVO<String> saveOrUpdateProduct(@RequestBody Product product) {
         if (productService.saveOrUpdate(product))
-            return ResultVO.ok(new Object());
+            return ResultVO.ok("");
         else
             return ResultVO.error("Failed");
     }
 
     @ApiOperation(value = "删除 Product")
     @PostMapping("deleteProduct")
-    public ResultVO<Object> deleteProduct(@RequestBody Product product) {
+    public ResultVO<String> deleteProduct(@RequestBody Product product) {
         if (productService.remove(new QueryWrapper<>(product)))
-            return ResultVO.ok(new Object());
+            return ResultVO.ok("");
         else
             return ResultVO.error("Failed");
     }
 
     @ApiOperation(value = "向产品线添加服务")
     @PostMapping("addServiceToProduct")
-    public ResultVO<Object> addServiceToProduct(@RequestBody ProductService productService) {
+    public ResultVO<String> addServiceToProduct(@RequestBody ProductService productService) {
         QueryWrapper<ProductService> queryWrapper = new QueryWrapper<>(productService);
         if (productServiceService.count(queryWrapper) == 0) {
             productServiceService.save(productService);
         }
-        return ResultVO.ok(new Object());
+        return ResultVO.ok("");
     }
 
     @ApiOperation(value = "查询服务列表")
@@ -104,10 +104,10 @@ public class ProductController {
 
     @ApiOperation(value = "删除服务列表")
     @PostMapping("deleteService")
-    public ResultVO<Object> deleteService(@RequestBody ProductService productService) {
+    public ResultVO<String> deleteService(@RequestBody ProductService productService) {
         QueryWrapper<ProductService> queryWrapper = new QueryWrapper<>(productService);
         productServiceService.remove(queryWrapper);
-        return ResultVO.ok(new Object());
+        return ResultVO.ok("");
     }
 
 }

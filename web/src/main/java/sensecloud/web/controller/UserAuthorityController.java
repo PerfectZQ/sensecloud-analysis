@@ -45,9 +45,9 @@ public class UserAuthorityController {
 
     @ApiOperation(value = "Delete UserAuthority")
     @PostMapping("deleteUserAuthority")
-    public ResultVO<Object> deleteUserAuthority(@RequestBody UserAuthority userAuthority) {
+    public ResultVO<String> deleteUserAuthority(@RequestBody UserAuthority userAuthority) {
         if (userAuthorityService.remove(new QueryWrapper<>(userAuthority)))
-            return ResultVO.ok(new Object());
+            return ResultVO.ok("");
         else
             return ResultVO.error("删除失败");
     }
