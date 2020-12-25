@@ -10,7 +10,7 @@ import sensecloud.web.bean.clickhouse.RequestProduct;
 
 import javax.websocket.server.PathParam;
 
-@FeignClient(name = "mysqlCDCService", url = "sensecloud-sync:8080/mysql-cdc/api/v1")
+@FeignClient(name = "mysqlCDCService", url = "http://10.10.18.109:49018//mysql-cdc/api/v1")
 public interface MysqlCDCService {
 
     @PostMapping("/syncdb/dbtable")
