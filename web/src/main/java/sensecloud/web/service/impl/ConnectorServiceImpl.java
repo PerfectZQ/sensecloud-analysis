@@ -67,10 +67,11 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
 
     public boolean addMysqlCDC (ConnectorBean bean) {
         JSONObject params = this.buildMysqlCDCServiceParams(bean);
-        log.debug("Start to call remote mysqlCDCService.add with parameters: {}", params);
+        log.info("Start to call remote mysqlCDCService.add with parameters: {}", params);
 
         JSONObject callback = this.mysqlCDCService.add(params);
 
+        log.info("Start to call remote mysqlCDCService.add and callback: {}", callback);
         boolean result = false;
         if(callback != null) {
             int code = callback.getInteger("code");
