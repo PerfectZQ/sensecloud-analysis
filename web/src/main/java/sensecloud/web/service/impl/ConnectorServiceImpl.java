@@ -165,16 +165,18 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         params.put("dbUser", accountConf.getString("jdbc.user"));
 
         params.put("dbUrl", sourceConf.getString("jdbc.url"));
-        params.put("targerDb", sourceConf.getString("db"));
+
+        String db = sourceConf.getString("db");
+        params.put("targerDb", db);
 
         JSONArray tables = sourceConf.getJSONArray("tables");
 
-//        JSONArray tbs = new JSONArray();
-//        for (int i = 0 ; i < tables.size() ; i ++) {
-//            JSONObject table = tables.getJSONObject(i);
-//            tbs.add(table.getString("table"));
-//        }
-        params.put("table", tables);
+        JSONArray tbs = new JSONArray();
+        for (int i = 0 ; i < tables.size() ; i ++) {
+            String tb = tables.getString(i);
+            tbs.add(db + "." + tb);
+        }
+        params.put("table", tbs);
         return params;
     }
 
