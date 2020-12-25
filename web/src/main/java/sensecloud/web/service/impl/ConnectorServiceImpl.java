@@ -169,12 +169,12 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
 
         JSONArray tables = sourceConf.getJSONArray("tables");
 
-        JSONArray tbs = new JSONArray();
-        for (int i = 0 ; i < tables.size() ; i ++) {
-            JSONObject table = tables.getJSONObject(i);
-            tbs.add(table.getString("table"));
-        }
-        params.put("table", tbs);
+//        JSONArray tbs = new JSONArray();
+//        for (int i = 0 ; i < tables.size() ; i ++) {
+//            JSONObject table = tables.getJSONObject(i);
+//            tbs.add(table.getString("table"));
+//        }
+        params.put("table", tables);
         return params;
     }
 
