@@ -126,6 +126,8 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         JSONObject callback = null;
         try {
             callback = this.clickHouseRemoteService.getClickHouseUser(username);
+
+            log.debug("Call getClickHouseUser finished. And callback is {}", callback);
         } catch (Exception e) {
             e.printStackTrace();
         }
