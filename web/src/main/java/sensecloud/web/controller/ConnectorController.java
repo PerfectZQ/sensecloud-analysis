@@ -230,6 +230,7 @@ public class ConnectorController {
             if(size != null) {
                 pageSize = size.longValue();
             }
+            query.orderByDesc("update_time");
             long total = query.count();
             IPage<ConnectorEntity> result = query.page(new Page<ConnectorEntity>(pageNum, pageSize, total));
             return ok(result);

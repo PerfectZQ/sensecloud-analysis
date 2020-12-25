@@ -155,20 +155,17 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         return result;
     }
 
-
-
-
     private JSONObject buildMysqlCDCServiceParams(ConnectorBean bean) {
         JSONObject params = new JSONObject();
         JSONObject accountConf = bean.getSourceAccountConf();
         JSONObject sourceConf = bean.getSourceConf();
 
         params.put("id", Long.valueOf(bean.getId()));
-        params.put("dbPassword", accountConf.getString("password"));
-        params.put("dbUser", accountConf.getString("username"));
+        params.put("dbPassword", accountConf.getString("jdbc.pwd"));
+        params.put("dbUser", accountConf.getString("jdbc.user"));
 
-        params.put("dbUrl", sourceConf.getString("url"));
-        params.put("targerDb", sourceConf.getString("database"));
+        params.put("dbUrl", sourceConf.getString("jdbc.url"));
+        params.put("targerDb", sourceConf.getString("db"));
 
         JSONArray tables = sourceConf.getJSONArray("tables");
 
