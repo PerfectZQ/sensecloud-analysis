@@ -35,17 +35,19 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(value = AuthenticationException.class)
-     @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "AuthenticationException")
-    public ResultVO<Object> exceptionHandler(HttpServletRequest req, HttpServletResponse response, AuthenticationException e) throws IOException {
+    @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "AuthenticationException")
+    public void exceptionHandler(HttpServletRequest req, HttpServletResponse response, AuthenticationException e) throws IOException {
         log.error("====> GlobalExceptionHandler AuthenticationException: ", e);
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         // response.sendRedirect(this.configuration.getNo_auth_redirect_url());
-        return ResultVO.error(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+//        return ResultVO.error(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
     }
 
     @ExceptionHandler(value = AccessDeniedException.class)
-    public ResultVO<Object> exceptionHandler(HttpServletRequest req, HttpServletResponse response, AccessDeniedException e) throws IOException {
+    public void exceptionHandler(HttpServletRequest req, HttpServletResponse response, AccessDeniedException e) throws IOException {
         log.error("====> GlobalExceptionHandler AccessDeniedException: ", e);
-        return ResultVO.error(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+//        return ResultVO.error(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+        response.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
     }
 
     /**
