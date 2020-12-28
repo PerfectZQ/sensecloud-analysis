@@ -85,7 +85,7 @@ public class ConnectorController {
                     ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                     String catalog = AttachmentCatalog.KAFKA_KEYSTORE.name();
                     attachmentEntity.setCatalog(catalog);
-                    attachmentEntity.setContent(this.readAttachment(keystoreLocation));
+                    attachmentEntity.setContent(this.readAttachment(this.uploadPath + keystoreLocation));
                     attachmentEntity.setConnectorId(entity.getId());
 
                     entities.add(attachmentEntity);
@@ -95,7 +95,7 @@ public class ConnectorController {
                     ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                     String catalog = AttachmentCatalog.KAFKA_TRUSTSTORE.name();
                     attachmentEntity.setCatalog(catalog);
-                    attachmentEntity.setContent(this.readAttachment(truststoreLocation));
+                    attachmentEntity.setContent(this.readAttachment(this.uploadPath + truststoreLocation));
                     attachmentEntity.setConnectorId(entity.getId());
                     entities.add(attachmentEntity);
                 }
