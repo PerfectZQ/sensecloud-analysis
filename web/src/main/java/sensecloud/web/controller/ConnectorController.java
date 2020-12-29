@@ -85,7 +85,7 @@ public class ConnectorController {
                     ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                     String catalog = AttachmentCatalog.KAFKA_KEYSTORE.name();
                     attachmentEntity.setCatalog(catalog);
-                    attachmentEntity.setContent(this.readAttachment(keystoreLocation));
+                    attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + keystoreLocation));
                     attachmentEntity.setConnectorId(entity.getId());
 
                     entities.add(attachmentEntity);
@@ -95,7 +95,7 @@ public class ConnectorController {
                     ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                     String catalog = AttachmentCatalog.KAFKA_TRUSTSTORE.name();
                     attachmentEntity.setCatalog(catalog);
-                    attachmentEntity.setContent(this.readAttachment(truststoreLocation));
+                    attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + truststoreLocation));
                     attachmentEntity.setConnectorId(entity.getId());
                     entities.add(attachmentEntity);
                 }
@@ -142,7 +142,7 @@ public class ConnectorController {
                     ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                     String catalog = AttachmentCatalog.KAFKA_KEYSTORE.name();
                     attachmentEntity.setCatalog(catalog);
-                    attachmentEntity.setContent(this.readAttachment(keystoreLocation));
+                    attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + keystoreLocation));
                     attachmentEntity.setConnectorId(entity.getId());
 
                     entities.add(attachmentEntity);
@@ -152,7 +152,7 @@ public class ConnectorController {
                     ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                     String catalog = AttachmentCatalog.KAFKA_TRUSTSTORE.name();
                     attachmentEntity.setCatalog(catalog);
-                    attachmentEntity.setContent(this.readAttachment(truststoreLocation));
+                    attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + truststoreLocation));
                     attachmentEntity.setConnectorId(entity.getId());
                     entities.add(attachmentEntity);
                 }
@@ -230,6 +230,7 @@ public class ConnectorController {
             if(size != null) {
                 pageSize = size.longValue();
             }
+            query.orderByDesc("create_time");
             long total = query.count();
             IPage<ConnectorEntity> result = query.page(new Page<ConnectorEntity>(pageNum, pageSize, total));
             return ok(result);
@@ -292,6 +293,7 @@ public class ConnectorController {
 
 
     private byte[] readAttachment(String location) {
+        log.debug("Attachment location: {}", location);
         byte[] res = null;
         try (FileInputStream in = new FileInputStream(new File(location))) {
             res = IOUtils.toByteArray(in);

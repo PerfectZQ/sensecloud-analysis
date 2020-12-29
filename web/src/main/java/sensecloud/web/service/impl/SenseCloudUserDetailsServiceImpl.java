@@ -49,8 +49,9 @@ public class SenseCloudUserDetailsServiceImpl implements UserDetailsService {
         log.info("====> Load user by username {}", username);
         UserEntity userEntity = userService.getOne(new QueryWrapper<>(new UserEntity().setUsername(username)));
         if (userEntity == null) {
-            log.error("====> User {} not found", username);
-            throw new UsernameNotFoundException(username + " not found");
+            log.info("====> User {} not found", username);
+            return new org.springframework.security.core.userdetails.User(username, null, null);
+//            throw new UsernameNotFoundException(username + " not found");
         }
         // Get all roles info of this user
         List<UserAuthorityVO> userAuthorities = userRoleProductService.getBaseMapper()

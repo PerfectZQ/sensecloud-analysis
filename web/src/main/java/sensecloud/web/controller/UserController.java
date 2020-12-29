@@ -2,6 +2,8 @@ package sensecloud.web.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,18 +20,18 @@ import static sensecloud.web.bean.vo.ResultVO.*;
 public class UserController {
 
     @GetMapping("/current")
-    public ResultVO<String> current() {
+    public ResponseEntity<ResultVO<String>> current() {
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication auth = context.getAuthentication();
         if (auth == null) {
-            return error("No authenticated user.");
+            return new ResponseEntity<ResultVO<String>>(error("No authenticated user."), HttpStatus.UNAUTHORIZED);
         }
 
         String username = auth.getName();
         if (StringUtils.isBlank(username)) {
-            return error("Username in auth is empty.");
+            return new ResponseEntity<ResultVO<String>>(error("Username in auth is empty."), HttpStatus.UNAUTHORIZED);
         }
-        return ok(auth.getName());
+        return new ResponseEntity<ResultVO<String>>(ok(auth.getName()), HttpStatus.OK);
     }
 
 }

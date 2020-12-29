@@ -67,8 +67,11 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
 
     public boolean addMysqlCDC (ConnectorBean bean) {
         JSONObject params = this.buildMysqlCDCServiceParams(bean);
+        log.info("Start to call remote mysqlCDCService.add with parameters: {}", params);
+
         JSONObject callback = this.mysqlCDCService.add(params);
 
+        log.info("Start to call remote mysqlCDCService.add and callback: {}", callback);
         boolean result = false;
         if(callback != null) {
             int code = callback.getInteger("code");
@@ -124,6 +127,8 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         JSONObject callback = null;
         try {
             callback = this.clickHouseRemoteService.getClickHouseUser(username);
+
+            log.debug("Call getClickHouseUser finished. And callback is {}", callback);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -150,27 +155,26 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         return result;
     }
 
-
-
-
     private JSONObject buildMysqlCDCServiceParams(ConnectorBean bean) {
         JSONObject params = new JSONObject();
         JSONObject accountConf = bean.getSourceAccountConf();
         JSONObject sourceConf = bean.getSourceConf();
 
         params.put("id", Long.valueOf(bean.getId()));
-        params.put("dbPassword", accountConf.getString("password"));
-        params.put("dbUser", accountConf.getString("username"));
+        params.put("dbPassword", accountConf.getString("jdbc.pwd"));
+        params.put("dbUser", accountConf.getString("jdbc.user"));
 
-        params.put("dbUrl", sourceConf.getString("url"));
-        params.put("targerDb", sourceConf.getString("database"));
+        params.put("dbUrl", sourceConf.getString("jdbc.url"));
+
+        String db = sourceConf.getString("db");
+        params.put("targerDb", db);
 
         JSONArray tables = sourceConf.getJSONArray("tables");
 
         JSONArray tbs = new JSONArray();
         for (int i = 0 ; i < tables.size() ; i ++) {
-            JSONObject table = tables.getJSONObject(i);
-            tbs.add(table.getString("table"));
+            String tb = tables.getString(i);
+            tbs.add(db + "." + tb);
         }
         params.put("table", tbs);
         return params;
