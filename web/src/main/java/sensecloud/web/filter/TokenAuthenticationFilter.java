@@ -91,13 +91,12 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         if (postOnly && !request.getMethod().equals(HttpMethod.POST.name())) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String name = headerNames.nextElement();
-            log.info(">>> HEADER name = {}, value = {}", name, request.getHeader(name));
-        }
+//        Enumeration<String> headerNames = request.getHeaderNames();
+//        while (headerNames.hasMoreElements()) {
+//            String name = headerNames.nextElement();
+//            log.info(">>> HEADER name = {}, value = {}", name, request.getHeader(name));
+//        }
 
-        
         String xIdToken = request.getHeader(configuration.getId_token_header());
         if (!checkToken(xIdToken)) return null;
         UserInfo userInfo = getUserInfo(xIdToken);
