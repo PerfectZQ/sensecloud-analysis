@@ -39,7 +39,6 @@ public class TokenAuthenticationFailureHandler implements AuthenticationFailureH
             ResultVO<Object> resultVO = ResultVO.error(HttpStatus.FORBIDDEN.value(), exception.getMessage());
             response.setCharacterEncoding("utf-8");
             response.setContentType("application/json; charset=utf-8");
-            response.setStatus(HttpStatus.FORBIDDEN.value());
             response.getWriter().write(JSON.toJSONString(resultVO));
         }
     }
