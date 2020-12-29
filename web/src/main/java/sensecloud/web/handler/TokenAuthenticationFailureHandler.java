@@ -31,6 +31,7 @@ public class TokenAuthenticationFailureHandler implements AuthenticationFailureH
         ResultVO<Object> resultVO = ResultVO.error(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
         response.setCharacterEncoding("utf-8");
         response.setContentType("application/json; charset=utf-8");
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().write(JSON.toJSONString(resultVO));
     }
 }
