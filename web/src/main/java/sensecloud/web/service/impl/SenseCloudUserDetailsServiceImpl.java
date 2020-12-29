@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 import sensecloud.web.bean.vo.UserAuthorityVO;
 import sensecloud.web.entity.UserEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,8 @@ public class SenseCloudUserDetailsServiceImpl implements UserDetailsService {
         UserEntity userEntity = userService.getOne(new QueryWrapper<>(new UserEntity().setUsername(username)));
         if (userEntity == null) {
             log.info("====> User {} not found", username);
-            return new org.springframework.security.core.userdetails.User(username, null, null);
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            return new org.springframework.security.core.userdetails.User(username, "", authorities);
 //            throw new UsernameNotFoundException(username + " not found");
         }
         // Get all roles info of this user
