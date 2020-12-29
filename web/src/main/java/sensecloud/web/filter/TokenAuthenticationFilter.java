@@ -24,6 +24,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 
 /**
  * 自定义登录认证过滤器
@@ -90,6 +91,13 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         if (postOnly && !request.getMethod().equals(HttpMethod.POST.name())) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String name = headerNames.nextElement();
+            log.info(">>> HEADER name = {}, value = {}", name, request.getHeader(name));
+        }
+
+        
         String xIdToken = request.getHeader(configuration.getId_token_header());
         if (!checkToken(xIdToken)) return null;
         UserInfo userInfo = getUserInfo(xIdToken);
