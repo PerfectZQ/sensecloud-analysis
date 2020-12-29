@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author ZhangQiang
@@ -20,8 +20,12 @@ public class UserAuthorityServiceImpl extends ServiceImpl<UserAuthorityMapper, U
 
     public UserAuthority createUserProductIfNotExist(UserAuthority userRoleProduct) {
         QueryWrapper<UserAuthority> queryWrapper = new QueryWrapper<>(userRoleProduct);
-        if (count(queryWrapper) == 0) {
-            save(userRoleProduct);
+        synchronized (this){
+            if (count(queryWrapper) == 0) {
+                save(userRoleProduct);
+            } else {
+                throw new IllegalArgumentException("UserAuthority is exist.");
+            }
         }
         return getOne(queryWrapper);
     }

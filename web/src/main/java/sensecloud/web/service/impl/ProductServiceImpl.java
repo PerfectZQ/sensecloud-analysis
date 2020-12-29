@@ -30,8 +30,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
      */
     public Product createProductIfNotExist(Product product) {
         QueryWrapper<Product> queryWrapper = new QueryWrapper<>(product);
-        if (count(queryWrapper) == 0) {
-            save(product);
+        synchronized (this){
+            if (count(queryWrapper) == 0) {
+                save(product);
+            }
         }
         return getOne(queryWrapper);
     }
