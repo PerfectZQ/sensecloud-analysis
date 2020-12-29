@@ -20,8 +20,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     public UserEntity createUserIfNotExist(UserEntity user) {
         QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>(user);
-        if (count(queryWrapper) == 0) {
-            save(user);
+        synchronized (this){
+            if (count(queryWrapper) == 0) {
+                save(user);
+            }
         }
         return getOne(queryWrapper);
     }
