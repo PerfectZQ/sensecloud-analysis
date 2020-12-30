@@ -318,9 +318,10 @@ public class ConnectorController {
 
     private void assembleClickHouseConf(String username, ConnectorEntity entity) {
         JSONObject chConf = connectorService.getClickHouseUser(username);
-        entity.getSourceAccountConf().put("jdbc.url", clickHouseJDBCUrl);
-        entity.getSourceAccountConf().put("jdbc.user", chConf.getString("ckUser"));
-        entity.getSourceAccountConf().put("jdbc.password", chConf.getString("ckPassword"));
+        log.debug(">>> connectorService.getClickHouseUser callback object: {}", chConf);
+        entity.getSinkAccountConf().put("jdbc.url", clickHouseJDBCUrl);
+        entity.getSinkAccountConf().put("jdbc.user", chConf.getString("ckUser"));
+        entity.getSinkAccountConf().put("jdbc.password", chConf.getString("ckPassword"));
     }
 
 
