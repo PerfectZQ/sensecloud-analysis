@@ -1,0 +1,23 @@
+{
+  "kafka": {
+    "group.id": "g1",
+    "bootstrap.servers": "kafka-kafka-outer-svc:9092"
+  },
+  "topic": [
+    {
+      "name": "api-gateway-log",
+      "schema": {
+        "message": [
+          {
+            "name": "service_name",
+            "type": "String"
+          },
+          {
+            "name": "docker",
+            "type": "String"
+          }
+        ]
+      }
+    }
+  ]
+}
