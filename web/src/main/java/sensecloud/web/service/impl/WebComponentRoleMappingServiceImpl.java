@@ -64,9 +64,13 @@ public class WebComponentRoleMappingServiceImpl extends ServiceImpl<WebComponent
                 supersetRemoteAuthService.bindRoleToUser(componentRoleName, username);
                 break;
             case CLICK_HOUSE_COMPONENT_NAME:
-                // 铁达在 InitProduct 接口已经初始化了，所以这里啥也不干
                 log.info("====> Init " + webRoleName + " " + username + " of " + productName + " on ClickHouse\n" +
                         "====> assign role " + componentRoleName + " to " + username);
+                RequestBoundUser requestBoundUser = new RequestBoundUser()
+                        .setUserName(username)
+                        .setRoleName(componentRoleName)
+                        .setProductLine(productName);
+                clickHouseRemoteAuthService.boundUserRoleToGroup(requestBoundUser);
                 break;
             default:
                 throw new IllegalArgumentException("UnSupport Component: " + componentName);
