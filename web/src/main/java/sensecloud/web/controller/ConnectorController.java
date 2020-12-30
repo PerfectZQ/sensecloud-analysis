@@ -23,6 +23,7 @@ import sensecloud.web.entity.ConnectorAttachmentEntity;
 import sensecloud.web.entity.ConnectorEntity;
 import sensecloud.web.service.impl.ConnectorAttachmentServiceImpl;
 import sensecloud.web.service.impl.ConnectorServiceImpl;
+import sensecloud.web.service.impl.SenseCloudUserDetailsServiceImpl;
 import sensecloud.web.service.impl.UserAuthorityServiceImpl;
 import sensecloud.web.service.remote.ClickHouseRemoteService;
 
@@ -54,6 +55,9 @@ public class ConnectorController {
 
     @Autowired
     private UserAuthorityServiceImpl userAuthorityService;
+
+    @Autowired
+    private SenseCloudUserDetailsServiceImpl senseCloudUserDetailsService;
 
     @PostMapping
     public ResultVO<Boolean> add(@RequestBody ConnectorVO params) {
