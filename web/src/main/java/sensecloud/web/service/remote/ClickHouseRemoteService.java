@@ -17,6 +17,6 @@ import javax.websocket.server.PathParam;
 public interface ClickHouseRemoteService {
 
     @RequestMapping(value = "/user/{username}", method = RequestMethod.GET, consumes = "application/json")
-    JSONObject getClickHouseUser(@PathParam("username") String username) throws Exception;
+    JSONObject getClickHouseUser(@PathVariable(value = "username") String username) throws Exception;
 
 }
