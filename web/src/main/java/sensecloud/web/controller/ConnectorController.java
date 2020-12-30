@@ -23,6 +23,7 @@ import sensecloud.web.entity.ConnectorAttachmentEntity;
 import sensecloud.web.entity.ConnectorEntity;
 import sensecloud.web.service.impl.ConnectorAttachmentServiceImpl;
 import sensecloud.web.service.impl.ConnectorServiceImpl;
+import sensecloud.web.service.impl.SenseCloudUserDetailsServiceImpl;
 import sensecloud.web.service.impl.UserAuthorityServiceImpl;
 import sensecloud.web.service.remote.ClickHouseRemoteService;
 
@@ -55,6 +56,9 @@ public class ConnectorController {
     @Autowired
     private UserAuthorityServiceImpl userAuthorityService;
 
+    @Autowired
+    private SenseCloudUserDetailsServiceImpl senseCloudUserDetailsService;
+
     @PostMapping
     public ResultVO<Boolean> add(@RequestBody ConnectorVO params) {
         //Todo: params validation
@@ -69,49 +73,53 @@ public class ConnectorController {
         BeanUtils.copyProperties(params, entity);
 
         entity.setCreateBy(user.getName());
+        try {
+            boolean success = connectorService.saveOrUpdate(entity);
 
-        boolean success = connectorService.saveOrUpdate(entity);
+            if ("KAFKA".equalsIgnoreCase(params.getSourceType())) {
+                JSONObject sourceAccountConf = params.getSourceAccountConf();
+                Boolean securityEnable = sourceAccountConf.getBoolean("security.enable");
 
-        if ("KAFKA".equalsIgnoreCase(params.getSourceType())) {
-            JSONObject sourceAccountConf = params.getSourceAccountConf();
-            Boolean securityEnable = sourceAccountConf.getBoolean("security.enable");
+                if (securityEnable != null && securityEnable.booleanValue()) {
+                    String keystoreLocation = sourceAccountConf.getString("ssl.keystore.location");
+                    String truststoreLocation = sourceAccountConf.getString("ssl.truststore.location");
+                    List<ConnectorAttachmentEntity> entities = new ArrayList<>();
 
-            if (securityEnable != null && securityEnable.booleanValue()) {
-                String keystoreLocation = sourceAccountConf.getString("ssl.keystore.location");
-                String truststoreLocation = sourceAccountConf.getString("ssl.truststore.location");
-                List<ConnectorAttachmentEntity> entities = new ArrayList<>();
+                    if (StringUtils.isNotBlank(keystoreLocation)) {
+                        ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
+                        String catalog = AttachmentCatalog.KAFKA_KEYSTORE.name();
+                        attachmentEntity.setCatalog(catalog);
+                        attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + keystoreLocation));
+                        attachmentEntity.setConnectorId(entity.getId());
 
-                if(StringUtils.isNotBlank(keystoreLocation)) {
-                    ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
-                    String catalog = AttachmentCatalog.KAFKA_KEYSTORE.name();
-                    attachmentEntity.setCatalog(catalog);
-                    attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + keystoreLocation));
-                    attachmentEntity.setConnectorId(entity.getId());
+                        entities.add(attachmentEntity);
+                    }
 
-                    entities.add(attachmentEntity);
+                    if (StringUtils.isNotBlank(truststoreLocation)) {
+                        ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
+                        String catalog = AttachmentCatalog.KAFKA_TRUSTSTORE.name();
+                        attachmentEntity.setCatalog(catalog);
+                        attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + truststoreLocation));
+                        attachmentEntity.setConnectorId(entity.getId());
+                        entities.add(attachmentEntity);
+                    }
+
+                    success = connectorAttachmentService.saveBatch(entities);
                 }
 
-                if(StringUtils.isNotBlank(truststoreLocation)) {
-                    ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
-                    String catalog = AttachmentCatalog.KAFKA_TRUSTSTORE.name();
-                    attachmentEntity.setCatalog(catalog);
-                    attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + truststoreLocation));
-                    attachmentEntity.setConnectorId(entity.getId());
-                    entities.add(attachmentEntity);
+                if (success) {
+                    this.assembleClickHouseConf(user.getName(), entity);
+                    success = connectorService.submitKafkaJob(entity);
                 }
-
-                success = connectorAttachmentService.saveBatch(entities);
+            } else if ("MYSQL_CDC".equalsIgnoreCase(params.getSourceType())) {
+                success = connectorService.addMysqlCDC(entity);
             }
-
-            if(success) {
-                this.assembleClickHouseConf(user.getName(), entity);
-                success = connectorService.submitKafkaJob(entity);
-            }
-        } else if ("MYSQL_CDC".equalsIgnoreCase(params.getSourceType())) {
-            success = connectorService.addMysqlCDC(entity);
+            return ok(success);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return error(2020, "Exception occurred");
         }
 
-        return ok(success);
     }
 
     @PutMapping

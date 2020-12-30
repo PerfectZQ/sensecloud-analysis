@@ -18,6 +18,7 @@ public class ConnectorBean implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private String id;
     private String name;
+    private String saas;
     private String sourceName;
     private String sourceType;
 

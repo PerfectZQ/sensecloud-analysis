@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
 
     public boolean submitKafkaJob(ConnectorBean bean) {
         String connectorName = bean.getName();
+        String saas = StringUtils.isNotBlank(bean.getSaas())? bean.getSaas() : "undefined";
 
         String ruleName = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
         String ruleExpr = ruleProvider.getRuleExpression(ruleName);
@@ -62,7 +64,7 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
 
         //Todo: Get current user's group from database
         String jobId = connectorName;
-        return this.submitter.submit(jobId, ruleName, jobConf);
+        return this.submitter.submit(saas, jobId, ruleName, jobConf);
     }
 
     public boolean addMysqlCDC (ConnectorBean bean) {
