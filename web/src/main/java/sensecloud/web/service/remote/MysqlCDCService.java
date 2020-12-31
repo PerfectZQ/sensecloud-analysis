@@ -2,10 +2,7 @@ package sensecloud.web.service.remote;
 
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
 
@@ -19,6 +16,6 @@ public interface MysqlCDCService {
     JSONObject update(@RequestBody JSONObject params);
 
     @DeleteMapping("/syncdb/dbtable/{id}")
-    JSONObject delete(@PathParam("id") String id);
+    JSONObject delete(@PathVariable("id") String id);
 
 }
