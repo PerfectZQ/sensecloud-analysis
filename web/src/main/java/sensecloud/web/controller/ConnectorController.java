@@ -163,31 +163,32 @@ public class ConnectorController {
                     ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                     String catalog = AttachmentCatalog.KAFKA_KEYSTORE.name();
                     attachmentEntity.setCatalog(catalog);
+                    attachmentEntity.setConnectorId(entity.getId());
 
                     String realLocation = this.uploadPath + "/" + keystoreLocation;
                     File attachment = new File(realLocation);
                     if(attachment.exists()) {
                         attachmentEntity.setContent(this.readAttachment(realLocation));
+                        entities.add(attachmentEntity);
                     }
-
-                    attachmentEntity.setConnectorId(entity.getId());
-                    entities.add(attachmentEntity);
                 }
 
                 if (StringUtils.isNotBlank(truststoreLocation)) {
                     ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                     String catalog = AttachmentCatalog.KAFKA_TRUSTSTORE.name();
+                    attachmentEntity.setConnectorId(entity.getId());
                     attachmentEntity.setCatalog(catalog);
                     String realLocation = this.uploadPath + "/" + truststoreLocation;
                     File attachment = new File(realLocation);
                     if(attachment.exists()) {
                         attachmentEntity.setContent(this.readAttachment(realLocation));
+                        entities.add(attachmentEntity);
                     }
-                    attachmentEntity.setConnectorId(entity.getId());
-                    entities.add(attachmentEntity);
                 }
-
-                updateResult = connectorAttachmentService.updateBatchById(entities, entities.size());
+                
+                if(!entities.isEmpty()) {
+                    updateResult = connectorAttachmentService.updateBatchById(entities, entities.size());
+                }
             }
 
             if(updateResult) {
@@ -230,18 +231,9 @@ public class ConnectorController {
     }
 
     @GetMapping
-    public ResultVO<ConnectorVO> get(@RequestParam Long id) {
+    public ResultVO<ConnectorEntity> get(@RequestParam Long id) {
         ConnectorEntity entity = connectorService.getById(id);
-        ConnectorVO vo = new ConnectorVO();
-        BeanUtils.copyProperties(entity, vo);
-        if(entity != null) {
-            List<ConnectorAttachmentEntity> attachments = connectorAttachmentService.query()
-                    .eq("connector_id", entity.getId())
-                    .and(q -> q.eq("deleted", false))
-                    .list();
-            vo.attachments.addAll(attachments);
-        }
-        return ok(vo);
+        return ok(entity);
     }
 
     @GetMapping("/query")
