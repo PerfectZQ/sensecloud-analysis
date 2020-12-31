@@ -6,13 +6,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import sensecloud.web.bean.AbRole;
 import sensecloud.web.bean.airflow.AirflowInitGroup;
+import sensecloud.web.config.feign.OpenFeignConfig;
 
 /**
  * @author zhangqiang
  * @since 2020/11/5 20:17
  */
 @FeignClient(name = "airflowRemoteAuthService", url = "dlink-airflow-auth:8088/")
-// @FeignClient(name = "airflowRemoteAuthService", url = "10.53.7.100:53395/")
+// @FeignClient(name = "airflowRemoteAuthService", url = "dlink-airflow-auth:8088/", configuration = OpenFeignConfig.class)
+// @FeignClient(name = "airflowRemoteAuthService", url = "10.53.7.100:53395/", configuration = OpenFeignConfig.class)
 public interface AirflowRemoteAuthService {
 
     @PostMapping("/airflowAuth/createRole")
