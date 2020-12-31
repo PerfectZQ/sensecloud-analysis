@@ -15,4 +15,6 @@ import java.util.List;
 @Data @TableName(value = "connector", autoResultMap = true)
 public class ConnectorEntity extends ConnectorBean {
 
+    public List<ConnectorAttachmentEntity> attachments = new ArrayList<>();
+
 }

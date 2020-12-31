@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -89,7 +90,13 @@ public class ConnectorController {
                         ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                         String catalog = AttachmentCatalog.KAFKA_KEYSTORE.name();
                         attachmentEntity.setCatalog(catalog);
-                        attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + keystoreLocation));
+
+                        String realLocation = this.uploadPath + "/" + keystoreLocation;
+                        File attachment = new File(realLocation);
+                        if(attachment.exists()) {
+                            attachmentEntity.setContent(this.readAttachment(realLocation));
+                        }
+
                         attachmentEntity.setConnectorId(entity.getId());
 
                         entities.add(attachmentEntity);
@@ -99,7 +106,13 @@ public class ConnectorController {
                         ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                         String catalog = AttachmentCatalog.KAFKA_TRUSTSTORE.name();
                         attachmentEntity.setCatalog(catalog);
-                        attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + truststoreLocation));
+
+                        String realLocation = this.uploadPath + "/" + truststoreLocation;
+                        File attachment = new File(realLocation);
+                        if(attachment.exists()) {
+                            attachmentEntity.setContent(this.readAttachment(realLocation));
+                        }
+                        
                         attachmentEntity.setConnectorId(entity.getId());
                         entities.add(attachmentEntity);
                     }
@@ -150,9 +163,14 @@ public class ConnectorController {
                     ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                     String catalog = AttachmentCatalog.KAFKA_KEYSTORE.name();
                     attachmentEntity.setCatalog(catalog);
-                    attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + keystoreLocation));
-                    attachmentEntity.setConnectorId(entity.getId());
 
+                    String realLocation = this.uploadPath + "/" + keystoreLocation;
+                    File attachment = new File(realLocation);
+                    if(attachment.exists()) {
+                        attachmentEntity.setContent(this.readAttachment(realLocation));
+                    }
+
+                    attachmentEntity.setConnectorId(entity.getId());
                     entities.add(attachmentEntity);
                 }
 
@@ -160,7 +178,11 @@ public class ConnectorController {
                     ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                     String catalog = AttachmentCatalog.KAFKA_TRUSTSTORE.name();
                     attachmentEntity.setCatalog(catalog);
-                    attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + truststoreLocation));
+                    String realLocation = this.uploadPath + "/" + truststoreLocation;
+                    File attachment = new File(realLocation);
+                    if(attachment.exists()) {
+                        attachmentEntity.setContent(this.readAttachment(realLocation));
+                    }
                     attachmentEntity.setConnectorId(entity.getId());
                     entities.add(attachmentEntity);
                 }
@@ -210,6 +232,13 @@ public class ConnectorController {
     @GetMapping
     public ResultVO<ConnectorEntity> get(@RequestParam Long id) {
         ConnectorEntity entity = connectorService.getById(id);
+        if(entity != null) {
+            List<ConnectorAttachmentEntity> attachments = connectorAttachmentService.query()
+                    .eq("connector_id", entity.getId())
+                    .and(q -> q.eq("deleted", false))
+                    .list();
+            entity.attachments.addAll(attachments);
+        }
         return ok(entity);
     }
 
