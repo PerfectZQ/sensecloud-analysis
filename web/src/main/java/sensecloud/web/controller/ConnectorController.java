@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -89,7 +90,13 @@ public class ConnectorController {
                         ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                         String catalog = AttachmentCatalog.KAFKA_KEYSTORE.name();
                         attachmentEntity.setCatalog(catalog);
-                        attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + keystoreLocation));
+
+                        String realLocation = this.uploadPath + "/" + keystoreLocation;
+                        File attachment = new File(realLocation);
+                        if(attachment.exists()) {
+                            attachmentEntity.setContent(this.readAttachment(realLocation));
+                        }
+
                         attachmentEntity.setConnectorId(entity.getId());
 
                         entities.add(attachmentEntity);
@@ -99,7 +106,13 @@ public class ConnectorController {
                         ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                         String catalog = AttachmentCatalog.KAFKA_TRUSTSTORE.name();
                         attachmentEntity.setCatalog(catalog);
-                        attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + truststoreLocation));
+
+                        String realLocation = this.uploadPath + "/" + truststoreLocation;
+                        File attachment = new File(realLocation);
+                        if(attachment.exists()) {
+                            attachmentEntity.setContent(this.readAttachment(realLocation));
+                        }
+
                         attachmentEntity.setConnectorId(entity.getId());
                         entities.add(attachmentEntity);
                     }
@@ -150,22 +163,32 @@ public class ConnectorController {
                     ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                     String catalog = AttachmentCatalog.KAFKA_KEYSTORE.name();
                     attachmentEntity.setCatalog(catalog);
-                    attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + keystoreLocation));
                     attachmentEntity.setConnectorId(entity.getId());
 
-                    entities.add(attachmentEntity);
+                    String realLocation = this.uploadPath + "/" + keystoreLocation;
+                    File attachment = new File(realLocation);
+                    if(attachment.exists()) {
+                        attachmentEntity.setContent(this.readAttachment(realLocation));
+                        entities.add(attachmentEntity);
+                    }
                 }
 
                 if (StringUtils.isNotBlank(truststoreLocation)) {
                     ConnectorAttachmentEntity attachmentEntity = new ConnectorAttachmentEntity();
                     String catalog = AttachmentCatalog.KAFKA_TRUSTSTORE.name();
-                    attachmentEntity.setCatalog(catalog);
-                    attachmentEntity.setContent(this.readAttachment(this.uploadPath + "/" + truststoreLocation));
                     attachmentEntity.setConnectorId(entity.getId());
-                    entities.add(attachmentEntity);
+                    attachmentEntity.setCatalog(catalog);
+                    String realLocation = this.uploadPath + "/" + truststoreLocation;
+                    File attachment = new File(realLocation);
+                    if(attachment.exists()) {
+                        attachmentEntity.setContent(this.readAttachment(realLocation));
+                        entities.add(attachmentEntity);
+                    }
                 }
 
-                updateResult = connectorAttachmentService.updateBatchById(entities, entities.size());
+                if(!entities.isEmpty()) {
+                    updateResult = connectorAttachmentService.updateBatchById(entities, entities.size());
+                }
             }
 
             if(updateResult) {
@@ -318,9 +341,10 @@ public class ConnectorController {
 
     private void assembleClickHouseConf(String username, ConnectorEntity entity) {
         JSONObject chConf = connectorService.getClickHouseUser(username);
-        entity.getSourceAccountConf().put("jdbc.url", clickHouseJDBCUrl);
-        entity.getSourceAccountConf().put("jdbc.user", chConf.getString("ckUser"));
-        entity.getSourceAccountConf().put("jdbc.password", chConf.getString("ckPassword"));
+        log.debug(">>> connectorService.getClickHouseUser callback object: {}", chConf);
+        entity.getSinkAccountConf().put("jdbc.url", clickHouseJDBCUrl);
+        entity.getSinkAccountConf().put("jdbc.user", chConf.getString("ckUser"));
+        entity.getSinkAccountConf().put("jdbc.password", chConf.getString("ckPassword"));
     }
 
 

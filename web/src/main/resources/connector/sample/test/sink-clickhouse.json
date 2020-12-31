@@ -1,0 +1,26 @@
+{
+  "db": "dlink",
+  "orders": [],
+  "sample": [],
+  "tables": [
+    {
+      "ref": "api-gateway-log",
+      "cols": [
+        {
+          "ref": "service_name",
+          "type": "String",
+          "field": "service_name"
+        },
+        {
+          "ref": "docker",
+          "type": "Nullable(String)",
+          "field": "docker"
+        }
+      ],
+      "table": "dlink"
+    }
+  ],
+  "partitions": [
+    "service_name"
+  ]
+}

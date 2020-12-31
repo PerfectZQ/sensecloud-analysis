@@ -99,7 +99,7 @@ public class AirflowSubmitter {
     }
 
     private File writeCode (String group, String runId, String code) {
-        File dir = new File(this.gitConf.getLocalRepo() + "/" + this.gitConf.getProject() + "/" + group);
+        File dir = new File(this.gitConf.getLocalRepo() + "/" + this.gitConf.getProject());
         if(!dir.exists()){
             dir.mkdirs();
         }
