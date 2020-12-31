@@ -185,7 +185,7 @@ public class ConnectorController {
                         entities.add(attachmentEntity);
                     }
                 }
-                
+
                 if(!entities.isEmpty()) {
                     updateResult = connectorAttachmentService.updateBatchById(entities, entities.size());
                 }
