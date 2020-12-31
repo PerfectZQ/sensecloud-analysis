@@ -3,9 +3,6 @@ package sensecloud.web.service.remote;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
-import sensecloud.web.bean.clickhouse.RequestAdmin;
-import sensecloud.web.bean.clickhouse.RequestBoundUser;
-import sensecloud.web.bean.clickhouse.RequestProduct;
 
 import javax.websocket.server.PathParam;
 
