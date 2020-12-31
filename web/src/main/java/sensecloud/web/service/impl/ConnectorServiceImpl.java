@@ -47,13 +47,18 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         String ruleExpr = ruleProvider.getRuleExpression(ruleName);
         PebbleExpRule rule = new PebbleExpRule().expression(ruleExpr);
 
+        JSONObject sinkAccountConf = bean.getSinkAccountConf();
+        //decrypt clickhouse password
+        String encryptedPwd = sinkAccountConf.getString("jdbc.password");
+        log.debug("encryptedPwd = {}", encryptedPwd);
+
         this.connector = new Connector()
                                 .name(connectorName)
                                 .sourceType(SourceType.valueOf(bean.getSourceType().toUpperCase()))
                                 .sourceAccountConf(bean.getSourceAccountConf())
                                 .sourceConf(bean.getSourceConf())
                                 .sinkType(SinkType.valueOf(bean.getSinkType().toUpperCase()))
-                                .sinkAccountConf(bean.getSinkAccountConf())
+                                .sinkAccountConf(sinkAccountConf)
                                 .sinkConf(bean.getSinkConf())
                                 .rule(rule);
 
