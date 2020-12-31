@@ -112,7 +112,7 @@ public class ConnectorController {
                         if(attachment.exists()) {
                             attachmentEntity.setContent(this.readAttachment(realLocation));
                         }
-                        
+
                         attachmentEntity.setConnectorId(entity.getId());
                         entities.add(attachmentEntity);
                     }
@@ -230,16 +230,18 @@ public class ConnectorController {
     }
 
     @GetMapping
-    public ResultVO<ConnectorEntity> get(@RequestParam Long id) {
+    public ResultVO<ConnectorVO> get(@RequestParam Long id) {
         ConnectorEntity entity = connectorService.getById(id);
+        ConnectorVO vo = new ConnectorVO();
+        BeanUtils.copyProperties(entity, vo);
         if(entity != null) {
             List<ConnectorAttachmentEntity> attachments = connectorAttachmentService.query()
                     .eq("connector_id", entity.getId())
                     .and(q -> q.eq("deleted", false))
                     .list();
-            entity.attachments.addAll(attachments);
+            vo.attachments.addAll(attachments);
         }
-        return ok(entity);
+        return ok(vo);
     }
 
     @GetMapping("/query")
