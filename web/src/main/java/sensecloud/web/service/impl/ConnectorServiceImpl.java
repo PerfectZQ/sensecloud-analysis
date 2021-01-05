@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import sensecloud.connector.Connector;
@@ -20,6 +21,7 @@ import sensecloud.web.mapper.ConnectorMapper;
 import sensecloud.web.service.IConnectorService;
 import sensecloud.web.service.remote.ClickHouseRemoteService;
 import sensecloud.web.service.remote.MysqlCDCService;
+import sensecloud.web.utils.DesUtil;
 
 @Slf4j
 @Service
@@ -39,6 +41,9 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
     @Autowired
     private ClickHouseRemoteService clickHouseRemoteService;
 
+    @Value("${service.connector.clickhouse.des.key}")
+    private String ch_pwd_decrypt_key;
+
     public boolean submitKafkaJob(ConnectorBean bean) {
         String connectorName = bean.getName();
         String saas = StringUtils.isNotBlank(bean.getSaas())? bean.getSaas() : "undefined";
@@ -47,13 +52,21 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         String ruleExpr = ruleProvider.getRuleExpression(ruleName);
         PebbleExpRule rule = new PebbleExpRule().expression(ruleExpr);
 
+        JSONObject sinkAccountConf = bean.getSinkAccountConf();
+        //decrypt clickhouse password
+        String encryptedPwd = sinkAccountConf.getString("jdbc.password");
+        log.info("encryptedPwd = {}", encryptedPwd);
+        if(StringUtils.isNotBlank(encryptedPwd)) {
+            bean.getSinkAccountConf().put("jdbc.password", DesUtil.decrypt(this.ch_pwd_decrypt_key, encryptedPwd));
+        }
+
         this.connector = new Connector()
                                 .name(connectorName)
                                 .sourceType(SourceType.valueOf(bean.getSourceType().toUpperCase()))
                                 .sourceAccountConf(bean.getSourceAccountConf())
                                 .sourceConf(bean.getSourceConf())
                                 .sinkType(SinkType.valueOf(bean.getSinkType().toUpperCase()))
-                                .sinkAccountConf(bean.getSinkAccountConf())
+                                .sinkAccountConf(sinkAccountConf)
                                 .sinkConf(bean.getSinkConf())
                                 .rule(rule);
 

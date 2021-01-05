@@ -26,7 +26,7 @@
 
             {% if sink.samples is not null %}"target.sample.fields": [{% for sample in sink.samples %}"{{ sample }}"{% if loop.last == false %},{%endif%}{% endfor %}], {% endif %}
 
-            "target.url": "{{ sink["jdbc.url"] }}",
+            "target.url": "{{ sinkAccount["jdbc.url"] }}",
             "target.db.username": "{{ sinkAccount["jdbc.user"] }}",
             "target.db.password": "{{ sinkAccount["jdbc.password"] }}",
             "kafka.mapping.value": [

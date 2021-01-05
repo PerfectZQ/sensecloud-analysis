@@ -72,6 +72,7 @@ public class ConnectorController {
 
         ConnectorEntity entity = new ConnectorEntity();
         BeanUtils.copyProperties(params, entity);
+        this.assembleClickHouseConf(user.getName(), entity);
 
         entity.setCreateBy(user.getName());
         try {
@@ -147,6 +148,7 @@ public class ConnectorController {
 
         ConnectorEntity entity = new ConnectorEntity();
         BeanUtils.copyProperties(params, entity);
+        this.assembleClickHouseConf(user.getName(), entity);
 
         entity.setUpdateBy(user.getName());
         boolean updateResult = connectorService.updateById(entity);
@@ -192,7 +194,6 @@ public class ConnectorController {
             }
 
             if(updateResult) {
-                this.assembleClickHouseConf(user.getName(), entity);
                 updateResult = connectorService.submitKafkaJob(entity);
             }
         } else if ("MYSQL_CDC".equalsIgnoreCase(params.getSourceType())) {
