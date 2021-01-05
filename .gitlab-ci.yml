@@ -22,7 +22,7 @@ job_code_scan2:
   image: registry.sensetime.com/security/codescan:latest
   stage: code_scan
   only:
-    - master
+    - test
   script:
     - sonar_full_scan.sh
   tags:
