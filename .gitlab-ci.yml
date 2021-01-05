@@ -13,9 +13,20 @@ variables:
 
 
 stages:
+  - code_scan
   - build
   - package
   - deploy
+
+job_code_scan2:
+  image: registry.sensetime.com/security/codescan:latest
+  stage: code_scan
+  only:
+    - master
+  script:
+    - sonar_full_scan.sh
+  tags:
+    - k8s
 
 maven-build:
   image: $IMAGE_REGISTRY/workplatform/mvn
