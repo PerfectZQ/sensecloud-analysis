@@ -63,6 +63,8 @@ service:
 
 remote:
   rest:
+    mysql_cdc:
+      url: http://10.10.18.109:49018/mysql-cdc/api/v1
     airflow:
       url: http://10.10.18.109:45688
       username: sre.bigdata

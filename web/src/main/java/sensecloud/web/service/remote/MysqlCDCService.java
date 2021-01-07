@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
 
-@FeignClient(name = "mysqlCDCService", url = "http://10.10.18.109:49018/mysql-cdc/api/v1")
+@FeignClient(name = "mysqlCDCService", url = "${remote.rest.mysql_cdc.url}")
 public interface MysqlCDCService {
 
     @PostMapping("/syncdb/dbtable")
