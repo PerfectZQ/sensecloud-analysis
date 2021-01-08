@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 
 @FeignClient(name = "mysqlCDCService", url = "${remote.rest.mysql_cdc.url}")
 public interface MysqlCDCService {
