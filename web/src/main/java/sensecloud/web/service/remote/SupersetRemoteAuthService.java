@@ -34,8 +34,8 @@ public interface SupersetRemoteAuthService {
     void initGroupRole(@RequestBody AbRole role);
 
     @PostMapping("/superset/dashboard/listDashboardsVO/{pageId}/{pageSize}")
-    PageResult listDashboardsVO(@PathVariable Integer pageId,
-                                @PathVariable Integer pageSize,
+    PageResult listDashboardsVO(@PathVariable("pageId") Integer pageId,
+                                @PathVariable("pageSize") Integer pageSize,
                                 @RequestBody DashboardsVO dashboardsVO);
 
 }
