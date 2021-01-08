@@ -34,10 +34,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static sensecloud.web.bean.vo.ResultVO.*;
 
@@ -355,9 +352,13 @@ public class ConnectorController {
 
     @PostMapping("/checkMysql")
     public ResultVO<String> checkMysql (
-            @RequestParam("dbUrl") String url,
-            @RequestParam("dbUser") String usr,
-            @RequestParam("dbPassword") String pss) {
+            @RequestBody Map<String, String> param
+            ) {
+
+        String url = param.get("url");
+        String usr = param.get("usr");
+        String pss = param.get("pss");
+
         Connection conn = null;
         Statement statement = null;
         boolean rs = false;
