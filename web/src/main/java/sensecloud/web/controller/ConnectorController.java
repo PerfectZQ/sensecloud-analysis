@@ -351,9 +351,7 @@ public class ConnectorController {
 
 
     @PostMapping("/checkMysql")
-    public ResultVO<String> checkMysql (
-            @RequestBody Map<String, String> param
-            ) {
+    public ResultVO<String> checkMysql (@RequestBody Map<String, String> param) {
 
         String url = param.get("url");
         String usr = param.get("usr");
