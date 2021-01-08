@@ -248,6 +248,7 @@ public class ConnectorController {
         if (user != null && StringUtils.isNotBlank(user.getName())) {
             String username = user.getName();
             QueryChainWrapper<ConnectorEntity> query = connectorService.query()
+                    .select("id", "name", "saas", "source_name", "source_type", "sink_name", "sink_type", "create_by", "create_time")
                     .eq("create_by", username)
                     .and(q -> q.eq("deleted", false));
             if(StringUtils.isNotBlank(name)) {

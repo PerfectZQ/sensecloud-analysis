@@ -1,6 +1,7 @@
 package sensecloud.web.bean;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -36,11 +37,14 @@ public class ConnectorBean implements Serializable {
     private JSONObject sinkAccountConf;
 
     private String createBy;
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
     private String updateBy;
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
     private boolean deleted;
     private String deleteBy;
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime deleteTime;
 
 }
