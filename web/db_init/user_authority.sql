@@ -15,4 +15,4 @@ COLLATE=utf8mb4_unicode_ci;
 -- 给用户 sre.bigdata 授予平台管理员权限
 insert into sensecloud.user_authority (id, user_id, role_id, product_id) values (1, 1, 3, 1);
 -- 给用户 dlink 授予产品线 dlink 的产品线管理员权限
-insert into sensecloud.user_authority (id, user_id, role_id, product_id) values (2, 2, 4, 2);
+insert into sensecloud.user_authority (id, user_id, role_id, product_id) values (2, 2, 4, 1);

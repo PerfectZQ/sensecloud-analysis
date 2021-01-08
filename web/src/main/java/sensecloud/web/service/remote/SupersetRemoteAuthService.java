@@ -1,17 +1,19 @@
 package sensecloud.web.service.remote;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import sensecloud.web.bean.AbRole;
+import sensecloud.web.bean.common.PageResult;
+import sensecloud.web.bean.superset.DashboardsVO;
 
 /**
  * @author zhangqiang
  * @since 2020/11/5 20:17
  */
 @FeignClient(name = "supersetRemoteAuthService", url = "dlink-superset-auth:8088/")
-// @FeignClient(name = "supersetRemoteAuthService", url = "10.53.5.134:57983/")
 public interface SupersetRemoteAuthService {
 
     @PostMapping("/supersetAuth/createRole")
@@ -30,5 +32,10 @@ public interface SupersetRemoteAuthService {
 
     @PostMapping("/supersetAuth/initGroupRole")
     void initGroupRole(@RequestBody AbRole role);
+
+    @PostMapping("/superset/dashboard/listDashboardsVO/{pageId}/{pageSize}")
+    PageResult listDashboardsVO(@PathVariable("pageId") Integer pageId,
+                                @PathVariable("pageSize") Integer pageSize,
+                                @RequestBody DashboardsVO dashboardsVO);
 
 }
