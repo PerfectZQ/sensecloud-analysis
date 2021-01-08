@@ -29,6 +29,10 @@ import sensecloud.web.service.impl.UserAuthorityServiceImpl;
 import sensecloud.web.service.remote.ClickHouseRemoteService;
 
 import java.io.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -346,6 +350,44 @@ public class ConnectorController {
         entity.getSinkAccountConf().put("jdbc.url", clickHouseJDBCUrl);
         entity.getSinkAccountConf().put("jdbc.user", chConf.getString("ckUser"));
         entity.getSinkAccountConf().put("jdbc.password", chConf.getString("ckPassword"));
+    }
+
+
+    @PostMapping("/checkMysql")
+    public ResultVO<String> checkMysql (
+            @RequestParam("dbUrl") String url,
+            @RequestParam("dbUser") String usr,
+            @RequestParam("dbPassword") String pss) {
+        Connection conn = null;
+        Statement statement = null;
+        boolean rs = false;
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(url, usr, pss);
+            statement = conn.createStatement();
+            rs = statement.execute("select 1");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return error("Server failed to load mysql driver.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return error("Failed to connect mysql");
+        } finally {
+            if(statement != null) {
+                try {
+                    statement.close();
+                    if(conn != null) conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        //Validate request result
+        if (rs) {
+            return ok("Success");
+        } else {
+            return error("Failed to execute SELECT 1");
+        }
     }
 
 
