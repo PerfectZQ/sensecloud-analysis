@@ -10,7 +10,7 @@ import sensecloud.web.bean.vo.ResultVO;
  * @author zhangqiang
  * @since 2020/11/5 20:17
  */
-@FeignClient(name = "airflowRemoteService", url = "dlink-airflow-auth:8088")
+@FeignClient(name = "airflowRemoteService", url = "airflow-scheduler-sidecar:8088")
 public interface AirflowRemoteService {
 
     @PostMapping("/gitlabRepo/saveOrUpdateGitlabRepo")
