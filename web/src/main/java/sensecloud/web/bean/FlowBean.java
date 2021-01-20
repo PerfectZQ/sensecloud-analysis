@@ -6,6 +6,8 @@ import sensecloud.flow.Flow;
 @Data
 public class FlowBean extends Flow {
 
+    private String saas;
+
     private FlowCodeBean code;
 
 }
