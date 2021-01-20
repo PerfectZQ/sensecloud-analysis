@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import sensecloud.web.bean.AbRole;
@@ -25,6 +26,7 @@ import sensecloud.web.service.remote.AirflowRemoteAuthService;
 import sensecloud.web.service.remote.ClickHouseRemoteAuthService;
 import sensecloud.web.service.remote.SupersetRemoteAuthService;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -67,7 +69,7 @@ public class AuthorizeController {
     @PostMapping("initProductPermissions")
     @PreAuthorize("hasRole('PlatformAdmin')")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
-    public ResultVO<String> initProductPermissions(@RequestBody InitProduct initProduct) {
+    public ResultVO<String> initProductPermissions(@RequestBody @Validated InitProduct initProduct) {
 
         String productName = initProduct.getProductName();
         String username = initProduct.getUsername();
@@ -97,13 +99,16 @@ public class AuthorizeController {
 
         AbRole abRole = new AbRole().setName(productName);
         log.info("====> Init Airflow of " + productName + "...");
-        airflowRemoteAuthService.initGroupRole(new AirflowInitGroup()
-                .setAbRole(abRole)
-                .setGitlabRepo(new GitlabRepo()
-                        .setRepository(initProduct.getRepository())
-                        .setBranch(initProduct.getBranch())
-                )
-        );
+        AirflowInitGroup airflowInitGroup = new AirflowInitGroup();
+        airflowInitGroup.setAbRole(abRole);
+        if (!initProduct.isGitEmpty()) {
+            airflowInitGroup.setGitlabRepo(
+                    new GitlabRepo()
+                            .setRepository(initProduct.getRepository())
+                            .setBranch(initProduct.getBranch())
+            );
+        }
+        airflowRemoteAuthService.initGroupRole(airflowInitGroup);
         log.info("====> Init Superset of " + productName + "...");
         supersetRemoteAuthService.initGroupRole(abRole);
         log.info("====> Init ClickHouse of " + productName + "...");
@@ -135,9 +140,9 @@ public class AuthorizeController {
     @PostMapping("bindUserRoleToProduct")
     @PreAuthorize("hasRole('PlatformAdmin') || (hasRole('ProductAdmin:'.concat(#productName)) && !'PlatformAdmin'.equals(#rolename))")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
-    public ResultVO<String> bindUserRoleToProduct(@RequestParam String username,
-                                                  @RequestParam String rolename,
-                                                  @RequestParam String productName) {
+    public ResultVO<String> bindUserRoleToProduct(@RequestParam @NotBlank String username,
+                                                  @RequestParam @NotBlank String rolename,
+                                                  @RequestParam @NotBlank String productName) {
 
 
         RoleComponentVO roleComponentVO = roleService.getSenseAnalysisRoleComponentVO(rolename);
@@ -189,9 +194,9 @@ public class AuthorizeController {
     @PostMapping("unbindUserRoleFromProduct")
     @PreAuthorize("hasRole('PlatformAdmin') OR (hasRole('ProductAdmin:'.concat(#productName)) AND !'PlatformAdmin'.equals(#rolename))")
     @Transactional(propagation = Propagation.NESTED, isolation = Isolation.DEFAULT, readOnly = false, rollbackFor = Exception.class)
-    public ResultVO<String> unbindUserRoleFromProduct(@RequestParam String username,
-                                                      @RequestParam String rolename,
-                                                      @RequestParam String productName) {
+    public ResultVO<String> unbindUserRoleFromProduct(@RequestParam @NotBlank String username,
+                                                      @RequestParam @NotBlank String rolename,
+                                                      @RequestParam @NotBlank String productName) {
 
         RoleComponentVO roleComponentVO = roleService.getSenseAnalysisRoleComponentVO(rolename);
         if (roleComponentVO == null) {

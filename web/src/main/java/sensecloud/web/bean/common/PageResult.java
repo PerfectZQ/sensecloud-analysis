@@ -10,8 +10,8 @@ import java.util.List;
 @Builder
 public class PageResult {
 
-    // When use @Data @Builder at the same time, no args constructor couldn't be generate
-    // @Tolerate will let Lombok ignore this no args constructor
+    // When use @Data @Builder at the same time, no args constructor couldn't be generate.
+    // @Tolerate will let Lombok ignore this no args constructor if you must indicate one.
     @Tolerate
     PageResult() {}
 
