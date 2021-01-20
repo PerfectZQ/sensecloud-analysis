@@ -13,6 +13,7 @@
         <module>web</module>
         <module>auth2</module>
         <module>connector</module>
+        <module>flow-manager</module>
     </modules>
 
     <properties>

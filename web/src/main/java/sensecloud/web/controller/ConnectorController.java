@@ -29,11 +29,12 @@ import sensecloud.web.service.impl.UserAuthorityServiceImpl;
 import sensecloud.web.service.remote.ClickHouseRemoteService;
 
 import java.io.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static sensecloud.web.bean.vo.ResultVO.*;
 
@@ -247,6 +248,7 @@ public class ConnectorController {
         if (user != null && StringUtils.isNotBlank(user.getName())) {
             String username = user.getName();
             QueryChainWrapper<ConnectorEntity> query = connectorService.query()
+                    .select("id", "name", "saas", "source_name", "source_type", "sink_name", "sink_type", "create_by", "create_time")
                     .eq("create_by", username)
                     .and(q -> q.eq("deleted", false));
             if(StringUtils.isNotBlank(name)) {
@@ -346,6 +348,46 @@ public class ConnectorController {
         entity.getSinkAccountConf().put("jdbc.url", clickHouseJDBCUrl);
         entity.getSinkAccountConf().put("jdbc.user", chConf.getString("ckUser"));
         entity.getSinkAccountConf().put("jdbc.password", chConf.getString("ckPassword"));
+    }
+
+
+    @PostMapping("/checkMysql")
+    public ResultVO<String> checkMysql (@RequestBody Map<String, String> param) {
+
+        String url = param.get("url");
+        String usr = param.get("usr");
+        String pss = param.get("pss");
+
+        Connection conn = null;
+        Statement statement = null;
+        boolean rs = false;
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(url, usr, pss);
+            statement = conn.createStatement();
+            rs = statement.execute("select 1");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return error("Server failed to load mysql driver.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return error("Failed to connect mysql");
+        } finally {
+            if(statement != null) {
+                try {
+                    statement.close();
+                    if(conn != null) conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        //Validate request result
+        if (rs) {
+            return ok("Success");
+        } else {
+            return error("Failed to execute SELECT 1");
+        }
     }
 
 
