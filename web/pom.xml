@@ -126,6 +126,12 @@
         </dependency>
 
         <dependency>
+            <groupId>sensetime</groupId>
+            <artifactId>flow-manager</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.6</version>

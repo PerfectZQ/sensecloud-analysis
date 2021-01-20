@@ -1,0 +1,51 @@
+package sensecloud.flow;
+
+import lombok.Data;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Data
+public class Flow {
+
+    private String dagId;
+    private String name;
+    private String scheduleExpr;
+    private List<Task> tasks = new LinkedList<>();
+
+    public String checkLoop() {
+        Map<String, Task> dict = new HashMap<>();
+        Set<String> ids = new HashSet<>();
+        Set<String> deps = new HashSet<>();
+        tasks.forEach(t -> {
+            ids.add(t.getTaskId());
+            deps.addAll(t.getDependencyIds());
+            dict.put(t.getTaskId(), t);
+        });
+
+        // Get the except set
+        ids.removeAll(deps);
+
+        Set<String> marked = new HashSet<>();
+        String loopedId = null;
+        for(String id : ids) {
+            Task end = dict.get(id);
+            loopedId = hasLoop(end, dict, marked);
+        }
+        return loopedId;
+    }
+
+    private String hasLoop(Task task, Map<String, Task> dict, Set<String> marked) {
+        for(String id :  task.getDependencyIds()) {
+            if (marked.contains(id)) {
+                return id;
+            } else {
+                Task next = dict.get(id);
+                marked.add(id);
+                return hasLoop(next, dict, marked);
+            }
+        }
+        return null;
+    }
+
+}
