@@ -25,5 +25,5 @@ public interface AirflowRemoteService {
     ResultVO<String> deleteDagFile(@RequestBody DagFileVO dagFileVO);
 
     @PostMapping("/api/v1/airflow/dags/dagPause")
-    ResultVO<String> dagPause(@RequestParam String dagId, @RequestParam boolean paused);
+    ResultVO<String> dagPause(@RequestParam("dagId") String dagId, @RequestParam("paused") boolean paused);
 }
