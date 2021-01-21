@@ -22,7 +22,7 @@ public class TaskEntity extends TaskBean {
     private Long id;
 
     @TableField(typeHandler = FastjsonTypeHandler.class)
-    private JSONArray dependencyIds = new JSONArray();
+    private List<String> dependencyIds = new ArrayList<String>();
 
     @TableField(typeHandler = FastjsonTypeHandler.class)
     private JSONObject conf;

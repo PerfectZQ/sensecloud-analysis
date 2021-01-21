@@ -37,7 +37,7 @@ public class Flow {
 
     private String hasLoop(Task task, Map<String, Task> dict, Set<String> marked) {
         for(int i = 0 ; i < task.getDependencyIds().size(); i++) {
-            String id = task.getDependencyIds().getString(i);
+            String id = task.getDependencyIds().get(i);
             if (marked.contains(id)) {
                 return id;
             } else {
