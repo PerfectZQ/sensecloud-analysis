@@ -9,7 +9,7 @@ public class Task {
 
     private String name;
     private String taskId;
-    private JSONArray dependencyIds;
+    private JSONArray dependencyIds = new JSONArray();
     private String type;
     private JSONObject conf;
     private String content;
