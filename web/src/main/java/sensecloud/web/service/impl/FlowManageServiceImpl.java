@@ -12,12 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sensecloud.flow.generator.DAGGenerator;
+import sensecloud.web.bean.vo.DagFileVO;
 import sensecloud.web.bean.vo.FlowVO;
+import sensecloud.web.bean.vo.ResultVO;
 import sensecloud.web.entity.FlowCodeEntity;
 import sensecloud.web.entity.FlowEntity;
 import sensecloud.web.entity.TaskEntity;
 import sensecloud.web.service.UserSupport;
 import sensecloud.web.service.IFlowManageService;
+import sensecloud.web.service.remote.AirflowRemoteService;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,6 +40,9 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
     @Autowired
     private DAGGenerator dagGenerator;
+
+    @Autowired
+    private AirflowRemoteService airflowRemoteService;
 
     @Value("${service.flow.env.clickhouse_host}")
     private String clickhouse_host;
@@ -75,6 +81,7 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
 
     public void save(FlowVO vo) {
+        vo.setDagId(vo.getName());
         flowService.save(vo);
 
         List<TaskEntity> entityList = new ArrayList<>();
@@ -94,12 +101,23 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         flowCodeService.save(codeEntity);
 
         //Todo: invoker restful api to submit code
-
+        DagFileVO dag = new DagFileVO();
+        dag.setFileName(vo.getName());
+        dag.setGroupName(vo.getSaas());
+        dag.setSourceCode(code);
+        ResultVO<String> createResult = airflowRemoteService.createOrUpdateDagFile(dag);
+        if (createResult.getCode() == 200) {
+            log.info("Create DAG successfully: {}", dag);
+        } else {
+            log.error("Failed to create Dag File. Please re-create manually. DAG info: {}, return message: {}", dag, createResult.getMsg());
+        }
     }
 
     public void update(FlowVO vo) {
         List<TaskEntity> tasksToModify = taskService.query().ge("flow_id", vo.getId()).list();
-
+        if(StringUtils.isNotBlank(vo.getName())){
+            vo.setDagId(vo.getName());
+        }
         String currentUser = this.getCurrentUserName();
         tasksToModify.forEach(task -> {
             task.setDeleted(true);
@@ -125,6 +143,19 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         codeEntity.setVersion(DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmssSSS"));
         flowCodeService.save(codeEntity);
         //Todo: invoker restful api to update code
+
+        DagFileVO dag = new DagFileVO();
+        dag.setFileName(vo.getName());
+        dag.setGroupName(vo.getSaas());
+        dag.setSourceCode(code);
+
+        ResultVO<String> updateResult = airflowRemoteService.createOrUpdateDagFile(dag);
+        if (updateResult.getCode() == 200) {
+            log.info("Update DAG successfully: {}", dag);
+        } else {
+            log.error("Failed to update Dag File. Please re-update manually. DAG info: {}, return message: {}", dag, updateResult.getMsg());
+        }
+
         //Todo: restart airflow job and restart k8s pod
     }
 
@@ -146,6 +177,17 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         flowService.updateById(flowEntity);
 
         //Todo: invoker restful api to delete code
+        DagFileVO dag = new DagFileVO();
+        dag.setFileName(flowEntity.getName());
+        dag.setGroupName(flowEntity.getSaas());
+        dag.setSourceCode(flowEntity.getCode().getCode());
+
+        ResultVO<String> deleteResult = airflowRemoteService.deleteDagFile(dag);
+        if (deleteResult.getCode() == 200) {
+            log.info("Delete DAG successfully: {}", dag);
+        } else {
+            log.error("Failed to delete Dag File. Please re-delete manually. DAG info: {}, return message: {}", dag, deleteResult.getMsg());
+        }
         //Todo: stop airflow job and kill k8s pod
     }
 
