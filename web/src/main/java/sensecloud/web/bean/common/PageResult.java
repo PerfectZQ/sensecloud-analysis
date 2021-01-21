@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class PageResult<E> {
+public class PageResult {
 
     // When use @Data @Builder at the same time, no args constructor couldn't be generate.
     // @Tolerate will let Lombok ignore this no args constructor if you must indicate one.
@@ -22,6 +22,6 @@ public class PageResult<E> {
     // 元素总数
     private long totalElems;
     // 当前页面元素
-    private List<E> currentPageElems;
+    private List<?> currentPageElems;
 
 }

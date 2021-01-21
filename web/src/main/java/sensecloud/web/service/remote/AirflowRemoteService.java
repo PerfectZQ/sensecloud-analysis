@@ -31,5 +31,5 @@ public interface AirflowRemoteService {
     ResultVO<String> dagPause(@RequestParam("dagId") String dagId, @RequestParam("paused") boolean paused);
 
     @PostMapping("/api/v1/airflow/dags/listDagRuns/{pageId}/{pageSize}")
-    PageResult<FlowRunVO> listDagRuns(@RequestBody FlowRunVO dagRun, @PathVariable("pageId") int pageId, @PathVariable("pageSize") int pageSize);
+    PageResult listDagRuns(@RequestBody FlowRunVO dagRun, @PathVariable("pageId") int pageId, @PathVariable("pageSize") int pageSize);
 }
