@@ -1,5 +1,6 @@
 package sensecloud.web.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -62,6 +63,8 @@ public class FlowMangerController {
 
     @PostMapping("/task/check")
     public ResultVO<Boolean> check(@RequestBody List<TaskBean> tasks) {
+        log.debug("Calling URL [POST] /task/check with parameters {}", JSON.toJSONString(tasks));
+
         Flow flow = new Flow();
         flow.getTasks().addAll(tasks);
         String loopedId = flow.checkLoop();

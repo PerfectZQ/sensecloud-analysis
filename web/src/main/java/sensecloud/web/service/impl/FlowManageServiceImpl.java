@@ -76,6 +76,14 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
         long total = query.count();
         IPage<FlowEntity> result = query.page(new Page<FlowEntity>(pageNum, pageSize, total));
+//        for(result.getRecords()) {
+//
+//        }
+
+
+
+
+
         return result;
     }
 
