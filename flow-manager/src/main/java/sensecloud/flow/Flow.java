@@ -19,7 +19,7 @@ public class Flow {
         Set<String> deps = new HashSet<>();
         tasks.forEach(t -> {
             ids.add(t.getTaskId());
-            deps.addAll(t.getDependencyIds());
+            t.getDependencyIds().forEach(id -> deps.add((String) id));
             dict.put(t.getTaskId(), t);
         });
 
@@ -36,7 +36,8 @@ public class Flow {
     }
 
     private String hasLoop(Task task, Map<String, Task> dict, Set<String> marked) {
-        for(String id :  task.getDependencyIds()) {
+        for(int i = 0 ; i < task.getDependencyIds().size(); i++) {
+            String id = task.getDependencyIds().getString(i);
             if (marked.contains(id)) {
                 return id;
             } else {
