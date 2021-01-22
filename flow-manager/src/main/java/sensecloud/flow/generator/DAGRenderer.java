@@ -10,7 +10,7 @@ public class DAGRenderer {
     private TextRenderer renderer = new TextRenderer();
 
     public String render(String tpl, JSONObject context) {
-        return renderer.render(tpl, context);
+        return renderer.renderStringTemplate(tpl, context);
     }
 
 }
