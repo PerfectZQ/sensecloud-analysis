@@ -1,10 +1,7 @@
 package sensecloud.web.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import lombok.Data;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -25,7 +22,7 @@ public class FlowEntity extends FlowBean {
     @TableField(typeHandler = FastjsonTypeHandler.class)
     private FlowCodeEntity code;
 
-    @TableField(typeHandler = FastjsonTypeHandler.class)
+    @TableField(typeHandler = FastjsonTypeHandler.class, insertStrategy = FieldStrategy.IGNORED, updateStrategy = FieldStrategy.IGNORED)
     private List<Task> tasks = new LinkedList<>();
 
     private String createBy;
