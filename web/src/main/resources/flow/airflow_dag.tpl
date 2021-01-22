@@ -38,7 +38,7 @@ dag = DAG(
 )
 
 ## Define operators
-{% for task in tasks %}
+{% for task in flow.tasks %}
 {% if task.type == 'CLICKHOUSE_SQL' and task.content is not empty %}
 ## Define operator for task {{task.taskId}}
 {{task.taskId}}_sql = """
@@ -51,14 +51,22 @@ CREATE TABLE IF NOT EXISTS {{ task.conf.db }}.{{ task.conf.table }} ON CLUSTER c
 ENGINE = Distributed('cat', '{{ task.conf.db }}', '{{ task.conf.table }}_shard', rand());
 """.replace("`", "").replace("\r\n", " ").replace("\r", " ").replace("\n", " ")
 
+
+ck_host={{env.ck_host}}
+ck_port={{env.ck_port}}
+ck_user={{env.ck_user}}
+ck_pwd={{env.ck_password}}
+
+db={{ task.conf.db }}
+
 {{task.taskId}}_cmd = r"""
   clickhouse-client \
-      --host {{env.ck_host}} --port {{env.ck_port}} \
-      --user {{env.ck_user}} --password {{env.ck_password}} \
-      --database {{ task.conf.db }} \
+      --host {ck_host} --port {ck_port} \
+      --user {ck_user} --password {ck_pwd} \
+      --database {db} \
       --multiquery \
       --query "{sql}"
-""".format(sql={{task.taskId}}_sql)
+""".format(sql={{task.taskId}}_sql, ck_host=ck_host, ck_port=ck_port, ck_user=ck_user, ck_pwd=ck_pwd, db=db)
 
 op_{{task.taskId}} = BashOperator(
     task_id='{{task.taskId}}',
