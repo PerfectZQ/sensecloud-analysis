@@ -1,5 +1,6 @@
 package sensecloud.flow;
 
+import com.alibaba.fastjson.JSON;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +34,7 @@ public class Flow {
         for(String id : ids) {
             if(!"None".equalsIgnoreCase(id)) {
                 Task end = dict.get(id);
-                log.info("Loop task: {}",end);
+                log.info("Loop task: {}", JSON.toJSONString(end));
                 if(end != null) {
                     loopedId = hasLoop(end, dict, marked);
                 }
