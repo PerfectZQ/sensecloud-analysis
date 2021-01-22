@@ -5,10 +5,10 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import lombok.Data;
 import org.apache.ibatis.annotations.SelectProvider;
-import org.springframework.security.core.Transient;
 import sensecloud.flow.Task;
 import sensecloud.web.bean.FlowBean;
 
+import java.beans.Transient;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +22,7 @@ public class FlowEntity extends FlowBean {
     @TableField(typeHandler = FastjsonTypeHandler.class)
     private FlowCodeEntity code;
 
-    @TableField(typeHandler = FastjsonTypeHandler.class, insertStrategy = FieldStrategy.IGNORED, updateStrategy = FieldStrategy.IGNORED)
+    @TableField(typeHandler = FastjsonTypeHandler.class, exist = false)
     private List<Task> tasks = new LinkedList<>();
 
     private String createBy;
