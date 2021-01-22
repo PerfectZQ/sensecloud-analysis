@@ -29,8 +29,12 @@ public class Flow {
         Set<String> marked = new HashSet<>();
         String loopedId = null;
         for(String id : ids) {
-            Task end = dict.get(id);
-            loopedId = hasLoop(end, dict, marked);
+            if(!"None".equalsIgnoreCase(id)) {
+                Task end = dict.get(id);
+                if(end != null) {
+                    loopedId = hasLoop(end, dict, marked);
+                }
+            }
         }
         return loopedId;
     }
