@@ -10,7 +10,7 @@ import sensecloud.flow.generator.DAGDefinitionProvider;
 @Slf4j
 @Order(99)
 @Component
-public class StartupProcessor implements CommandLineRunner {
+public class FlowManagerStarter implements CommandLineRunner {
 
     @Autowired
     private DAGDefinitionProvider provider;
