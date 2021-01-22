@@ -94,12 +94,14 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
     public void save(FlowVO vo) {
         vo.setDagId(vo.getName());
+        vo.setCreateBy(this.getCurrentUserName());
         flowService.save(vo);
 
         List<TaskEntity> entityList = new ArrayList<>();
         vo.getTasks().forEach(task -> {
             TaskEntity entity = new TaskEntity();
             BeanUtils.copyProperties(task, entity);
+            entity.setFlowId(vo.getId());
             entityList.add(entity);
         });
         taskService.saveBatch(entityList);
@@ -137,12 +139,14 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
             task.setDeleteTime(LocalDateTime.now());
         });
         taskService.updateBatchById(tasksToModify, 100);
+        vo.setUpdateBy(currentUser);
         flowService.updateById(vo);
 
         List<TaskEntity> entityList = new ArrayList<>();
         vo.getTasks().forEach(task -> {
             TaskEntity entity = new TaskEntity();
             BeanUtils.copyProperties(task, entity);
+            entity.setFlowId(vo.getId());
             entityList.add(entity);
         });
         taskService.saveBatch(entityList);

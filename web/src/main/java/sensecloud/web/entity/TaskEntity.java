@@ -27,6 +27,8 @@ public class TaskEntity extends TaskBean {
     @TableField(typeHandler = FastjsonTypeHandler.class)
     private JSONObject conf;
 
+    private Long flowId;
+
     private String createBy;
     @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
