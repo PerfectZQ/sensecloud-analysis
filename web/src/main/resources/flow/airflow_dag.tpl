@@ -80,7 +80,7 @@ op_{{task.taskId}} = BashOperator(
 {% endfor %}
 
 ## Define dependencies
-{% for task in tasks %}
+{% for task in flow.tasks %}
 {% for dependency in task.dependencyIds %}
 op_{{task.taskId}}.set_upstream(op_{{dependency}})
 {% endfor %}
