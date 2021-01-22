@@ -1,10 +1,12 @@
 package sensecloud.flow;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Data
 public class Flow {
 
@@ -31,6 +33,7 @@ public class Flow {
         for(String id : ids) {
             if(!"None".equalsIgnoreCase(id)) {
                 Task end = dict.get(id);
+                log.info("Loop task: {}",end);
                 if(end != null) {
                     loopedId = hasLoop(end, dict, marked);
                 }
