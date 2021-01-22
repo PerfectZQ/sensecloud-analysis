@@ -51,14 +51,15 @@ CREATE TABLE IF NOT EXISTS {{ task.conf.db }}.{{ task.conf.table }} ON CLUSTER c
 ENGINE = Distributed('cat', '{{ task.conf.db }}', '{{ task.conf.table }}_shard', rand());
 """.replace("`", "").replace("\r\n", " ").replace("\r", " ").replace("\n", " ")
 
-{{task.taskId}}_cmd = rf"""
+{{task.taskId}}_cmd = r"""
   clickhouse-client \
       --host {{env.ck_host}} --port {{env.ck_port}} \
       --user {{env.ck_user}} --password {{env.ck_password}} \
       --database {{ task.conf.db }} \
       --multiquery \
-      --query "{{{task.taskId}}_sql}"
-"""
+      --query "{sql}"
+""".format(sql={{task.taskId}}_sql)
+
 op_{{task.taskId}} = BashOperator(
     task_id='{{task.taskId}}',
     depends_on_past=False,
