@@ -21,7 +21,7 @@ public interface AirflowRemoteService {
     @PostMapping("/gitlabRepo/saveOrUpdateGitlabRepo")
     ResultVO<String> saveOrUpdateGitlabRepo(@RequestBody GitlabRepoVO gitlabRepoVO);
 
-    @PostMapping("/api/v1/airflow/dags/createOrUpdateDagFile")
+    @PostMapping(value = "/api/v1/airflow/dags/createOrUpdateDagFile", consumes = "application/json")
     ResultVO<String> createOrUpdateDagFile(@RequestBody DagFileVO dagFileVO);
 
     @PostMapping("/api/v1/airflow/dags/deleteDagFile")
