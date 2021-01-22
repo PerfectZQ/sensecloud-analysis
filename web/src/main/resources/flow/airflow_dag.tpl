@@ -33,7 +33,7 @@ dag = DAG(
     schedule_interval=None,
 {% else %}
     schedule_interval={{ flow.scheduleExpr }}
-{% %}
+{% endif %}
     catchup=False,
 )
 
