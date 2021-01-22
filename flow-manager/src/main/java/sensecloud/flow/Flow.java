@@ -34,7 +34,6 @@ public class Flow {
         for(String id : ids) {
             if(!"None".equalsIgnoreCase(id)) {
                 Task end = dict.get(id);
-                log.info("Loop task: {}", JSON.toJSONString(end));
                 if(end != null) {
                     loopedId = hasLoop(end, dict, marked);
                 }
@@ -44,6 +43,7 @@ public class Flow {
     }
 
     private String hasLoop(Task task, Map<String, Task> dict, Set<String> marked) {
+        log.info("Loop task: {}", JSON.toJSONString(task));
         for(int i = 0 ; i < task.getDependencyIds().size(); i++) {
             String id = task.getDependencyIds().get(i);
             if (marked.contains(id)) {
@@ -51,7 +51,9 @@ public class Flow {
             } else {
                 Task next = dict.get(id);
                 marked.add(id);
-                return hasLoop(next, dict, marked);
+                if(next != null) {
+                    return hasLoop(next, dict, marked);
+                }
             }
         }
         return null;
