@@ -70,6 +70,8 @@ service:
 
 remote:
   rest:
+    airflow_service:
+      url: http://10.53.7.75:45679
     mysql_cdc:
       url: http://10.10.18.109:49018/mysql-cdc/api/v1
     airflow:
