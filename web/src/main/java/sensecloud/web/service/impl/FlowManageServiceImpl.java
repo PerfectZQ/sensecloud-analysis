@@ -209,13 +209,16 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
     private String generateCode(FlowVO vo) {
         Map<String, Object> env = new HashMap<>();
-        JSONObject clickhouseConf = this.getClickHouseUser(this.getCurrentUserName());
+        try {
+            JSONObject clickhouseConf = this.getClickHouseUser(this.getCurrentUserName());
 
-        env.put("ck_host", this.clickhouse_host);
-        env.put("ck_port", this.clickhouse_port);
-        env.put("ck_password", clickhouseConf.getString("ckPassword"));
-        env.put("ck_user", clickhouseConf.getString("ckUser"));
-
+            env.put("ck_host", this.clickhouse_host);
+            env.put("ck_port", this.clickhouse_port);
+            env.put("ck_password", clickhouseConf.getString("ckPassword"));
+            env.put("ck_user", clickhouseConf.getString("ckUser"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         String code = dagGenerator.generate(vo, env);
         log.info(">>> Generated code: {}", code);
         return code;
