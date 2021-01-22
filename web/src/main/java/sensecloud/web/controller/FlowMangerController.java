@@ -63,7 +63,7 @@ public class FlowMangerController {
 
     @PostMapping("/task/check")
     public ResultVO<Boolean> check(@RequestBody List<TaskBean> tasks) {
-        log.debug("Calling URL [POST] /task/check with parameters {}", JSON.toJSONString(tasks));
+        log.info("Calling URL [POST] /task/check with parameters {}", JSON.toJSONString(tasks));
 
         Flow flow = new Flow();
         flow.getTasks().addAll(tasks);
