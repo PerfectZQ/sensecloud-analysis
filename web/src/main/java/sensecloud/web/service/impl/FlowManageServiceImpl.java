@@ -52,7 +52,11 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
 
     public FlowEntity get(Long id) {
-        FlowEntity entity = flowService.getWithTasks(id);
+        FlowEntity entity = flowService.getById(id);
+        if(entity != null) {
+            List<TaskEntity> tasks = taskService.query().eq("deleted", false).eq("flow_id", entity.getId()).list();
+            entity.getTasks().addAll(tasks);
+        }
         return entity;
     }
 
