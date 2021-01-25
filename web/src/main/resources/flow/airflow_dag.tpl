@@ -19,11 +19,10 @@ default_args = {
     'retry_delay': timedelta(minutes=1),
 }
 
-{% if env is not empty %}
-{% for entry in env %}
-{{ entry.key }} = {{ entry.value }}
-{% endfor %}
-{% endif %}
+ck_host="{{env.ck_host}}"
+ck_port="{{env.ck_port}}"
+ck_user="{{env.ck_user}}"
+ck_pwd="{{env.ck_password}}"
 
 dag = DAG(
     dag_id=app_name,
@@ -32,7 +31,7 @@ dag = DAG(
 {% if flow.scheduleExpr is empty %}
     schedule_interval=None,
 {% else %}
-    schedule_interval={{ flow.scheduleExpr }}
+    schedule_interval="{{ flow.scheduleExpr }}"
 {% endif %}
     catchup=False,
 )
@@ -50,12 +49,6 @@ ON CLUSTER cat AS {{ task.content }};
 CREATE TABLE IF NOT EXISTS {{ task.conf.db }}.{{ task.conf.table }} ON CLUSTER cat AS {{ task.conf.db }}.{{ task.conf.table }}_shard
 ENGINE = Distributed('cat', '{{ task.conf.db }}', '{{ task.conf.table }}_shard', rand());
 """.replace("`", "").replace("\r\n", " ").replace("\r", " ").replace("\n", " ")
-
-
-ck_host={{env.ck_host}}
-ck_port={{env.ck_port}}
-ck_user={{env.ck_user}}
-ck_pwd={{env.ck_password}}
 
 db={{ task.conf.db }}
 
@@ -82,7 +75,7 @@ op_{{task.taskId}} = BashOperator(
 ## Define dependencies
 {% for task in flow.tasks %}
 {% for dependency in task.dependencyIds %}
-{% if task.taskId != 'None' %}
+{% if task.dependency != 'None' %}
 op_{{task.taskId}}.set_upstream(op_{{dependency}})
 {% endif %}
 {% endfor %}
