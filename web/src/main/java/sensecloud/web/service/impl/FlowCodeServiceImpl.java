@@ -13,4 +13,9 @@ import sensecloud.web.service.IFlowService;
 @Slf4j
 @Service
 public class FlowCodeServiceImpl extends ServiceImpl<FlowCodeMapper, FlowCodeEntity> implements IFlowCodeService {
+
+    public FlowCodeEntity getLatestVersionCode(Long flowId) {
+        return this.baseMapper.getLatestVersion(flowId);
+    }
+
 }

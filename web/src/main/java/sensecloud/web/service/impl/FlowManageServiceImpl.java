@@ -232,12 +232,7 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         taskService.updateBatchById(tasksToModify, 100);
         flowService.updateById(flowEntity);
 
-        QueryChainWrapper<FlowCodeEntity> query = flowCodeService.query()
-                .eq("deleted", false)
-                .eq("flow_id", flowEntity.getId())
-                .orderByDesc("version");
-
-        FlowCodeEntity codeEntity = flowCodeService.getOne(query);
+        FlowCodeEntity codeEntity = flowCodeService.getLatestVersionCode(flowEntity.getId());
         if(codeEntity != null) {
             codeEntity.setDeleted(true);
             codeEntity.setDeleteBy(currentUser);
