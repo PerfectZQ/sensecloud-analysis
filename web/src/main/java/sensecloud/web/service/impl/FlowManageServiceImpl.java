@@ -93,8 +93,9 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
 
     public void save(FlowVO vo) {
+        String currentUser = this.getCurrentUserName();
         vo.setDagId(vo.getName());
-        vo.setCreateBy(this.getCurrentUserName());
+        vo.setCreateBy(currentUser);
         flowService.save(vo);
 
         List<TaskEntity> entityList = new ArrayList<>();
@@ -109,6 +110,7 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         String code = this.generateCode(vo);
 
         FlowCodeEntity codeEntity = new FlowCodeEntity();
+        codeEntity.setCreateBy(currentUser);
         codeEntity.setFlowId(vo.getId());
         codeEntity.setCode(code);
         codeEntity.setVersion(DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmssSSS"));
@@ -150,10 +152,11 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
             entityList.add(entity);
         });
         taskService.saveBatch(entityList);
-
+        log.debug(">>> Test vo.getId = {}", vo.getId());
         //Save new version code
         String code = this.generateCode(vo);
         FlowCodeEntity codeEntity = new FlowCodeEntity();
+        codeEntity.setCreateBy(currentUser);
         codeEntity.setFlowId(vo.getId());
         codeEntity.setCode(code);
         codeEntity.setVersion(DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmssSSS"));
