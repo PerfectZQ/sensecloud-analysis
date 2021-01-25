@@ -7,6 +7,7 @@ import lombok.Data;
 import org.apache.ibatis.annotations.SelectProvider;
 import sensecloud.flow.Task;
 import sensecloud.web.bean.FlowBean;
+import sensecloud.web.bean.FlowRunBean;
 
 import java.beans.Transient;
 import java.time.LocalDateTime;
@@ -24,6 +25,9 @@ public class FlowEntity extends FlowBean {
 
     @TableField(typeHandler = FastjsonTypeHandler.class, exist = false)
     private List<Task> tasks = new LinkedList<>();
+
+//    @TableField(typeHandler = FastjsonTypeHandler.class, exist = false)
+//    private FlowRunBean flowRunBean;
 
     private String createBy;
     @JSONField(format="yyyy-MM-dd HH:mm:ss")

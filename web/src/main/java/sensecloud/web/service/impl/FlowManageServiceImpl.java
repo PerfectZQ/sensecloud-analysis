@@ -1,7 +1,9 @@
 package sensecloud.web.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sensecloud.flow.generator.DAGGenerator;
+import sensecloud.web.bean.FlowRunBean;
+import sensecloud.web.bean.common.PageResult;
 import sensecloud.web.bean.vo.DagFileVO;
+import sensecloud.web.bean.vo.FlowRunVO;
 import sensecloud.web.bean.vo.FlowVO;
 import sensecloud.web.bean.vo.ResultVO;
 import sensecloud.web.entity.FlowCodeEntity;
@@ -62,8 +67,9 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
     public IPage<FlowEntity> queryFlows(String name, Long page, Long size) {
         QueryChainWrapper<FlowEntity> query = flowService.query()
-                                                        .orderByDesc("create_time")
-                                                        .eq("deleted", false);
+                                                        .eq("create_by", this.getCurrentUserName())
+                                                        .eq("deleted", false)
+                                                        .orderByDesc("create_time");
         if (StringUtils.isNotBlank(name)) {
             query.like("name", "%" + name + "%");
         }
@@ -80,15 +86,38 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
         long total = query.count();
         IPage<FlowEntity> result = query.page(new Page<FlowEntity>(pageNum, pageSize, total));
-//        for(result.getRecords()) {
+
+//        PageResult dagRuns = this.airflowRemoteService.listDagRunsByUser(this.getCurrentUserName(),1, Integer.MAX_VALUE);
 //
-//        }
-
-
-
-
-
+//        Map<String, FlowEntity> temp = new HashMap<>();
+//        result.getRecords().forEach(flowEntity -> {
+//            temp.put(flowEntity.getDagId(), flowEntity);
+//        });
+//
+//        dagRuns.getCurrentPageElems().forEach(run -> {
+//            FlowRunVO runVO = (FlowRunVO) run;
+//            log.debug(">>> Got run info: {}", JSON.toJSONString(runVO));
+//
+//            String dagId = runVO.getDagId();
+//            if(temp.containsKey(dagId)) {
+//                FlowEntity entity = temp.get(dagId);
+//                FlowRunBean runBean = entity.getFlowRunBean();
+//                if (runBean != null) {
+//                    LocalDateTime t1 = runBean.getExecutionDate();
+//                    LocalDateTime t2 = runVO.getExecutionDate();
+//                    if(t2.isAfter(t1)) {
+//                        entity.setFlowRunBean(runVO);
+//                    }
+//                } else {
+//                    entity.setFlowRunBean(runVO);
+//                }
+//            }
+//        });
         return result;
+    }
+
+    public PageResult queryFlowRuns(String dagId, Long page, Long size) {
+        return this.airflowRemoteService.listDagRunsByUser(this.getCurrentUserName(), page.intValue(), size.intValue());
     }
 
 
@@ -161,7 +190,6 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         codeEntity.setCode(code);
         codeEntity.setVersion(DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmssSSS"));
         flowCodeService.save(codeEntity);
-        //Todo: invoker restful api to update code
 
         DagFileVO dag = new DagFileVO();
         dag.setFileName(vo.getName());
@@ -173,6 +201,7 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
             log.info("Update DAG successfully: {}", dag);
         } else {
             log.error("Failed to update Dag File. Please re-update manually. DAG info: {}, return message: {}", dag, updateResult.getMsg());
+            //Todo: Rollback and return failure message to caller
         }
 
         //Todo: restart airflow job and restart k8s pod
@@ -195,17 +224,26 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         taskService.updateBatchById(tasksToModify, 100);
         flowService.updateById(flowEntity);
 
-        //Todo: invoker restful api to delete code
-        DagFileVO dag = new DagFileVO();
-        dag.setFileName(flowEntity.getName());
-        dag.setGroupName(flowEntity.getSaas());
-        dag.setSourceCode(flowEntity.getCode().getCode());
+        QueryChainWrapper<FlowCodeEntity> query = flowCodeService.query()
+                .eq("deleted", false)
+                .eq("flow_id", flowEntity.getId())
+                .orderByDesc("version")
+                .first("limit 1");
+        FlowCodeEntity codeEntity = flowCodeService.getOne(query);
+        if(codeEntity != null) {
+            codeEntity.setDeleted(true);
+            codeEntity.setDeleteBy(currentUser);
+            codeEntity.setDeleteTime(LocalDateTime.now());
+            flowCodeService.updateById(codeEntity);
+        }
 
-        ResultVO<String> deleteResult = airflowRemoteService.deleteDagFile(dag);
+        //invoker restful api to delete code
+        ResultVO<String> deleteResult = airflowRemoteService.deleteDagFile(flowEntity.getName(), flowEntity.getSaas());
         if (deleteResult.getCode() == 200) {
-            log.info("Delete DAG successfully: {}", dag);
+            log.info("Delete DAG successfully: fileName = {}, groupName = {}", flowEntity.getName(), flowEntity.getSaas());
         } else {
-            log.error("Failed to delete Dag File. Please re-delete manually. DAG info: {}, return message: {}", dag, deleteResult.getMsg());
+            log.error("Failed to delete Dag File. Please re-delete manually. DAG info: fileName = {}, groupName = {}, return message: {}", flowEntity.getName(), flowEntity.getSaas(), deleteResult.getMsg());
+            //Todo: Rollback and return failure message to caller
         }
         //Todo: stop airflow job and kill k8s pod
     }

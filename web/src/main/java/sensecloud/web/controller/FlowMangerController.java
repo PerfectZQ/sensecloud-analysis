@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import sensecloud.flow.Flow;
 import sensecloud.web.bean.FlowBean;
 import sensecloud.web.bean.TaskBean;
+import sensecloud.web.bean.common.PageResult;
 import sensecloud.web.bean.vo.FlowVO;
 import sensecloud.web.bean.vo.ResultVO;
 import sensecloud.web.entity.ConnectorEntity;
@@ -33,6 +34,15 @@ public class FlowMangerController {
     ) {
         IPage<FlowEntity> flows = flowManageService.queryFlows(name, page, size);
         return ResultVO.ok(flows);
+    }
+
+    @GetMapping
+    public PageResult listRuns(
+            @RequestParam String dagId,
+            @RequestParam Long page,
+            @RequestParam Long size
+    ) {
+        return flowManageService.queryFlowRuns(dagId, page, size);
     }
 
     @GetMapping("/{id}")

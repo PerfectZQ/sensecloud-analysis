@@ -1,10 +1,7 @@
 package sensecloud.web.service.remote;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import sensecloud.web.bean.airflow.GitlabRepoVO;
 import sensecloud.web.bean.common.PageResult;
 import sensecloud.web.bean.vo.DagFileVO;
@@ -24,12 +21,15 @@ public interface AirflowRemoteService {
     @PostMapping(value = "/api/v1/airflow/dags/createOrUpdateDagFile", consumes = "application/json")
     ResultVO<String> createOrUpdateDagFile(@RequestBody DagFileVO dagFileVO);
 
-    @PostMapping("/api/v1/airflow/dags/deleteDagFile")
-    ResultVO<String> deleteDagFile(@RequestBody DagFileVO dagFileVO);
+    @DeleteMapping("/api/v1/airflow/dags/deleteDagFile")
+    ResultVO<String> deleteDagFile(@RequestParam("dagFileName") String dagFileName, @RequestParam("groupName") String groupName);
 
     @PostMapping("/api/v1/airflow/dags/dagPause")
     ResultVO<String> dagPause(@RequestParam("dagId") String dagId, @RequestParam("paused") boolean paused);
 
-    @PostMapping("/api/v1/airflow/dags/listDagRuns/{pageId}/{pageSize}")
-    PageResult listDagRuns(@RequestBody FlowRunVO dagRun, @PathVariable("pageId") int pageId, @PathVariable("pageSize") int pageSize);
+    @PostMapping("/api/v1/airflow/dags/dagTrigger")
+    ResultVO<String> dagTrigger(@RequestParam("dagId") String dagId);
+
+    @PostMapping("/api/v1/airflow/dags/listDagRunsByUser")
+    PageResult listDagRunsByUser(@RequestParam("username") String username, @RequestParam(value = "pageId", required = false) int pageId, @RequestParam(value = "pageSize", required = false) int pageSize);
 }
