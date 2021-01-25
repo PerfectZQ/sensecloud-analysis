@@ -36,8 +36,8 @@ public class FlowMangerController {
         return ResultVO.ok(flows);
     }
 
-    @GetMapping
-    public PageResult listRuns(
+    @GetMapping("/runs")
+    public PageResult queryFlowRuns(
             @RequestParam String dagId,
             @RequestParam Long page,
             @RequestParam Long size
