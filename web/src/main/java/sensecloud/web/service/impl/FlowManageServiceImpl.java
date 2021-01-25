@@ -160,12 +160,12 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
             vo.setDagId(vo.getName());
         }
         String currentUser = this.getCurrentUserName();
+        List<Long> ids = new ArrayList<>();
         tasksToModify.forEach(task -> {
-            task.setDeleted(true);
-            task.setDeleteBy(currentUser);
-            task.setDeleteTime(LocalDateTime.now());
+            ids.add(task.getId());
         });
-        taskService.updateBatchById(tasksToModify, 100);
+        taskService.removeByIds(ids);
+
         vo.setUpdateBy(currentUser);
         flowService.updateById(vo);
 
@@ -177,7 +177,7 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
             entityList.add(entity);
         });
         taskService.saveBatch(entityList);
-        log.debug(">>> Test vo.getId = {}", vo.getId());
+        log.info(">>> Test vo.getId = {}", vo.getId());
         //Save new version code
         String code = this.generateCode(vo);
         FlowCodeEntity codeEntity = new FlowCodeEntity();
