@@ -54,21 +54,30 @@ public class FlowMangerController {
     @PostMapping
     public ResultVO<Boolean> add(@RequestBody FlowVO vo) {
         //Input validation
-        flowManageService.save(vo);
-        return ResultVO.ok(true);
+        if(flowManageService.save(vo)) {
+            return ResultVO.ok(true);
+        } else {
+            return ResultVO.error("Failed to save.");
+        }
     }
 
     @PutMapping
     public ResultVO<Boolean> update(@RequestBody FlowVO vo) {
         //Input validation
-        flowManageService.update(vo);
-        return ResultVO.ok(true);
+        if(flowManageService.update(vo)){
+            return ResultVO.ok(true);
+        } else {
+            return ResultVO.error("Failed to update.");
+        }
     }
 
     @DeleteMapping
     public ResultVO<Boolean> delete(@RequestParam Long id) {
-        flowManageService.delete(id);
-        return ResultVO.ok(true);
+        if(flowManageService.delete(id)) {
+            return ResultVO.ok(true);
+        } else {
+            return ResultVO.error("Failed to delete.");
+        }
     }
 
     @PostMapping("/task/check")

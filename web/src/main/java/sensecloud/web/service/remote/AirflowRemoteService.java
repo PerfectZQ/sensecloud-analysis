@@ -32,4 +32,8 @@ public interface AirflowRemoteService {
 
     @PostMapping("/api/v1/airflow/dags/listDagRunsByUser")
     PageResult listDagRunsByUser(@RequestParam("username") String username, @RequestParam(value = "pageId", required = false) int pageId, @RequestParam(value = "pageSize", required = false) int pageSize);
+
+    @PostMapping("/api/v1/airflow/dags/listDagRunsByUserAndDagId")
+    PageResult listDagRuns(@RequestParam("username") String username, @RequestParam("dagId") String dagId, @RequestParam(value = "pageId", required = false) int pageId, @RequestParam(value = "pageSize", required = false) int pageSize);
+
 }

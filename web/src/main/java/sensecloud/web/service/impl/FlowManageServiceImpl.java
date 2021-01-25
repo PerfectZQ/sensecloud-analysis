@@ -87,41 +87,15 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         long total = query.count();
         IPage<FlowEntity> result = query.page(new Page<FlowEntity>(pageNum, pageSize, total));
 
-//        PageResult dagRuns = this.airflowRemoteService.listDagRunsByUser(this.getCurrentUserName(),1, Integer.MAX_VALUE);
-//
-//        Map<String, FlowEntity> temp = new HashMap<>();
-//        result.getRecords().forEach(flowEntity -> {
-//            temp.put(flowEntity.getDagId(), flowEntity);
-//        });
-//
-//        dagRuns.getCurrentPageElems().forEach(run -> {
-//            FlowRunVO runVO = (FlowRunVO) run;
-//            log.debug(">>> Got run info: {}", JSON.toJSONString(runVO));
-//
-//            String dagId = runVO.getDagId();
-//            if(temp.containsKey(dagId)) {
-//                FlowEntity entity = temp.get(dagId);
-//                FlowRunBean runBean = entity.getFlowRunBean();
-//                if (runBean != null) {
-//                    LocalDateTime t1 = runBean.getExecutionDate();
-//                    LocalDateTime t2 = runVO.getExecutionDate();
-//                    if(t2.isAfter(t1)) {
-//                        entity.setFlowRunBean(runVO);
-//                    }
-//                } else {
-//                    entity.setFlowRunBean(runVO);
-//                }
-//            }
-//        });
         return result;
     }
 
     public PageResult queryFlowRuns(String dagId, Long page, Long size) {
-        return this.airflowRemoteService.listDagRunsByUser(this.getCurrentUserName(), page.intValue(), size.intValue());
+        return this.airflowRemoteService.listDagRuns(this.getCurrentUserName(), dagId, page.intValue(), size.intValue());
     }
 
 
-    public void save(FlowVO vo) {
+    public boolean save(FlowVO vo) {
         String currentUser = this.getCurrentUserName();
         vo.setDagId(vo.getName());
         vo.setCreateBy(currentUser);
@@ -153,12 +127,14 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         ResultVO<String> createResult = airflowRemoteService.createOrUpdateDagFile(dag);
         if (createResult.getCode() == 200) {
             log.info("Create DAG successfully: {}", dag);
+            return true;
         } else {
             log.error("Failed to create Dag File. Please re-create manually. DAG info: {}, return message: {}", dag, createResult.getMsg());
+            return false;
         }
     }
 
-    public void update(FlowVO vo) {
+    public boolean update(FlowVO vo) {
         List<TaskEntity> tasksToModify = taskService.query().ge("flow_id", vo.getId()).list();
         if(StringUtils.isNotBlank(vo.getName())){
             vo.setDagId(vo.getName());
@@ -199,15 +175,17 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         ResultVO<String> updateResult = airflowRemoteService.createOrUpdateDagFile(dag);
         if (updateResult.getCode() == 200) {
             log.info("Update DAG successfully: {}", dag);
+            return true;
         } else {
             log.error("Failed to update Dag File. Please re-update manually. DAG info: {}, return message: {}", dag, updateResult.getMsg());
             //Todo: Rollback and return failure message to caller
+            return false;
         }
 
         //Todo: restart airflow job and restart k8s pod
     }
 
-    public void delete(Long id) {
+    public boolean delete(Long id) {
         FlowEntity flowEntity = flowService.getById(id);
         String currentUser = this.getCurrentUserName();
         flowEntity.setDeleteBy(currentUser);
@@ -241,11 +219,14 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         ResultVO<String> deleteResult = airflowRemoteService.deleteDagFile(flowEntity.getName(), flowEntity.getSaas());
         if (deleteResult.getCode() == 200) {
             log.info("Delete DAG successfully: fileName = {}, groupName = {}", flowEntity.getName(), flowEntity.getSaas());
+            //Todo: stop airflow job and kill k8s pod
+            return true;
         } else {
             log.error("Failed to delete Dag File. Please re-delete manually. DAG info: fileName = {}, groupName = {}, return message: {}", flowEntity.getName(), flowEntity.getSaas(), deleteResult.getMsg());
             //Todo: Rollback and return failure message to caller
+            return false;
         }
-        //Todo: stop airflow job and kill k8s pod
+
     }
 
     private String generateCode(FlowVO vo) {
