@@ -235,8 +235,8 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         QueryChainWrapper<FlowCodeEntity> query = flowCodeService.query()
                 .eq("deleted", false)
                 .eq("flow_id", flowEntity.getId())
-                .orderByDesc("version")
-                .first("limit 1");
+                .orderByDesc("version");
+
         FlowCodeEntity codeEntity = flowCodeService.getOne(query);
         if(codeEntity != null) {
             codeEntity.setDeleted(true);
