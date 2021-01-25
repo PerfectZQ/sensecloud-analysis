@@ -26,7 +26,6 @@ import sensecloud.web.service.impl.ConnectorAttachmentServiceImpl;
 import sensecloud.web.service.impl.ConnectorServiceImpl;
 import sensecloud.web.service.impl.SenseCloudUserDetailsServiceImpl;
 import sensecloud.web.service.impl.UserAuthorityServiceImpl;
-import sensecloud.web.service.remote.ClickHouseRemoteService;
 
 import java.io.*;
 import java.sql.Connection;

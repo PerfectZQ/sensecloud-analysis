@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sensecloud.flow.generator.DAGGenerator;
+import sensecloud.flow.queue.FlowQueue;
+import sensecloud.flow.queue.FlowQueueStatus;
+import sensecloud.flow.queue.FlowQueueType;
 import sensecloud.web.bean.FlowRunBean;
 import sensecloud.web.bean.common.PageResult;
 import sensecloud.web.bean.vo.DagFileVO;
@@ -22,6 +25,7 @@ import sensecloud.web.bean.vo.FlowVO;
 import sensecloud.web.bean.vo.ResultVO;
 import sensecloud.web.entity.FlowCodeEntity;
 import sensecloud.web.entity.FlowEntity;
+import sensecloud.web.entity.FlowQueueEntity;
 import sensecloud.web.entity.TaskEntity;
 import sensecloud.web.service.UserSupport;
 import sensecloud.web.service.IFlowManageService;
@@ -42,6 +46,9 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
     @Autowired
     private FlowCodeServiceImpl flowCodeService;
+
+    @Autowired
+    private FlowQueueServiceImpl flowQueueService;
 
     @Autowired
     private DAGGenerator dagGenerator;
@@ -67,7 +74,7 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
     public IPage<FlowEntity> queryFlows(String name, Long page, Long size) {
         QueryChainWrapper<FlowEntity> query = flowService.query()
-                                                        .eq("create_by", this.getCurrentUserName())
+//                                                        .eq("create_by", this.getCurrentUserName())
                                                         .eq("deleted", false)
                                                         .orderByDesc("create_time");
         if (StringUtils.isNotBlank(name)) {
@@ -127,6 +134,16 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         ResultVO<String> createResult = airflowRemoteService.createOrUpdateDagFile(dag);
         if (createResult.getCode() == 200) {
             log.info("Create DAG successfully: {}", dag);
+            FlowQueueEntity queueItem = new FlowQueueEntity();
+            queueItem.setCreateBy(currentUser);
+            queueItem.setCreateTime(LocalDateTime.now());
+            queueItem.setFlowId(vo.getId());
+
+            queueItem.setName("Create_Flow");
+            queueItem.setType(FlowQueueType.FLOW_MANAGER.name());
+            queueItem.setStatus(FlowQueueStatus.PENDING.name());
+
+
             return true;
         } else {
             log.error("Failed to create Dag File. Please re-create manually. DAG info: {}, return message: {}", dag, createResult.getMsg());

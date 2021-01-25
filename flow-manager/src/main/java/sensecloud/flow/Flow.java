@@ -43,6 +43,9 @@ public class Flow {
     }
 
     private String hasLoop(Task task, Map<String, Task> dict, Set<String> marked) {
+        Set<String> ext = new HashSet<>();
+        ext.addAll(marked);
+
         log.info("Loop task: {}", JSON.toJSONString(task));
         for(int i = 0 ; i < task.getDependencyIds().size(); i++) {
             String id = task.getDependencyIds().get(i);
@@ -50,9 +53,9 @@ public class Flow {
                 return id;
             } else {
                 Task next = dict.get(id);
-                marked.add(id);
+                ext.add(id);
                 if(next != null) {
-                    return hasLoop(next, dict, marked);
+                    return hasLoop(next, dict, ext);
                 }
             }
         }
