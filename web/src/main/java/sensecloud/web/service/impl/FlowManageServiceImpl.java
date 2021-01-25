@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sensecloud.flow.generator.DAGGenerator;
 import sensecloud.flow.queue.FlowQueue;
+import sensecloud.flow.queue.FlowQueueActions;
 import sensecloud.flow.queue.FlowQueueStatus;
 import sensecloud.flow.queue.FlowQueueType;
 import sensecloud.web.bean.FlowRunBean;
@@ -142,7 +143,9 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
             queueItem.setName("Create_Flow");
             queueItem.setType(FlowQueueType.FLOW_MANAGER.name());
             queueItem.setStatus(FlowQueueStatus.PENDING.name());
+            queueItem.setAction(FlowQueueActions.CREATE_DAG.name());
 
+            flowQueueService.save(queueItem);
 
             return true;
         } else {
@@ -192,14 +195,24 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         ResultVO<String> updateResult = airflowRemoteService.createOrUpdateDagFile(dag);
         if (updateResult.getCode() == 200) {
             log.info("Update DAG successfully: {}", dag);
+
+            FlowQueueEntity queueItem = new FlowQueueEntity();
+            queueItem.setCreateBy(currentUser);
+            queueItem.setCreateTime(LocalDateTime.now());
+            queueItem.setFlowId(vo.getId());
+
+            queueItem.setName("Update_Flow");
+            queueItem.setType(FlowQueueType.FLOW_MANAGER.name());
+            queueItem.setStatus(FlowQueueStatus.PENDING.name());
+            queueItem.setAction(FlowQueueActions.UPDATE_DAG.name());
+
+            flowQueueService.save(queueItem);
             return true;
         } else {
             log.error("Failed to update Dag File. Please re-update manually. DAG info: {}, return message: {}", dag, updateResult.getMsg());
             //Todo: Rollback and return failure message to caller
             return false;
         }
-
-        //Todo: restart airflow job and restart k8s pod
     }
 
     public boolean delete(Long id) {
@@ -237,10 +250,21 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         if (deleteResult.getCode() == 200) {
             log.info("Delete DAG successfully: fileName = {}, groupName = {}", flowEntity.getName(), flowEntity.getSaas());
             //Todo: stop airflow job and kill k8s pod
+            FlowQueueEntity queueItem = new FlowQueueEntity();
+            queueItem.setCreateBy(currentUser);
+            queueItem.setCreateTime(LocalDateTime.now());
+            queueItem.setFlowId(id);
+
+            queueItem.setName("Delete_Flow");
+            queueItem.setType(FlowQueueType.FLOW_MANAGER.name());
+            queueItem.setStatus(FlowQueueStatus.PENDING.name());
+            queueItem.setAction(FlowQueueActions.DELETE_DAG.name());
+
+            flowQueueService.save(queueItem);
+
             return true;
         } else {
             log.error("Failed to delete Dag File. Please re-delete manually. DAG info: fileName = {}, groupName = {}, return message: {}", flowEntity.getName(), flowEntity.getSaas(), deleteResult.getMsg());
-            //Todo: Rollback and return failure message to caller
             return false;
         }
 

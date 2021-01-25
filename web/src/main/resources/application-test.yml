@@ -28,13 +28,6 @@ service:
     domain: bigdata
     id_token_header: X-Id-Token
     access_token_header: access_token
-    no_auth_redirect_url: https://sensecloud-dev.sensetimetech.cn/login
-    logout_uri: /logout
-    logout_redirect_url: https://sensecloud-dev.sensetimetech.cn/logout?redirect_uri=https://bigdata-dev.sensetimetech.cn
-    rest-api:
-      url: https://sso-sc-dev.sensetime.com
-      endpoints:
-        userinfo: /userinfo
   connector:
     upload:
       path: /tmp/sensecloud
