@@ -40,7 +40,7 @@ dag = DAG(
 {% for task in flow.tasks %}
 {% if task.type == 'CLICKHOUSE_SQL' and task.content is not empty %}
 ## Define operator for task {{task.taskId}}
-{{task.taskId}}_sql = """
+sql_{{task.taskId}} = """
 CREATE TABLE IF NOT EXISTS {{ task.conf.db }}.{{ task.conf.table }}_shard
 ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard_cat}/{{ task.conf.db }}.{{ task.conf.table }}_shard', '{replica_cat}')
 ORDER BY tuple()
@@ -59,7 +59,7 @@ cmd_{{task.taskId}} = r"""
       --database {db} \
       --multiquery \
       --query "{sql}"
-""".format(sql={{task.taskId}}_sql, ck_host=ck_host, ck_port=ck_port, ck_user=ck_user, ck_pwd=ck_pwd, db=db_{{task.taskId}})
+""".format(sql=sql_{{task.taskId}}, ck_host=ck_host, ck_port=ck_port, ck_user=ck_user, ck_pwd=ck_pwd, db=db_{{task.taskId}})
 
 op_{{task.taskId}} = BashOperator(
     task_id='{{task.taskId}}',
