@@ -39,7 +39,7 @@ dag = DAG(
 ## Define operators
 {% for task in flow.tasks %}
 {% if task.type == 'CLICKHOUSE_SQL' and task.content is not empty %}
-## Define operator for task {{task.taskId}}. 
+## Define operator for task {{task.taskId}}.
 sql_{{task.taskId}} = """
 CREATE TABLE IF NOT EXISTS {{ task.conf.db }}.{{ task.conf.table }}_shard
 ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard_cat}/{{ task.conf.db }}.{{ task.conf.table }}_shard', '{replica_cat}')
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS {{ task.conf.db }}.{{ task.conf.table }} ON CLUSTER c
 ENGINE = Distributed('cat', '{{ task.conf.db }}', '{{ task.conf.table }}_shard', rand());
 """.replace("`", "").replace("\r\n", " ").replace("\r", " ").replace("\n", " ")
 
-db_{{task.taskId}}={{ task.conf.db }}
+db_{{task.taskId}}="{{ task.conf.db }}"
 
 cmd_{{task.taskId}} = r"""
   clickhouse-client \
