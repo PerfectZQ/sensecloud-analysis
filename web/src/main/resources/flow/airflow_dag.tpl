@@ -31,7 +31,7 @@ dag = DAG(
 {% if flow.scheduleExpr is empty %}
     schedule_interval=None,
 {% else %}
-    schedule_interval="{{ flow.scheduleExpr }}"
+    schedule_interval="{{ flow.scheduleExpr }}",
 {% endif %}
     catchup=False,
 )
