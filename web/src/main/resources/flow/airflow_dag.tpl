@@ -39,7 +39,7 @@ dag = DAG(
 ## Define operators
 {% for task in flow.tasks %}
 {% if task.type == 'CLICKHOUSE_SQL' and task.content is not empty %}
-## Define operator for task {{task.taskId}}
+## Define operator for task {{task.taskId}}. 
 sql_{{task.taskId}} = """
 CREATE TABLE IF NOT EXISTS {{ task.conf.db }}.{{ task.conf.table }}_shard
 ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard_cat}/{{ task.conf.db }}.{{ task.conf.table }}_shard', '{replica_cat}')
