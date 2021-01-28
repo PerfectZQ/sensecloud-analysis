@@ -129,7 +129,7 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
         //Todo: invoker restful api to submit code
         DagFileVO dag = new DagFileVO();
-        dag.setFileName(vo.getName());
+        dag.setFileName(vo.getName() + ".py");
         dag.setGroupName(vo.getSaas());
         dag.setSourceCode(code);
         ResultVO<String> createResult = airflowRemoteService.createOrUpdateDagFile(dag);
@@ -188,7 +188,7 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         flowCodeService.save(codeEntity);
 
         DagFileVO dag = new DagFileVO();
-        dag.setFileName(vo.getName());
+        dag.setFileName(vo.getName() + ".py");
         dag.setGroupName(vo.getSaas());
         dag.setSourceCode(code);
 
@@ -241,7 +241,7 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         }
 
         //invoker restful api to delete code
-        ResultVO<String> deleteResult = airflowRemoteService.deleteDagFile(flowEntity.getName(), flowEntity.getSaas());
+        ResultVO<String> deleteResult = airflowRemoteService.deleteDagFile(flowEntity.getName()  + ".py", flowEntity.getSaas());
         if (deleteResult.getCode() == 200) {
             log.info("Delete DAG successfully: fileName = {}, groupName = {}", flowEntity.getName(), flowEntity.getSaas());
             //Todo: stop airflow job and kill k8s pod
