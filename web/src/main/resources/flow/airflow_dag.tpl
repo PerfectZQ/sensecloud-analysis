@@ -55,7 +55,7 @@ db_{{task.taskId}}="{{ task.conf.db }}"
 cmd_{{task.taskId}} = r"""
   clickhouse-client \
       --host {ck_host} --port {ck_port} \
-      --user {ck_user} --password {ck_pwd} \
+      --user {ck_user} --password "{ck_pwd}" \
       --database {db} \
       --multiquery \
       --query "{sql}"

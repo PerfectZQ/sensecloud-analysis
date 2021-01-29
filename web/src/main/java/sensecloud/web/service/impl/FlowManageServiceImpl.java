@@ -31,6 +31,7 @@ import sensecloud.web.entity.TaskEntity;
 import sensecloud.web.service.UserSupport;
 import sensecloud.web.service.IFlowManageService;
 import sensecloud.web.service.remote.AirflowRemoteService;
+import sensecloud.web.utils.DesUtil;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -62,6 +63,9 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
     @Value("${service.flow.env.clickhouse_port}")
     private String clickhouse_port;
+
+    @Value("${service.connector.clickhouse.des.key}")
+    private String ch_pwd_decrypt_key;
 
 
     public FlowEntity get(Long id) {
@@ -272,7 +276,10 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
             env.put("ck_host", this.clickhouse_host);
             env.put("ck_port", this.clickhouse_port);
-            env.put("ck_password", clickhouseConf.getString("ckPassword"));
+
+            String encryptedPwd = clickhouseConf.getString("ckPassword");
+
+            env.put("ck_password", DesUtil.decrypt(this.ch_pwd_decrypt_key, encryptedPwd));
             env.put("ck_user", clickhouseConf.getString("ckUser"));
         } catch (Exception e) {
             e.printStackTrace();
