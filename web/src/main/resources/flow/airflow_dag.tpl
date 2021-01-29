@@ -64,7 +64,7 @@ cmd_{{task.taskId}} = r"""
 op_{{task.taskId}} = BashOperator(
     task_id='{{task.taskId}}',
     depends_on_past=False,
-    bash_command="cmd_{{task.taskId}}",
+    bash_command=cmd_{{task.taskId}},
     retries=0,
     dag=dag
 )
