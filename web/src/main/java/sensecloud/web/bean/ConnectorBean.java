@@ -8,7 +8,13 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import lombok.Data;
+import org.apache.commons.lang.StringUtils;
+import sensecloud.connector.Connector;
+import sensecloud.connector.SinkType;
+import sensecloud.connector.SourceType;
+import sensecloud.connector.rule.pebble.PebbleExpRule;
 import sensecloud.web.config.db.JSONObjectHandler;
+import sensecloud.web.utils.DesUtil;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -46,5 +52,6 @@ public class ConnectorBean implements Serializable {
     private String deleteBy;
     @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime deleteTime;
+
 
 }

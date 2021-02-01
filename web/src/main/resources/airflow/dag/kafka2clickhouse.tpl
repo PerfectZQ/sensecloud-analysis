@@ -7,15 +7,15 @@ from airflow.utils.dates import days_ago
 from base64 import b64encode, b64decode
 
 app_name = "{{ appName }}"
-kubernetes_context = "{{ kubernetes_context }}"
-kubernetes_namespace = "{{ kubernetes_namespace }}"
+kubernetes_context = "{{ env.kubernetes_context }}"
+kubernetes_namespace = "{{ env.kubernetes_namespace }}"
 
 job_config = """
 {{ config | raw }}
 
 """
 
-oauthToken = "{{ kubernetes_oauth_token }}"
+oauthToken = "{{ env.kubernetes_oauth_token }}"
 
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
@@ -95,7 +95,7 @@ submit = [
     "sh", "-c",
     r"""
         /opt/spark/bin/spark-submit \
-        --master "{{ env_kubernetes_api_server }}" \
+        --master "{{ env.kubernetes_api_server }}" \
         --deploy-mode cluster \
         --name "{app_name}" \
         --driver-cores 1 --driver-memory 1g \
@@ -108,8 +108,8 @@ submit = [
         --conf "spark.kubernetes.container.image={image}" \
         --conf "spark.kubernetes.container.image.pullPolicy=IfNotPresent" \
         --conf "spark.kubernetes.container.image.pullSecrets=sensetime" \
-        --conf "spark.kubernetes.context={{ kubernetes_context }}" \
-        --conf "spark.kubernetes.namespace={{ kubernetes_namespace }}" \
+        --conf "spark.kubernetes.context={{ env.kubernetes_context }}" \
+        --conf "spark.kubernetes.namespace={{ env.kubernetes_namespace }}" \
         --conf "spark.kubernetes.authenticate.driver.serviceAccountName=dlink-spark" \
         --conf "spark.kubernetes.authenticate.submission.oauthToken={oauthToken}" \
         --conf "spark.streaming.concurrentJobs=1" \
@@ -117,6 +117,7 @@ submit = [
         --conf "spark.streaming.kafka.maxRatePerPartition=10000" \
         --conf "spark.streaming.kafka.maxRetries=3" \
         --conf "spark.streaming.kafka.consumer.poll.ms=310000" \
+        --conf "spark.kubernetes.driver.pod.name=connector-{app_name}" \
         "local:///app/app.jar" \
         --jobConfig "$JOB_CONFIG" \
     """.format(app_name=app_name, image=image, oauthToken=oauthToken)

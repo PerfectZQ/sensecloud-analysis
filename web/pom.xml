@@ -128,6 +128,12 @@
 
         <dependency>
             <groupId>sensetime</groupId>
+            <artifactId>submitter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>sensetime</groupId>
             <artifactId>flow-manager</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

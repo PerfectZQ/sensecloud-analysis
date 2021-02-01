@@ -7,21 +7,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import sensecloud.connector.Connector;
 import sensecloud.connector.SinkType;
 import sensecloud.connector.SourceType;
 import sensecloud.connector.rule.RuleProvider;
 import sensecloud.connector.rule.pebble.PebbleExpRule;
-import sensecloud.connector.submitter.airflow.AirflowSubmitter;
+import sensecloud.submitter.airflow.RestfulApiSubmitter;
 import sensecloud.web.bean.ConnectorBean;
 import sensecloud.web.entity.ConnectorEntity;
 import sensecloud.web.mapper.ConnectorMapper;
 import sensecloud.web.service.IConnectorService;
+import sensecloud.web.service.UserSupport;
 import sensecloud.web.service.remote.ClickHouseRemoteService;
 import sensecloud.web.service.remote.MysqlCDCService;
 import sensecloud.web.utils.DesUtil;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -30,7 +33,10 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
     private Connector connector;
 
     @Autowired
-    private AirflowSubmitter submitter;
+    private UserSupport userSupport;
+
+    @Autowired
+    private RestfulApiSubmitter submitter;
 
     @Autowired
     private RuleProvider ruleProvider;
@@ -41,13 +47,48 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
     @Autowired
     private ClickHouseRemoteService clickHouseRemoteService;
 
+    @Value("${service.submitter.env.k8s.context}")
+    private String env_kubernetes_context;
+
+    @Value("${service.submitter.env.k8s.namespace}")
+    private String env_kubernetes_namespace;
+
+    @Value("${service.submitter.env.k8s.oauth_token}")
+    private String env_kubernetes_oauth_token;
+
+    @Value("${service.submitter.env.k8s.api_server}")
+    private String env_kubernetes_api_server;
+
     @Value("${service.connector.clickhouse.des.key}")
     private String ch_pwd_decrypt_key;
 
     public boolean submitKafkaJob(ConnectorBean bean) {
         String connectorName = bean.getName();
         String saas = StringUtils.isNotBlank(bean.getSaas())? bean.getSaas() : "undefined";
+        String ruleName = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
+        JSONObject jobConf = this.configConnector(bean);
 
+        //Todo: Get current user's group from database
+        String appName = connectorName;
+
+        Map<String, String> env = new HashMap<>();
+        env.put("kubernetes_context", env_kubernetes_context);
+        env.put("kubernetes_namespace", env_kubernetes_namespace);
+        env.put("kubernetes_oauth_token", env_kubernetes_oauth_token);
+        env.put("kubernetes_api_server", env_kubernetes_api_server);
+
+        return this.submitter.submitConnectorJob(
+                saas,
+                userSupport.getCurrentUserName(),
+                appName,
+                ruleName,
+                jobConf,
+                env);
+    }
+
+
+    private JSONObject configConnector(ConnectorBean bean) {
+        String connectorName = bean.getName();
         String ruleName = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
         String ruleExpr = ruleProvider.getRuleExpression(ruleName);
         PebbleExpRule rule = new PebbleExpRule().expression(ruleExpr);
@@ -61,24 +102,23 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         }
 
         this.connector = new Connector()
-                                .name(connectorName)
-                                .sourceType(SourceType.valueOf(bean.getSourceType().toUpperCase()))
-                                .sourceAccountConf(bean.getSourceAccountConf())
-                                .sourceConf(bean.getSourceConf())
-                                .sinkType(SinkType.valueOf(bean.getSinkType().toUpperCase()))
-                                .sinkAccountConf(sinkAccountConf)
-                                .sinkConf(bean.getSinkConf())
-                                .rule(rule);
+                .name(connectorName)
+                .sourceType(SourceType.valueOf(bean.getSourceType().toUpperCase()))
+                .sourceAccountConf(bean.getSourceAccountConf())
+                .sourceConf(bean.getSourceConf())
+                .sinkType(SinkType.valueOf(bean.getSinkType().toUpperCase()))
+                .sinkAccountConf(sinkAccountConf)
+                .sinkConf(bean.getSinkConf())
+                .rule(rule);
 
         JSONObject jobConf = new JSONObject();
         if(this.connector.configure()) {
             jobConf = this.connector.connectConf();
         }
-
-        //Todo: Get current user's group from database
-        String jobId = connectorName;
-        return this.submitter.submit(saas, jobId, ruleName, jobConf);
+        return jobConf;
     }
+
+
 
     public boolean addMysqlCDC (ConnectorBean bean) {
         JSONObject params = this.buildMysqlCDCServiceParams(bean);
@@ -162,12 +202,13 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
                 log.error("Error occurred while calling getClickHouseUser: {}", message);
                 result = null;
             }
-        } else {
-            result.put("id", 10);
-            result.put("ckUser", "writer");
-            result.put("ckPassword", "2c82mirS");
-            result.put("userType", "admin");
         }
+//        else {
+//            result.put("id", 10);
+//            result.put("ckUser", "writer");
+//            result.put("ckPassword", "2c82mirS");
+//            result.put("userType", "admin");
+//        }
         log.debug("Call [getClickHouseUser] and return : {}", result);
         return result;
     }

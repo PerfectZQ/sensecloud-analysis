@@ -1,4 +1,4 @@
-package sensecloud.connector.submitter.airflow;
+package sensecloud.submitter.airflow;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

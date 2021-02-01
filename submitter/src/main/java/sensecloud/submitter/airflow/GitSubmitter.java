@@ -1,4 +1,4 @@
-package sensecloud.connector.submitter.airflow;
+package sensecloud.submitter.airflow;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -6,52 +6,42 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import sensecloud.connector.submitter.remote.AirflowRestInvoker;
-import sensecloud.connector.submitter.remote.GitClient;
+import sensecloud.submitter.remote.GitClient;
+import sensecloud.submitter.remote.AirflowRestInvoker;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 @Slf4j
 @Component
-public class AirflowSubmitter {
+public class GitSubmitter {
 
-    @Autowired
+//    @Autowired
     private GitConf gitConf;
 
     @Autowired
-    private AirflowDAGProvider airflowDAGProvider;
+    private AirflowDAGGenerator dagGenerator;
 
     @Autowired
     private AirflowRestInvoker airflowRestInvoker;
 
-    @Value("${service.submitter.env.k8s.context}")
-    private String env_kubernetes_context;
-
-    @Value("${service.submitter.env.k8s.namespace}")
-    private String env_kubernetes_namespace;
-
-    @Value("${service.submitter.env.k8s.oauth_token}")
-    private String env_kubernetes_oauth_token;
-
-    @Value("${service.submitter.env.k8s.api_server}")
-    private String env_kubernetes_api_server;
-
     private GitClient gitClient;
 
-    private void init () {
+    protected void init (GitConf gitConf) {
+        this.gitConf = gitConf;
         this.gitClient = new GitClient();
-        File localRepoDir = new File(this.gitConf.getLocalRepo());
+        File localRepoDir = new File(gitConf.getLocalRepo());
         if (!localRepoDir.exists()) {
             localRepoDir.mkdirs();
         }
 
-        if(!this.gitClient.init(this.gitConf.getUsername(),
-                this.gitConf.getPassword(), this.gitConf.getLocalRepo(),
-                this.gitConf.getRemoteUrl(), this.gitConf.getRemote())) {
-            this.gitClient.clone(this.gitConf.getRemoteBranch());
+        if(!this.gitClient.init(gitConf.getUsername(),
+                gitConf.getPassword(), gitConf.getLocalRepo(),
+                gitConf.getRemoteUrl(), gitConf.getRemote())) {
+            this.gitClient.clone(gitConf.getRemoteBranch());
         }
     }
 
@@ -62,18 +52,8 @@ public class AirflowSubmitter {
      * @param jobConf Configurations for the job
      * @return Return true if submission success
      */
-    public boolean submit(String group, String jobId, String name, JSONObject jobConf) {
-        this.init();
-
-        JSONObject context = new JSONObject();
-        context.put("appName", jobId);
-        context.put("kubernetes_context", env_kubernetes_context);
-        context.put("kubernetes_namespace", env_kubernetes_namespace);
-        context.put("kubernetes_oauth_token", env_kubernetes_oauth_token);
-        context.put("env_kubernetes_api_server", env_kubernetes_api_server);
-        context.put("config", jobConf);
-        String code = this.airflowDAGProvider.dag(name, context);
-
+    public boolean submit(String group, String jobId, String name, JSONObject jobConf, Map<String, String> env) {
+        String code = dagGenerator.generateDAG(jobId, name, jobConf, env);
         this.gitClient.pull(this.gitConf.getRemoteBranch());
         File codeFile = this.writeCode(group, jobId, code);
         this.gitClient.addFile(codeFile);
@@ -98,7 +78,7 @@ public class AirflowSubmitter {
         return true;
     }
 
-    private File writeCode (String group, String runId, String code) {
+    protected File writeCode (String group, String runId, String code) {
         File dir = new File(this.gitConf.getLocalRepo() + "/" + this.gitConf.getProject());
         if(!dir.exists()){
             dir.mkdirs();

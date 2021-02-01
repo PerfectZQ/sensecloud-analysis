@@ -7,16 +7,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import lombok.Data;
-import sensecloud.flow.Task;
-import sensecloud.web.bean.FlowBean;
-import sensecloud.web.bean.FlowQueueBean;
+import sensecloud.web.bean.EventBean;
 
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
 
-@Data @TableName(value = "flow_queue", autoResultMap = true)
-public class FlowQueueEntity extends FlowQueueBean {
+@Data @TableName(value = "event", autoResultMap = true)
+public class EventEntity extends EventBean {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
@@ -24,7 +20,7 @@ public class FlowQueueEntity extends FlowQueueBean {
     @TableField(typeHandler = FastjsonTypeHandler.class, exist = false)
     private FlowEntity flow;
 
-    private Long flowId;
+    private Long generatorId;
 
     private String createBy;
     @JSONField(format="yyyy-MM-dd HH:mm:ss")

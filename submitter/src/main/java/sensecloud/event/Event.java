@@ -1,14 +1,13 @@
-package sensecloud.flow.queue;
+package sensecloud.event;
 
 import lombok.Data;
-import sensecloud.flow.Flow;
 
 @Data
-public class FlowQueue {
+public class Event {
 
     private String name;
     private String type;
-    private Flow flow;
     private String action;
     private String status;
+    private String dagId;
 }

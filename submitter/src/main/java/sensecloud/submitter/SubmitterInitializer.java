@@ -1,24 +1,24 @@
-package sensecloud;
+package sensecloud.submitter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import sensecloud.connector.rule.RuleProvider;
+import sensecloud.submitter.airflow.AirflowDAGProvider;
 
 @Slf4j
-@Order(99)
+@Order(98)
 @Component
-public class StartupProcessor implements CommandLineRunner {
+public class SubmitterInitializer implements CommandLineRunner {
 
     @Autowired
-    private RuleProvider ruleProvider;
+    private AirflowDAGProvider airflowDAGProvider;
 
     @Override
     public void run(String... args) throws Exception {
-        log.info(">>> Connector setup start ...");
-        ruleProvider.loadFromClassPath();
-        log.info(">>> Connector setup end!");
+        log.info(">>> Submitter setup start ...");
+        airflowDAGProvider.reloadTemplates();
+        log.info(">>> Submitter setup end!");
     }
 }

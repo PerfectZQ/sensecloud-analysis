@@ -9,14 +9,15 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>connector</artifactId>
+    <artifactId>submitter</artifactId>
 
-    <name>connector</name>
+    <name>submitter</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <mybatis-plus.version>3.3.1</mybatis-plus.version>
     </properties>
 
     <dependencies>
@@ -69,6 +70,18 @@
             <version>3.1.4</version>
         </dependency>
 
+        <!-- Mybatis-plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-generator</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+
         <!-- jgit -->
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
@@ -86,6 +99,18 @@
             <groupId>io.kubernetes</groupId>
             <artifactId>client-java</artifactId>
             <version>10.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>sensetime</groupId>
+            <artifactId>connector</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>sensetime</groupId>
+            <artifactId>flow-manager</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>

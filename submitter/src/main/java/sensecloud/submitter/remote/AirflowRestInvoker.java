@@ -1,4 +1,4 @@
-package sensecloud.connector.submitter.remote;
+package sensecloud.submitter.remote;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.AllArgsConstructor;
@@ -11,6 +11,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+@Deprecated
 @Component
 @Data
 @Slf4j

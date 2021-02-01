@@ -1,4 +1,4 @@
-package sensecloud.connector.submitter.airflow;
+package sensecloud.submitter.airflow;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.FilenameUtils;
@@ -9,9 +9,8 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
-import sensecloud.connector.utils.TextRenderer;
+import sensecloud.submitter.utils.TextRenderer;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 

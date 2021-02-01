@@ -1,12 +1,11 @@
-package sensecloud.connector.submitter.remote;
+package sensecloud.submitter.remote;
 
+import io.kubernetes.client.openapi.ApiCallback;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.models.V1ObjectMeta;
-import io.kubernetes.client.openapi.models.V1Secret;
-import io.kubernetes.client.openapi.models.V1SecretList;
+import io.kubernetes.client.openapi.models.*;
 import io.kubernetes.client.util.Config;
 import lombok.Data;
 import org.springframework.stereotype.Component;
@@ -31,6 +30,32 @@ public class KubernetesClient {
             Configuration.setDefaultApiClient(client);
             this.apiV1 = new CoreV1Api();
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public V1Pod getPod (String namespace, String podName) {
+        V1Pod pod = null;
+        try {
+            pod = apiV1.readNamespacedPod(podName, namespace, "true", false, false);
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
+        return pod;
+    }
+
+    public void stopPodAsync(String namespace, String podName, ApiCallback<V1Pod> _callback) {
+        try {
+            V1Pod pod = this.getPod(namespace, podName);
+            V1DeleteOptions body = new V1DeleteOptions();
+            body.setApiVersion(pod.getApiVersion());
+            body.setDryRun(null);
+            body.setGracePeriodSeconds(300L);
+            body.setKind(pod.getKind());
+            body.setOrphanDependents(false);
+            body.setPropagationPolicy("Foreground");
+            apiV1.deleteNamespacedPodAsync(podName, namespace, "true", null, 300, false, "Foreground", body, _callback);
+        } catch (ApiException e) {
             e.printStackTrace();
         }
     }

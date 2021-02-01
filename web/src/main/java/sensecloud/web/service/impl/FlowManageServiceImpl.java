@@ -1,9 +1,7 @@
 package sensecloud.web.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -14,19 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sensecloud.flow.generator.DAGGenerator;
-import sensecloud.flow.queue.FlowQueue;
-import sensecloud.flow.queue.FlowQueueActions;
-import sensecloud.flow.queue.FlowQueueStatus;
-import sensecloud.flow.queue.FlowQueueType;
-import sensecloud.web.bean.FlowRunBean;
+import sensecloud.event.EventAction;
+import sensecloud.event.EventStatus;
+import sensecloud.event.EventType;
+import sensecloud.submitter.airflow.RestfulApiSubmitter;
 import sensecloud.web.bean.common.PageResult;
 import sensecloud.web.bean.vo.DagFileVO;
-import sensecloud.web.bean.vo.FlowRunVO;
 import sensecloud.web.bean.vo.FlowVO;
 import sensecloud.web.bean.vo.ResultVO;
 import sensecloud.web.entity.FlowCodeEntity;
 import sensecloud.web.entity.FlowEntity;
-import sensecloud.web.entity.FlowQueueEntity;
+import sensecloud.web.entity.EventEntity;
 import sensecloud.web.entity.TaskEntity;
 import sensecloud.web.service.UserSupport;
 import sensecloud.web.service.IFlowManageService;
@@ -50,7 +46,10 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
     private FlowCodeServiceImpl flowCodeService;
 
     @Autowired
-    private FlowQueueServiceImpl flowQueueService;
+    private EventServiceImpl eventQueueService;
+
+    @Autowired
+    private RestfulApiSubmitter submitter;
 
     @Autowired
     private DAGGenerator dagGenerator;
@@ -131,29 +130,12 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         codeEntity.setVersion(DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmssSSS"));
         flowCodeService.save(codeEntity);
 
-        //Todo: invoker restful api to submit code
-        DagFileVO dag = new DagFileVO();
-        dag.setFileName(vo.getName() + ".py");
-        dag.setGroupName(vo.getSaas());
-        dag.setSourceCode(code);
-        ResultVO<String> createResult = airflowRemoteService.createOrUpdateDagFile(dag);
-        if (createResult.getCode() == 200) {
-            log.info("Create DAG successfully: {}", dag);
-            FlowQueueEntity queueItem = new FlowQueueEntity();
-            queueItem.setCreateBy(currentUser);
-            queueItem.setCreateTime(LocalDateTime.now());
-            queueItem.setFlowId(vo.getId());
-
-            queueItem.setName("Create_Flow");
-            queueItem.setType(FlowQueueType.FLOW_MANAGER.name());
-            queueItem.setStatus(FlowQueueStatus.PENDING.name());
-            queueItem.setAction(FlowQueueActions.CREATE_DAG.name());
-
-            flowQueueService.save(queueItem);
-
+        //invoker restful api to submit code
+        boolean success = this.submitter.submitFlowJob(vo.getSaas(), currentUser, vo.getName(), code);
+        if (success) {
             return true;
         } else {
-            log.error("Failed to create Dag File. Please re-create manually. DAG info: {}, return message: {}", dag, createResult.getMsg());
+            log.error("Failed to create Dag File. Please re-create manually.");
             return false;
         }
     }
@@ -200,17 +182,17 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         if (updateResult.getCode() == 200) {
             log.info("Update DAG successfully: {}", dag);
 
-            FlowQueueEntity queueItem = new FlowQueueEntity();
+            EventEntity queueItem = new EventEntity();
             queueItem.setCreateBy(currentUser);
             queueItem.setCreateTime(LocalDateTime.now());
-            queueItem.setFlowId(vo.getId());
+            queueItem.setGeneratorId(vo.getId());
 
             queueItem.setName("Update_Flow");
-            queueItem.setType(FlowQueueType.FLOW_MANAGER.name());
-            queueItem.setStatus(FlowQueueStatus.PENDING.name());
-            queueItem.setAction(FlowQueueActions.UPDATE_DAG.name());
+            queueItem.setType(EventType.FLOW_MANAGER.name());
+            queueItem.setStatus(EventStatus.PENDING.name());
+            queueItem.setAction(EventAction.UPDATE_DAG.name());
 
-            flowQueueService.save(queueItem);
+            eventQueueService.save(queueItem);
             return true;
         } else {
             log.error("Failed to update Dag File. Please re-update manually. DAG info: {}, return message: {}", dag, updateResult.getMsg());
@@ -249,17 +231,17 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         if (deleteResult.getCode() == 200) {
             log.info("Delete DAG successfully: fileName = {}, groupName = {}", flowEntity.getName(), flowEntity.getSaas());
             //Todo: stop airflow job and kill k8s pod
-            FlowQueueEntity queueItem = new FlowQueueEntity();
+            EventEntity queueItem = new EventEntity();
             queueItem.setCreateBy(currentUser);
             queueItem.setCreateTime(LocalDateTime.now());
-            queueItem.setFlowId(id);
+            queueItem.setGeneratorId(id);
 
             queueItem.setName("Delete_Flow");
-            queueItem.setType(FlowQueueType.FLOW_MANAGER.name());
-            queueItem.setStatus(FlowQueueStatus.PENDING.name());
-            queueItem.setAction(FlowQueueActions.DELETE_DAG.name());
+            queueItem.setType(EventType.FLOW_MANAGER.name());
+            queueItem.setStatus(EventStatus.PENDING.name());
+            queueItem.setAction(EventAction.DELETE_DAG.name());
 
-            flowQueueService.save(queueItem);
+            eventQueueService.save(queueItem);
 
             return true;
         } else {
