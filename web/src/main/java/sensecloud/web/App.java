@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -28,10 +29,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ServletComponentScan
 @ConfigurationPropertiesScan("sensecloud")
 @EnableAutoConfiguration
-@EnableFeignClients
+@EnableFeignClients(basePackages = {
+        "sensecloud.web.service.remote", "sensecloud.submitter.remote"
+})
 @EnableAsync
 @EnableScheduling
-@MapperScan({"sensecloud.event.db", "sensecloud.web.mapper", "sensecloud.submitter.remote.feign"})
 public class App {
 
     public static void main(String[] args) {
