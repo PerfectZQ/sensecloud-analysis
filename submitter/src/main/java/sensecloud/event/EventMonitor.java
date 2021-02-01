@@ -74,7 +74,7 @@ public class EventMonitor {
                                 }
                             }
 
-                            ResultVO<String> pauseResult = this.airflowSidecarService.dagPause(dagId, true);
+                            ResultVO<String> pauseResult = this.airflowSidecarService.dagPause(dagId, false);
                             if (pauseResult.getCode() == 200) {
                                 log.info("EventMonitor - Pause DAG {} success: {}", dagId, pauseResult.getMsg());
                                 event.setStatus(EventStatus.SUCCESS.name());
@@ -91,7 +91,7 @@ public class EventMonitor {
                         }
                         case UPDATE_DAG: {
                             if (type.equalsIgnoreCase(EventType.CONNECTOR.name())) {
-                                ResultVO<String> pauseResult = this.airflowSidecarService.dagPause(dagId, false);
+                                ResultVO<String> pauseResult = this.airflowSidecarService.dagPause(dagId, true);
                                 if (pauseResult.getCode() != 200) {
                                     log.error("EventMonitor - Un-paused DAG {} failed: {}", dagId, pauseResult.getMsg());
                                     //rollback
@@ -115,7 +115,7 @@ public class EventMonitor {
                                         ResultVO<String> triggerResult = airflowSidecarService.dagTrigger(dagId);
 
                                         if (triggerResult.getCode() == 200) {
-                                            ResultVO<String> pauseResult = airflowSidecarService.dagPause(dagId, true);
+                                            ResultVO<String> pauseResult = airflowSidecarService.dagPause(dagId, false);
                                             if (pauseResult.getCode() == 200) {
                                                 log.info("DAG {} is ready to rerun", dagId);
                                             } else {
@@ -142,7 +142,7 @@ public class EventMonitor {
                         }
                         case DELETE_DAG: {
                             if (type.equalsIgnoreCase(EventType.CONNECTOR.name())) {
-                                ResultVO<String> pauseResult = this.airflowSidecarService.dagPause(dagId, false);
+                                ResultVO<String> pauseResult = this.airflowSidecarService.dagPause(dagId, true);
                                 if (pauseResult.getCode() != 200) {
                                     log.error("EventMonitor - Un-paused DAG {} failed: {}", dagId, pauseResult.getMsg());
                                     //rollback
