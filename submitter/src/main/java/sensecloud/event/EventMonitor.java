@@ -76,6 +76,7 @@ public class EventMonitor {
 
                             ResultVO<String> pauseResult = this.airflowSidecarService.dagPause(dagId, true);
                             if (pauseResult.getCode() == 200) {
+                                log.info("EventMonitor - Pause DAG {} success: {}", dagId, pauseResult.getMsg());
                                 event.setStatus(EventStatus.SUCCESS.name());
                             } else {
                                 log.error("EventMonitor - Pause DAG {} failed: {}", dagId, pauseResult.getMsg());
