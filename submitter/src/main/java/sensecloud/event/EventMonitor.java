@@ -140,7 +140,7 @@ public class EventMonitor {
                             } else {
                                 ResultVO<String> pauseResult = airflowSidecarService.dagPause(dagId, false);
                                 if (pauseResult.getCode() == 200) {
-                                    log.info("DAG {} is ready to rerun", dagId);
+                                    log.info("DAG {} is ready to run", dagId);
                                 } else {
                                     log.error("Failed to un-pause DAG {}, message is {}", dagId, pauseResult.getMsg());
                                 }
