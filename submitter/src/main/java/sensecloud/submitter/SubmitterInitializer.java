@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import sensecloud.submitter.airflow.AirflowDAGProvider;
 
 @Slf4j
-@Order(98)
+@Order(100)
 @Component
 public class SubmitterInitializer implements CommandLineRunner {
 
