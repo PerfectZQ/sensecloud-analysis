@@ -267,7 +267,7 @@ public class ConnectorController {
                 pageSize = size.longValue();
             }
             query.orderByDesc("create_time");
-            long total = query.count();
+            long total = connectorService.getBaseMapper().selectCount(query);
             IPage<ConnectorEntity> result = query.page(new Page<ConnectorEntity>(pageNum, pageSize, total));
             return ok(result);
         } else {
