@@ -12,17 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sensecloud.flow.generator.DAGGenerator;
-import sensecloud.event.EventAction;
-import sensecloud.event.EventStatus;
-import sensecloud.event.EventType;
 import sensecloud.submitter.airflow.RestfulApiSubmitter;
 import sensecloud.web.bean.common.PageResult;
-import sensecloud.web.bean.vo.DagFileVO;
 import sensecloud.web.bean.vo.FlowVO;
-import sensecloud.web.bean.vo.ResultVO;
 import sensecloud.web.entity.FlowCodeEntity;
 import sensecloud.web.entity.FlowEntity;
-import sensecloud.web.entity.EventEntity;
 import sensecloud.web.entity.TaskEntity;
 import sensecloud.web.service.UserSupport;
 import sensecloud.web.service.IFlowManageService;
@@ -44,9 +38,6 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
     @Autowired
     private FlowCodeServiceImpl flowCodeService;
-
-    @Autowired
-    private EventServiceImpl eventQueueService;
 
     @Autowired
     private RestfulApiSubmitter submitter;
@@ -173,29 +164,13 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         codeEntity.setVersion(DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmssSSS"));
         flowCodeService.save(codeEntity);
 
-        DagFileVO dag = new DagFileVO();
-        dag.setFileName(vo.getName() + ".py");
-        dag.setGroupName(vo.getSaas());
-        dag.setSourceCode(code);
+        boolean success = this.submitter.updateFlowJob(vo.getSaas(), currentUser, vo.getName(), code);
 
-        ResultVO<String> updateResult = airflowRemoteService.createOrUpdateDagFile(dag);
-        if (updateResult.getCode() == 200) {
-            log.info("Update DAG successfully: {}", dag);
-
-            EventEntity queueItem = new EventEntity();
-            queueItem.setCreateBy(currentUser);
-            queueItem.setCreateTime(LocalDateTime.now());
-            queueItem.setGeneratorId(vo.getId());
-
-            queueItem.setName("Update_Flow");
-            queueItem.setType(EventType.FLOW_MANAGER.name());
-            queueItem.setStatus(EventStatus.PENDING.name());
-            queueItem.setAction(EventAction.UPDATE_DAG.name());
-
-            eventQueueService.save(queueItem);
+        if (success) {
+            log.info("Update DAG successfully: {}", vo.getName());
             return true;
         } else {
-            log.error("Failed to update Dag File. Please re-update manually. DAG info: {}, return message: {}", dag, updateResult.getMsg());
+            log.error("Failed to update Dag File. Please re-update manually. DAG info: {}", vo);
             //Todo: Rollback and return failure message to caller
             return false;
         }
@@ -227,25 +202,12 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
         }
 
         //invoker restful api to delete code
-        ResultVO<String> deleteResult = airflowRemoteService.deleteDagFile(flowEntity.getName()  + ".py", flowEntity.getSaas());
-        if (deleteResult.getCode() == 200) {
+        boolean success = this.submitter.removeFlowJob(flowEntity.getSaas(), currentUser, flowEntity.getName());
+        if (success) {
             log.info("Delete DAG successfully: fileName = {}, groupName = {}", flowEntity.getName(), flowEntity.getSaas());
-            //Todo: stop airflow job and kill k8s pod
-            EventEntity queueItem = new EventEntity();
-            queueItem.setCreateBy(currentUser);
-            queueItem.setCreateTime(LocalDateTime.now());
-            queueItem.setGeneratorId(id);
-
-            queueItem.setName("Delete_Flow");
-            queueItem.setType(EventType.FLOW_MANAGER.name());
-            queueItem.setStatus(EventStatus.PENDING.name());
-            queueItem.setAction(EventAction.DELETE_DAG.name());
-
-            eventQueueService.save(queueItem);
-
             return true;
         } else {
-            log.error("Failed to delete Dag File. Please re-delete manually. DAG info: fileName = {}, groupName = {}, return message: {}", flowEntity.getName(), flowEntity.getSaas(), deleteResult.getMsg());
+            log.error("Failed to delete Dag File. Please re-delete manually. DAG info: fileName = {}, groupName = {}", flowEntity.getName(), flowEntity.getSaas());
             return false;
         }
 

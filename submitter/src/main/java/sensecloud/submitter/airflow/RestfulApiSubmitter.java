@@ -51,12 +51,12 @@ public class RestfulApiSubmitter {
         return false;
     }
 
-    public boolean renewConnectorJob(String group,
-                                     String submitter,
-                                     String appName,
-                                     String appType,
-                                     JSONObject appConf,
-                                     Map<String, String> env) {
+    public boolean updateConnectorJob(String group,
+                                      String submitter,
+                                      String appName,
+                                      String appType,
+                                      JSONObject appConf,
+                                      Map<String, String> env) {
         String dagCode = this.dagGenerator.generateDAG(appName, appType, appConf, env);
         DagFileVO dag = new DagFileVO();
         dag.setFileName(appName + ".py");
@@ -106,6 +106,44 @@ public class RestfulApiSubmitter {
                     "Create_Flow",
                     EventType.FLOW_MANAGER,
                     EventAction.CREATE_DAG,
+                    appName);
+            return true;
+        }
+        return false;
+    }
+
+
+    public boolean updateFlowJob (
+            String group,
+            String submitter,
+            String appName,
+            String appCode) {
+        DagFileVO dag = new DagFileVO();
+        dag.setFileName(appName + ".py");
+        dag.setGroupName(group);
+        dag.setSourceCode(appCode);
+        ResultVO<String> createResult = airflowSidecarService.createOrUpdateDagFile(dag);
+        log.debug("Request airflow sidecar for dag {} and return code = {}, message = {}", appName, createResult.getCode(), createResult.getMsg());
+        if (createResult.getCode() == 200) {
+            eventService.raiseEvent(submitter,
+                    "Update_Flow",
+                    EventType.FLOW_MANAGER,
+                    EventAction.UPDATE_DAG,
+                    appName);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeFlowJob(String group,String submitter,String appName) {
+        String fileName = appName + ".py";
+        ResultVO<String> deleteResult = airflowSidecarService.deleteDagFile(fileName, group);
+        log.debug("Request airflow sidecar and return code = {}, message = {}", deleteResult.getCode(), deleteResult.getMsg());
+        if (deleteResult.getCode() == 200) {
+            eventService.raiseEvent(submitter,
+                    "Delete_Flow",
+                    EventType.FLOW_MANAGER,
+                    EventAction.DELETE_DAG,
                     appName);
             return true;
         }

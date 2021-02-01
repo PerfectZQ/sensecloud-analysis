@@ -10,7 +10,7 @@ import sensecloud.connector.rule.RuleProvider;
 @Slf4j
 @Order(99)
 @Component
-public class StartupProcessor implements CommandLineRunner {
+public class ConnectorInitializer implements CommandLineRunner {
 
     @Autowired
     private RuleProvider ruleProvider;
