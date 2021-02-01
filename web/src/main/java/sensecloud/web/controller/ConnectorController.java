@@ -267,8 +267,8 @@ public class ConnectorController {
                 pageSize = size.longValue();
             }
             query.orderByDesc("create_time");
-            long total = connectorService.getBaseMapper().selectCount(query);
-            IPage<ConnectorEntity> result = query.page(new Page<ConnectorEntity>(pageNum, pageSize, total));
+            
+            IPage<ConnectorEntity> result = query.page(new Page<ConnectorEntity>(pageNum, pageSize));
             return ok(result);
         } else {
             log.warn("Accept a request but current user is null or username is empty.");
