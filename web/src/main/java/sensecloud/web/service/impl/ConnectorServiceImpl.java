@@ -62,7 +62,7 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
     @Value("${service.connector.clickhouse.des.key}")
     private String ch_pwd_decrypt_key;
 
-    public boolean submitKafkaJob(ConnectorBean bean) {
+    public boolean addConnectorJob(ConnectorBean bean) {
         String connectorName = bean.getName();
         String saas = StringUtils.isNotBlank(bean.getSaas())? bean.getSaas() : "undefined";
         String ruleName = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
@@ -84,6 +84,38 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
                 ruleName,
                 jobConf,
                 env);
+    }
+
+    public boolean updateConnectorJob(ConnectorBean bean) {
+        String connectorName = bean.getName();
+        String saas = StringUtils.isNotBlank(bean.getSaas())? bean.getSaas() : "undefined";
+        String ruleName = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
+
+        String appName = connectorName;
+        JSONObject jobConf = this.configConnector(bean);
+
+        Map<String, String> env = new HashMap<>();
+        env.put("kubernetes_context", env_kubernetes_context);
+        env.put("kubernetes_namespace", env_kubernetes_namespace);
+        env.put("kubernetes_oauth_token", env_kubernetes_oauth_token);
+        env.put("kubernetes_api_server", env_kubernetes_api_server);
+        return this.submitter.renewConnectorJob(saas, userSupport.getCurrentUserName(), appName, ruleName, jobConf, env);
+    }
+
+    public boolean deleteConnectorJob(ConnectorBean bean) {
+        String connectorName = bean.getName();
+        String saas = StringUtils.isNotBlank(bean.getSaas())? bean.getSaas() : "undefined";
+        String ruleName = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
+
+        String appName = connectorName;
+        JSONObject jobConf = this.configConnector(bean);
+
+        Map<String, String> env = new HashMap<>();
+        env.put("kubernetes_context", env_kubernetes_context);
+        env.put("kubernetes_namespace", env_kubernetes_namespace);
+        env.put("kubernetes_oauth_token", env_kubernetes_oauth_token);
+        env.put("kubernetes_api_server", env_kubernetes_api_server);
+        return this.submitter.renewConnectorJob(saas, userSupport.getCurrentUserName(), appName, ruleName, jobConf, env);
     }
 
 

@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -123,7 +122,7 @@ public class ConnectorController {
 
                 if (success) {
                     this.assembleClickHouseConf(user.getName(), entity);
-                    success = connectorService.submitKafkaJob(entity);
+                    success = connectorService.addConnectorJob(entity);
                 }
             } else if ("MYSQL_CDC".equalsIgnoreCase(params.getSourceType())) {
                 success = connectorService.addMysqlCDC(entity);
@@ -194,7 +193,7 @@ public class ConnectorController {
             }
 
             if(updateResult) {
-                updateResult = connectorService.submitKafkaJob(entity);
+                updateResult = connectorService.updateConnectorJob(entity);
             }
         } else if ("MYSQL_CDC".equalsIgnoreCase(params.getSourceType())) {
             updateResult = connectorService.updateMysqlCDC(entity);
@@ -223,6 +222,10 @@ public class ConnectorController {
 
             if (securityEnable != null && securityEnable.booleanValue()) {
                 deleteResult = connectorAttachmentService.deleteAll(entity.getId());
+            }
+
+            if(deleteResult) {
+                deleteResult = connectorService.deleteConnectorJob(entity);
             }
 
         } else if ("MYSQL_CDC".equalsIgnoreCase(entity.getSourceType())) {
