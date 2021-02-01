@@ -31,7 +31,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableFeignClients
 @EnableAsync
 @EnableScheduling
-@MapperScan({"sensecloud"})
+@MapperScan({"sensecloud.event.db", "sensecloud.web.mapper"})
 public class App {
 
     public static void main(String[] args) {
