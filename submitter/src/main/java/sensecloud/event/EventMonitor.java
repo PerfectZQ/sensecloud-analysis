@@ -41,7 +41,7 @@ public class EventMonitor {
     @Autowired
     private KubernetesClient kubernetesClient;
 
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     public void work() {
         List<EventEntity> events = eventService.listUnHandledEvents();
         if (events != null && !events.isEmpty()) {
@@ -180,9 +180,12 @@ public class EventMonitor {
                         }
                     }
 
+                    event.setStatus(EventStatus.SUCCESS.name());
+                    event.setUpdateBy("system");
+                    event.setUpdateTime(LocalDateTime.now());
+                    eventService.updateById(event);
 
                 }
-
             }
         }
     }
