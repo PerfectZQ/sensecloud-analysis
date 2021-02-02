@@ -47,6 +47,7 @@ public class KubernetesClient {
     public void stopPodAsync(String namespace, String podName, ApiCallback<V1Pod> _callback) {
         try {
             V1Pod pod = this.getPod(namespace, podName);
+            System.out.println(">>>>>>>>>>>>>>>> Pod = " + pod.toString());
             V1DeleteOptions body = new V1DeleteOptions();
             body.setApiVersion(pod.getApiVersion());
             body.setDryRun(null);
