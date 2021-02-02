@@ -250,7 +250,7 @@ public class ConnectorController {
         if (user != null && StringUtils.isNotBlank(user.getName())) {
             String username = user.getName();
             QueryChainWrapper<ConnectorEntity> query = connectorService.query()
-                    .select("id", "name", "saas", "source_name", "source_type", "sink_name", "sink_type", "create_by", "create_time")
+                    .select("id", "name", "saas", "source_name", "source_type", "sink_name", "sink_conf", "sink_type", "create_by", "create_time")
                     .eq("create_by", username)
                     .and(q -> q.eq("deleted", false));
             if(StringUtils.isNotBlank(name)) {
@@ -267,7 +267,7 @@ public class ConnectorController {
                 pageSize = size.longValue();
             }
             query.orderByDesc("create_time");
-            
+
             IPage<ConnectorEntity> result = query.page(new Page<ConnectorEntity>(pageNum, pageSize));
             return ok(result);
         } else {
