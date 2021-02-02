@@ -41,10 +41,10 @@ dag = DAG(
 {% if task.type == 'CLICKHOUSE_SQL' and task.content is not empty %}
 ## Define operator for task {{task.taskId}}.
 sql_{{task.taskId}} = """
-CREATE TABLE IF NOT EXISTS {{ task.conf.db }}.{{ task.conf.table }}_shard
+CREATE TABLE IF NOT EXISTS {{ task.conf.db }}.{{ task.conf.table }}_shard ON CLUSTER cat
 ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard_cat}/{{ task.conf.db }}.{{ task.conf.table }}_shard', '{replica_cat}')
 ORDER BY tuple()
-ON CLUSTER cat AS {{ task.content }};
+AS {{ task.content }};
 
 CREATE TABLE IF NOT EXISTS {{ task.conf.db }}.{{ task.conf.table }} ON CLUSTER cat AS {{ task.conf.db }}.{{ task.conf.table }}_shard
 ENGINE = Distributed('cat', '{{ task.conf.db }}', '{{ task.conf.table }}_shard', rand());
