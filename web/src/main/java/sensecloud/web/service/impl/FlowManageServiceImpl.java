@@ -69,7 +69,7 @@ public class FlowManageServiceImpl extends UserSupport implements IFlowManageSer
 
     public IPage<FlowEntity> queryFlows(String name, Long page, Long size) {
         QueryChainWrapper<FlowEntity> query = flowService.query()
-//                                                        .eq("create_by", this.getCurrentUserName())
+                                                        .eq("create_by", this.getCurrentUserName())
                                                         .eq("deleted", false)
                                                         .orderByDesc("create_time");
         if (StringUtils.isNotBlank(name)) {
