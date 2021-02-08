@@ -12,7 +12,7 @@ import sensecloud.web.config.feign.OpenFeignConfig;
  * @author zhangqiang
  * @since 2020/11/5 20:17
  */
-@FeignClient(name = "airflowRemoteAuthService", url = "dlink-airflow-auth:8088/")
+@FeignClient(name = "airflowRemoteAuthService", url = "${remote.rest.airflow_service.url}")
 // @FeignClient(name = "airflowRemoteAuthService", url = "dlink-airflow-auth:8088/", configuration = OpenFeignConfig.class)
 // @FeignClient(name = "airflowRemoteAuthService", url = "10.53.7.100:53395/", configuration = OpenFeignConfig.class)
 public interface AirflowRemoteAuthService {
