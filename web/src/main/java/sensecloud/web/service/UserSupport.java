@@ -8,11 +8,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import sensecloud.auth2.model.UserInfo;
 import sensecloud.web.service.remote.ClickHouseRemoteService;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 @Component
 public class UserSupport {
+
+    @Autowired
+    private HttpServletRequest request;
 
     @Autowired
     private ClickHouseRemoteService clickHouseRemoteService;
@@ -56,6 +62,10 @@ public class UserSupport {
     public String getCurrentUserName() {
         Authentication authentication = this.currentUser();
         return authentication.getName();
+    }
+
+    public UserInfo currentUserInfo(){
+        return (UserInfo) request.getSession().getAttribute("current_user");
     }
 
 }
