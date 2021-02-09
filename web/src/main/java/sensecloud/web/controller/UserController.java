@@ -26,7 +26,7 @@ public class UserController {
         if (auth == null) {
             return new ResponseEntity<ResultVO<String>>(error("No authenticated user."), HttpStatus.UNAUTHORIZED);
         }
-
+        log.info("Current User's details: {}", auth.getDetails());
         String username = auth.getName();
         if (StringUtils.isBlank(username)) {
             return new ResponseEntity<ResultVO<String>>(error("Username in auth is empty."), HttpStatus.UNAUTHORIZED);

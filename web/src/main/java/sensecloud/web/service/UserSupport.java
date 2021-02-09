@@ -43,11 +43,6 @@ public class UserSupport {
                 log.error("Error occurred while calling getClickHouseUser: {}", message);
                 result = null;
             }
-        } else {
-            result.put("id", 10);
-            result.put("ckUser", "writer");
-            result.put("ckPassword", "2c82mirS");
-            result.put("userType", "admin");
         }
         log.debug("Call [getClickHouseUser] and return : {}", result);
         return result;
