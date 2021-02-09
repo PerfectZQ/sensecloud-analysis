@@ -129,6 +129,9 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
             eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(
                     authResult, this.getClass()));
         }
+        String xIdToken = request.getHeader(configuration.getId_token_header());
+        UserInfo userInfo = getUserInfo(xIdToken);
+        request.getSession().setAttribute("current_user", userInfo);
         getSuccessHandler().onAuthenticationSuccess(request, response, chain, authResult);
     }
 
