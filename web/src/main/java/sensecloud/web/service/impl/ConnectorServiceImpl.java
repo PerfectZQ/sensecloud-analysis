@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import sensecloud.auth2.model.UserInfo;
 import sensecloud.connector.Connector;
 import sensecloud.connector.SinkType;
 import sensecloud.connector.SourceType;
@@ -67,6 +68,9 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         String saas = StringUtils.isNotBlank(bean.getSaas())? bean.getSaas() : "undefined";
         String ruleName = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
         JSONObject jobConf = this.configConnector(bean);
+
+        UserInfo userInfo = this.userSupport.currentUserInfo();
+        jobConf.put("creator", userInfo);
 
         //Todo: Get current user's group from database
         String appName = connectorName;
@@ -208,8 +212,7 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         JSONObject callback = null;
         try {
             callback = this.clickHouseRemoteService.getClickHouseUser(username);
-
-            log.debug("Call getClickHouseUser finished. And callback is {}", callback);
+            log.info("Call getClickHouseUser finished. And callback is {}", callback);
         } catch (Exception e) {
             e.printStackTrace();
         }
