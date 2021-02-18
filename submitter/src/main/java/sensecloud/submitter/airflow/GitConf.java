@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+@Deprecated
 @Data
 @Component @ConfigurationProperties(prefix = "service.submitter.airflow.git")
 public class GitConf {

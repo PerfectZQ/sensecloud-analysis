@@ -14,7 +14,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import sensecloud.event.db.EventEntity;
 import sensecloud.event.db.EventService;
-import sensecloud.submitter.airflow.KubernetesConf;
 import sensecloud.submitter.remote.KubernetesClient;
 import sensecloud.submitter.remote.bean.ResultVO;
 import sensecloud.submitter.remote.feign.AirflowSidecarService;

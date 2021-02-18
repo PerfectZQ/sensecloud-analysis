@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
+@Deprecated
 @Slf4j
 @Component
 public class GitSubmitter {
@@ -52,8 +53,8 @@ public class GitSubmitter {
      * @param jobConf Configurations for the job
      * @return Return true if submission success
      */
-    public boolean submit(String group, String jobId, String name, JSONObject jobConf, Map<String, String> env) {
-        String code = dagGenerator.generateCode(jobId, name, jobConf, env);
+    public boolean submit(String group, String jobId, String name, JSONObject runner, JSONObject jobConf, Map<String, String> env) {
+        String code = dagGenerator.generateCode(jobId, name, runner, jobConf, env);
         this.gitClient.pull(this.gitConf.getRemoteBranch());
         File codeFile = this.writeCode(group, jobId, code);
         this.gitClient.addFile(codeFile);
