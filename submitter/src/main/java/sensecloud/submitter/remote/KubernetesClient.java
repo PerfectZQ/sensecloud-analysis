@@ -55,7 +55,10 @@ public class KubernetesClient {
             body.setKind(pod.getKind());
             body.setOrphanDependents(false);
             body.setPropagationPolicy("Foreground");
-            apiV1.deleteNamespacedPodAsync(podName, namespace, "true", null, 300, false, "Foreground", body, _callback);
+            pod = apiV1.deleteNamespacedPod(podName, namespace, "true", null, 300, false, "Foreground", body);
+            System.out.println(">>>>>>>>>>>>>>>> Deleted Pod = " + pod.toString());
+            _callback.onSuccess(pod, 0, null);
+
         } catch (ApiException e) {
             e.printStackTrace();
         }
