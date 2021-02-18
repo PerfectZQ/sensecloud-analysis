@@ -27,8 +27,9 @@ public class DAGTemplateProvider {
     private static ConcurrentHashMap<String, String> templates = new ConcurrentHashMap<>();
 
     public void reloadTemplates() {
-        String templatePath = this.airflowConf.getTplPath();
 
+        String templatePath = this.airflowConf.getTplPath();
+        log.info("Load connector templatePath: {}", templatePath);
         if(StringUtils.isNotBlank(templatePath)) {
             templates.clear();
 
@@ -40,7 +41,7 @@ public class DAGTemplateProvider {
                     String baseName = FilenameUtils.getBaseName(filename);
                     byte[] bytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
                     String content = new String(bytes, "utf-8");
-                    log.debug("Load connector tpl: {}", baseName);
+                    log.info("Load connector tpl: {}", baseName);
                     templates.put(baseName, content);
                 }
             } catch (IOException e) {
