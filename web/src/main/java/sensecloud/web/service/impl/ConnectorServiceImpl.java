@@ -82,7 +82,7 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         String connectorName = bean.getName();
         String ruleName = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
         String ruleExpr = ruleProvider.getRuleExpression(ruleName);
-        PebbleExpRule rule = new PebbleExpRule().expression(ruleExpr);
+        PebbleExpRule rule = new PebbleExpRule().ruleName(ruleName).expression(ruleExpr);
 
         JSONObject sinkAccountConf = bean.getSinkAccountConf();
         //decrypt clickhouse password

@@ -78,7 +78,7 @@ public class Connector<R extends IRule> {
     public String dagCode() {
         return ConnectorCodeGenerator.generateCode(
                 this.name,
-                this.rule.type().name(),
+                this.rule.ruleName(),
                 this.runner,
                 this.connectConf,
                 this.runEnv);

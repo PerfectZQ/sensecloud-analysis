@@ -11,6 +11,7 @@ import sensecloud.connector.rule.IRule;
 @Data @Accessors(fluent = true)
 public class PebbleExpRule implements IRule {
 
+    private String ruleName;
     private String expression;
     private ExpressionType type = ExpressionType.PebbleTemplate;
 
