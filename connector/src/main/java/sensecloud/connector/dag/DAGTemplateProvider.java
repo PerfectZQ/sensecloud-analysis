@@ -60,7 +60,6 @@ public class DAGTemplateProvider {
         if (StringUtils.isNotBlank(tpl)) {
             dag = renderer.renderStringTemplate(tpl, context);
         }
-        log.info("Generated DAG with tpl {}: {} ", name, dag);
         return dag;
     }
 

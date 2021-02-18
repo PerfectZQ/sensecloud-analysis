@@ -27,7 +27,7 @@ import java.util.Map;
 @Component
 @Configuration
 @EnableScheduling
-@ConfigurationProperties(prefix = "service.submitter.env")
+@ConfigurationProperties(prefix = "service.submitter")
 public class EventMonitor {
 
     @Autowired
@@ -37,7 +37,7 @@ public class EventMonitor {
     private AirflowSidecarService airflowSidecarService;
 
     @Setter
-    private Map<String, String> k8s;
+    private Map<String, String> env;
 
     @Autowired
     private KubernetesClient kubernetesClient;
@@ -102,7 +102,7 @@ public class EventMonitor {
                                     eventService.updateById(event);
                                     break;
                                 }
-                                String namespace = k8s.get("namespace");
+                                String namespace = env.get("kubernetes_namespace");
                                 String podName = "connector-" + dagId;
                                 kubernetesClient.stopPodAsync(namespace, podName, new ApiCallback<V1Pod>() {
                                     @Override
@@ -160,7 +160,7 @@ public class EventMonitor {
                                     eventService.updateById(event);
                                     break;
                                 }
-                                String namespace = k8s.get("namespace");
+                                String namespace = env.get("kubernetes_namespace");
                                 String podName = "connector-" + dagId;
                                 kubernetesClient.stopPodAsync(namespace, podName, new ApiCallback<V1Pod>() {
                                     @Override
