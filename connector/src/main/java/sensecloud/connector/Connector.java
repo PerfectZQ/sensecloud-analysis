@@ -79,6 +79,7 @@ public class Connector<R extends IRule> {
         return ConnectorCodeGenerator.generateCode(
                 this.name,
                 this.rule.type().name(),
+                this.runner,
                 this.connectConf,
                 this.runEnv);
     }

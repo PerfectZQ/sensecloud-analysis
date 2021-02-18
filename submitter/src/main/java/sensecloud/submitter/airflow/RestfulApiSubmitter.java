@@ -38,6 +38,7 @@ public class RestfulApiSubmitter {
             String submitter,
             JSONObject submitterInfo,
             Connector connector) {
+        connector.runner(submitterInfo);
         connector.runEnv(this.env);
         String dagCode = connector.dagCode();
         DagFileVO dag = new DagFileVO();
@@ -61,6 +62,7 @@ public class RestfulApiSubmitter {
                                       String submitter,
                                       JSONObject submitterInfo,
                                       Connector connector) {
+        connector.runner(submitterInfo);
         connector.runEnv(this.env);
         String dagCode = connector.dagCode();
         DagFileVO dag = new DagFileVO();
