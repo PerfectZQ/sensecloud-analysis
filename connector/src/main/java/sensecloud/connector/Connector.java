@@ -7,12 +7,12 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import sensecloud.connector.annotation.Enforcer;
+import sensecloud.connector.dag.ConnectorCodeGenerator;
 import sensecloud.connector.rule.IEnforcer;
 import sensecloud.connector.rule.IRule;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -26,9 +26,11 @@ public class Connector<R extends IRule> {
     private SinkType sinkType;
     private JSONObject sinkAccountConf;
     private JSONObject sinkConf;
-
     private R rule;
     private JSONObject connectConf;
+
+    private JSONObject runner;
+    private Map<String, String> runEnv;
 
     private IEnforcer<R, JSONObject, String> enforcer;
 
@@ -71,6 +73,14 @@ public class Connector<R extends IRule> {
         this.connectConf = JSONObject.parseObject(plan);
 
         return this.connectConf != null;
+    }
+
+    public String dagCode() {
+        return ConnectorCodeGenerator.generateCode(
+                this.name,
+                this.rule.type().name(),
+                this.connectConf,
+                this.runEnv);
     }
 
 

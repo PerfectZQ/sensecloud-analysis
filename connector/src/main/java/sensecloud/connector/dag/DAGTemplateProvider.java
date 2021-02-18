@@ -1,4 +1,4 @@
-package sensecloud.submitter.airflow;
+package sensecloud.connector.dag;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.FilenameUtils;
@@ -9,23 +9,23 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
-import sensecloud.submitter.utils.TextRenderer;
+import sensecloud.connector.utils.TextRenderer;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class AirflowDAGProvider {
+public class DAGTemplateProvider {
 
     @Autowired
     private AirflowConf airflowConf;
 
-    private TextRenderer renderer = new TextRenderer();
+    private static TextRenderer renderer = new TextRenderer();
 
     private static ConcurrentHashMap<String, String> templates = new ConcurrentHashMap<>();
 
     public void reloadTemplates() {
-        String templatePath = this.airflowConf.getTemplatePath();
+        String templatePath = this.airflowConf.getTplPath();
 
         if(StringUtils.isNotBlank(templatePath)) {
             templates.clear();
@@ -47,15 +47,15 @@ public class AirflowDAGProvider {
         }
     }
 
-    public String getTemplate(String name) {
-        return this.templates.get(name);
+    public static String getTemplate(String name) {
+        return templates.get(name);
     }
 
-    public String dag (String name, JSONObject context) {
-        String tpl = this.getTemplate(name);
+    public static String dag (String name, JSONObject context) {
+        String tpl = getTemplate(name);
         String dag = "";
         if (StringUtils.isNotBlank(tpl)) {
-            dag = this.renderer.renderStringTemplate(tpl, context);
+            dag = renderer.renderStringTemplate(tpl, context);
         }
         return dag;
     }

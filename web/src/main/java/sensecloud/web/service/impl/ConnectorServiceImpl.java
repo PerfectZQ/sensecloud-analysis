@@ -1,5 +1,6 @@
 package sensecloud.web.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -31,8 +32,6 @@ import java.util.Map;
 @Service
 public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, ConnectorEntity> implements IConnectorService {
 
-    private Connector connector;
-
     @Autowired
     private UserSupport userSupport;
 
@@ -48,74 +47,38 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
     @Autowired
     private ClickHouseRemoteService clickHouseRemoteService;
 
-    @Value("${service.submitter.env.k8s.context}")
-    private String env_kubernetes_context;
-
-    @Value("${service.submitter.env.k8s.namespace}")
-    private String env_kubernetes_namespace;
-
-    @Value("${service.submitter.env.k8s.oauth_token}")
-    private String env_kubernetes_oauth_token;
-
-    @Value("${service.submitter.env.k8s.api_server}")
-    private String env_kubernetes_api_server;
-
     @Value("${service.connector.clickhouse.des.key}")
     private String ch_pwd_decrypt_key;
 
     public boolean addConnectorJob(ConnectorBean bean) {
-        String connectorName = bean.getName();
         String saas = StringUtils.isNotBlank(bean.getSaas())? bean.getSaas() : "undefined";
-        String ruleName = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
-        JSONObject jobConf = this.configConnector(bean);
+        Connector connector = this.buildConnector(bean);
 
         UserInfo userInfo = this.userSupport.currentUserInfo();
-        jobConf.put("creator", userInfo);
-
-        //Todo: Get current user's group from database
-        String appName = connectorName;
-
-        Map<String, String> env = new HashMap<>();
-        env.put("kubernetes_context", env_kubernetes_context);
-        env.put("kubernetes_namespace", env_kubernetes_namespace);
-        env.put("kubernetes_oauth_token", env_kubernetes_oauth_token);
-        env.put("kubernetes_api_server", env_kubernetes_api_server);
-
+        JSONObject submitterInfo = (JSONObject) JSON.toJSON(userInfo);
         return this.submitter.submitConnectorJob(
                 saas,
-                userSupport.getCurrentUserName(),
-                appName,
-                ruleName,
-                jobConf,
-                env);
+                userInfo.getUsername(),
+                submitterInfo,
+                connector);
     }
 
     public boolean updateConnectorJob(ConnectorBean bean) {
-        String connectorName = bean.getName();
         String saas = StringUtils.isNotBlank(bean.getSaas())? bean.getSaas() : "undefined";
-        String ruleName = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
-
-        String appName = connectorName;
-        JSONObject jobConf = this.configConnector(bean);
-
-        Map<String, String> env = new HashMap<>();
-        env.put("kubernetes_context", env_kubernetes_context);
-        env.put("kubernetes_namespace", env_kubernetes_namespace);
-        env.put("kubernetes_oauth_token", env_kubernetes_oauth_token);
-        env.put("kubernetes_api_server", env_kubernetes_api_server);
-        return this.submitter.updateConnectorJob(saas, userSupport.getCurrentUserName(), appName, ruleName, jobConf, env);
+        Connector connector = this.buildConnector(bean);
+        UserInfo userInfo = this.userSupport.currentUserInfo();
+        JSONObject submitterInfo = (JSONObject) JSON.toJSON(userInfo);
+        return this.submitter.updateConnectorJob(saas, userInfo.getUsername(), submitterInfo, connector);
     }
 
     public boolean deleteConnectorJob(ConnectorBean bean) {
         String connectorName = bean.getName();
         String saas = StringUtils.isNotBlank(bean.getSaas())? bean.getSaas() : "undefined";
         String appName = connectorName;
-
         return this.submitter.removeConnectorJob(saas, userSupport.getCurrentUserName(), appName);
     }
 
-
-    private JSONObject configConnector(ConnectorBean bean) {
+    private Connector buildConnector(ConnectorBean bean) {
         String connectorName = bean.getName();
         String ruleName = bean.getSourceType().toLowerCase() + "2" + bean.getSinkType().toLowerCase();
         String ruleExpr = ruleProvider.getRuleExpression(ruleName);
@@ -129,7 +92,7 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
             bean.getSinkAccountConf().put("jdbc.password", DesUtil.decrypt(this.ch_pwd_decrypt_key, encryptedPwd));
         }
 
-        this.connector = new Connector()
+        Connector connector = new Connector()
                 .name(connectorName)
                 .sourceType(SourceType.valueOf(bean.getSourceType().toUpperCase()))
                 .sourceAccountConf(bean.getSourceAccountConf())
@@ -138,15 +101,10 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
                 .sinkAccountConf(sinkAccountConf)
                 .sinkConf(bean.getSinkConf())
                 .rule(rule);
+        connector.configure();
 
-        JSONObject jobConf = new JSONObject();
-        if(this.connector.configure()) {
-            jobConf = this.connector.connectConf();
-        }
-        return jobConf;
+        return connector;
     }
-
-
 
     public boolean addMysqlCDC (ConnectorBean bean) {
         JSONObject params = this.buildMysqlCDCServiceParams(bean);

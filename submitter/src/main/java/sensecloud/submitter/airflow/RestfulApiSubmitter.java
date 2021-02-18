@@ -1,9 +1,15 @@
 package sensecloud.submitter.airflow;
 
 import com.alibaba.fastjson.JSONObject;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import sensecloud.connector.Connector;
 import sensecloud.event.EventAction;
 import sensecloud.event.EventType;
 import sensecloud.event.db.EventService;
@@ -15,10 +21,8 @@ import java.util.Map;
 
 @Slf4j
 @Component
+@ConfigurationProperties(prefix = "service.submitter.env")
 public class RestfulApiSubmitter {
-
-    @Autowired
-    private AirflowDAGGenerator dagGenerator;
 
     @Autowired
     private AirflowSidecarService airflowSidecarService;
@@ -26,16 +30,18 @@ public class RestfulApiSubmitter {
     @Autowired
     private EventService eventService;
 
+    @Getter @Setter
+    private Map<String, String> env;
+
     public boolean submitConnectorJob(
             String group,
             String submitter,
-            String appName,
-            String appType,
-            JSONObject appConf,
-            Map<String, String> env) {
-        String dagCode = this.dagGenerator.generateDAG(appName, appType, appConf, env);
+            JSONObject submitterInfo,
+            Connector connector) {
+        connector.runEnv(this.env);
+        String dagCode = connector.dagCode();
         DagFileVO dag = new DagFileVO();
-        dag.setFileName(appName + ".py");
+        dag.setFileName(connector.name() + ".py");
         dag.setGroupName(group);
         dag.setSourceCode(dagCode);
         ResultVO<String> createResult = airflowSidecarService.createOrUpdateDagFile(dag);
@@ -45,7 +51,7 @@ public class RestfulApiSubmitter {
                     "Create_Connector",
                     EventType.CONNECTOR,
                     EventAction.CREATE_DAG,
-                    appName);
+                    connector.name());
             return true;
         }
         return false;
@@ -53,13 +59,12 @@ public class RestfulApiSubmitter {
 
     public boolean updateConnectorJob(String group,
                                       String submitter,
-                                      String appName,
-                                      String appType,
-                                      JSONObject appConf,
-                                      Map<String, String> env) {
-        String dagCode = this.dagGenerator.generateDAG(appName, appType, appConf, env);
+                                      JSONObject submitterInfo,
+                                      Connector connector) {
+        connector.runEnv(this.env);
+        String dagCode = connector.dagCode();
         DagFileVO dag = new DagFileVO();
-        dag.setFileName(appName + ".py");
+        dag.setFileName(connector.name() + ".py");
         dag.setGroupName(group);
         dag.setSourceCode(dagCode);
         ResultVO<String> createResult = airflowSidecarService.createOrUpdateDagFile(dag);
@@ -69,7 +74,7 @@ public class RestfulApiSubmitter {
                     "Update_Connector",
                     EventType.CONNECTOR,
                     EventAction.UPDATE_DAG,
-                    appName);
+                    connector.name());
             return true;
         }
         return false;
@@ -111,7 +116,6 @@ public class RestfulApiSubmitter {
         }
         return false;
     }
-
 
     public boolean updateFlowJob (
             String group,

@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import sensecloud.connector.dag.ConnectorCodeGenerator;
 import sensecloud.submitter.remote.GitClient;
 import sensecloud.submitter.remote.AirflowRestInvoker;
 
@@ -23,7 +23,7 @@ public class GitSubmitter {
     private GitConf gitConf;
 
     @Autowired
-    private AirflowDAGGenerator dagGenerator;
+    private ConnectorCodeGenerator dagGenerator;
 
     @Autowired
     private AirflowRestInvoker airflowRestInvoker;
@@ -53,7 +53,7 @@ public class GitSubmitter {
      * @return Return true if submission success
      */
     public boolean submit(String group, String jobId, String name, JSONObject jobConf, Map<String, String> env) {
-        String code = dagGenerator.generateDAG(jobId, name, jobConf, env);
+        String code = dagGenerator.generateCode(jobId, name, jobConf, env);
         this.gitClient.pull(this.gitConf.getRemoteBranch());
         File codeFile = this.writeCode(group, jobId, code);
         this.gitClient.addFile(codeFile);

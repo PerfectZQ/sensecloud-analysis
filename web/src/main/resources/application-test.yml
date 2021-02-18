@@ -31,15 +31,13 @@ service:
   connector:
     upload:
       path: /tmp/sensecloud
-    rule:
-      path: connector/rule
+    rule.path: connector/rule
+    dag.tplPath: connector/dag
     clickhouse:
       url: jdbc:clickhouse://10.53.7.100:33334
       des.key: dlink@2020
   submitter:
     airflow:
-      conf:
-        templatePath: airflow/dag
       git:
         localRepo: /git
         project: sensecloud-analysis
@@ -49,10 +47,11 @@ service:
         remoteBranch: test
         remote: origin
     env:
-      k8s.context: aliyun-hd1-diamond
-      k8s.namespace: dlink-prod
-      k8s.oauth_token: kubeconfig-u-2n2gk7efdi:tjg4ckq6nvps7xg6cdlg64fjvwqtdmrtnhkpjzhtshxrdlj4n7cf6b
-      k8s.api_server: k8s://https://mordor.sensetime.com/k8s/clusters/c-kzszr
+      kubernetes_context: bjidc-test-diamond
+      kubernetes_namespace: dlink-test
+      kubernetes_project: dlink
+      kubernetes_oauth_token: kubeconfig-u-2n2gk7efdi:tjg4ckq6nvps7xg6cdlg64fjvwqtdmrtnhkpjzhtshxrdlj4n7cf6b
+      kubernetes_api_server: k8s://https://mordor.sensetime.com/k8s/clusters/c-t5mbq
   flow:
     tpl:
       name: airflow_dag

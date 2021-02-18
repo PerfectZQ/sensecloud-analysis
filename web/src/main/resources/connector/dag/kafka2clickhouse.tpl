@@ -22,10 +22,10 @@ oauthToken = "{{ env.kubernetes_oauth_token }}"
 # You can override them on a per-task basis during operator initialization
 
 default_args = {
-    'owner': 'airflow',
+    'owner': '{{ runner.username }}',
     'depends_on_past': False,
     'start_date': days_ago(2),
-    'email': ['zhangqiang@sensetime.com'],
+    'email': ['{{ runner.email }}'],
     'email_on_failure': True,
     'email_on_retry': True,
     'retries': 2147483647,
