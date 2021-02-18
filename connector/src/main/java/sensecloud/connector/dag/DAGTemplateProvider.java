@@ -1,6 +1,7 @@
 package sensecloud.connector.dag;
 
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import sensecloud.connector.utils.TextRenderer;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Component
 public class DAGTemplateProvider {
 
@@ -57,6 +59,7 @@ public class DAGTemplateProvider {
         if (StringUtils.isNotBlank(tpl)) {
             dag = renderer.renderStringTemplate(tpl, context);
         }
+        log.info("Generated DAG with tpl {}: {} ", tpl, dag);
         return dag;
     }
 
