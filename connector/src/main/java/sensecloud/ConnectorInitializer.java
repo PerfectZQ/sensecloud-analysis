@@ -24,6 +24,8 @@ public class ConnectorInitializer implements CommandLineRunner {
         log.info(">>> Connector setup start ...");
         ruleProvider.loadFromClassPath();
         DAGTemplateProvider.reloadTemplates();
+
+        log.debug("");
         log.info(">>> Connector setup end!");
     }
 }

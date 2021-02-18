@@ -40,7 +40,7 @@ public class DAGTemplateProvider {
                     String baseName = FilenameUtils.getBaseName(filename);
                     byte[] bytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
                     String content = new String(bytes, "utf-8");
-
+                    log.debug("Load connector tpl: {}", baseName);
                     templates.put(baseName, content);
                 }
             } catch (IOException e) {
@@ -59,7 +59,7 @@ public class DAGTemplateProvider {
         if (StringUtils.isNotBlank(tpl)) {
             dag = renderer.renderStringTemplate(tpl, context);
         }
-        log.info("Generated DAG with tpl {}: {} ", tpl, dag);
+        log.info("Generated DAG with tpl {}: {} ", name, dag);
         return dag;
     }
 
