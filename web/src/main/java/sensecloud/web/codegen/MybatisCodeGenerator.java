@@ -19,7 +19,7 @@ public class MybatisCodeGenerator {
     private final static String url = "jdbc:mysql://sh.paas.sensetime.com:34004/sensecloud?useUnicode=true&characterEncoding=utf-8&useSSL=false";
     private final static String username = "9mmyxokq";
     // 改成正确的密码，不要提交到 gitlab 否则会报安全漏洞
-    private final static String passwd = "bxzqx4f5";
+    private final static String passwd = "";
     private final static String moduleName = "web";
     private final static String[] includeTables = new String[]{
             "component",
