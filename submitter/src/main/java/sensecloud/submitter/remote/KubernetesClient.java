@@ -40,6 +40,7 @@ public class KubernetesClient {
     public V1Pod getPod (String namespace, String podName) {
         V1Pod pod = null;
         try {
+            System.out.println(">>>>> Get Pod: namespace = " + namespace + ", pod = " + podName);
 //            pod = apiV1.readNamespacedPod(podName, namespace, "true", false, false);
             pod = Kubectl.get(V1Pod.class)
                     .namespace(namespace)
