@@ -102,6 +102,12 @@
         </dependency>
 
         <dependency>
+            <groupId>io.kubernetes</groupId>
+            <artifactId>client-java-extended</artifactId>
+            <version>10.0.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>sensetime</groupId>
             <artifactId>connector</artifactId>
             <version>0.0.1-SNAPSHOT</version>

@@ -1,5 +1,7 @@
 package sensecloud.submitter.remote;
 
+import io.kubernetes.client.extended.kubectl.Kubectl;
+import io.kubernetes.client.extended.kubectl.exception.KubectlException;
 import io.kubernetes.client.openapi.ApiCallback;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
@@ -29,6 +31,7 @@ public class KubernetesClient {
             this.client = Config.defaultClient();
             Configuration.setDefaultApiClient(client);
             this.apiV1 = new CoreV1Api();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,8 +40,12 @@ public class KubernetesClient {
     public V1Pod getPod (String namespace, String podName) {
         V1Pod pod = null;
         try {
-            pod = apiV1.readNamespacedPod(podName, namespace, "true", false, false);
-        } catch (ApiException e) {
+//            pod = apiV1.readNamespacedPod(podName, namespace, "true", false, false);
+            pod = Kubectl.get(V1Pod.class)
+                    .namespace(namespace)
+                    .name(podName)
+                    .execute();
+        } catch (KubectlException e) {
             e.printStackTrace();
         }
         return pod;
