@@ -3,6 +3,7 @@ package sensecloud.event;
 import io.kubernetes.client.openapi.ApiCallback;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.models.V1Pod;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class EventMonitor {
     @Autowired
     private AirflowSidecarService airflowSidecarService;
 
+    @Setter
     private Map<String, String> k8s;
 
     @Autowired
