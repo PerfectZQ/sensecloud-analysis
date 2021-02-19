@@ -121,7 +121,7 @@ submit = [
         --conf "spark.streaming.kafka.maxRatePerPartition=10000" \
         --conf "spark.streaming.kafka.maxRetries=3" \
         --conf "spark.streaming.kafka.consumer.poll.ms=310000" \
-        --conf "spark.kubernetes.driver.pod.name={ pod_name }" \
+        --conf "spark.kubernetes.driver.pod.name={pod_name}" \
         "local:///app/app.jar" \
         --jobConfig "$JOB_CONFIG" \
     """.format(app_name=app_name, image=image, oauthToken=oauthToken, pod_name=pod_name)
