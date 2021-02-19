@@ -6,7 +6,7 @@ from airflow.utils.dates import days_ago
 
 from base64 import b64encode, b64decode
 
-app_name = "{{ appName }}"
+app_name = "{{ appName | replace({'_': '-'})}}"
 kubernetes_context = "{{ env.kubernetes_context }}"
 kubernetes_namespace = "{{ env.kubernetes_namespace }}"
 kubernetes_project = "{{ env.kubernetes_project }}"

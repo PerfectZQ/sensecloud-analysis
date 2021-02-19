@@ -38,7 +38,7 @@ public class KubernetesClient {
                 String apiServer = conf.getKubernetes_api_server();
                 if(StringUtils.isNotBlank(apiServer)) {
                     builder.setBasePath(conf.getKubernetes_api_server());
-                    if(apiServer.toLowerCase().startsWith("https")) {
+                    if(apiServer.toLowerCase().contains("https")) {
                         builder.setVerifyingSsl(true);
                     }
                 }
