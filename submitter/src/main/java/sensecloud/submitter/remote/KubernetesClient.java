@@ -8,19 +8,24 @@ import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.*;
+import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.Config;
+import io.kubernetes.client.util.credentials.AccessTokenAuthentication;
 import lombok.Data;
+import okhttp3.Call;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @Component
 public class KubernetesClient {
+
+    @Autowired
+    private KubernetesClientConf conf;
 
     private ApiClient client;
 
@@ -28,7 +33,25 @@ public class KubernetesClient {
 
     public KubernetesClient() {
         try {
-            this.client = Config.defaultClient();
+            if(conf != null) {
+                ClientBuilder builder = new ClientBuilder();
+                String apiServer = conf.getKubernetes_api_server();
+                if(StringUtils.isNotBlank(apiServer)) {
+                    builder.setBasePath(conf.getKubernetes_api_server());
+                    if(apiServer.toLowerCase().startsWith("https")) {
+                        builder.setVerifyingSsl(true);
+                    }
+                }
+
+                String token = conf.getKubernetes_oauth_token();
+                if(StringUtils.isNotBlank(token)) {
+                    builder.setAuthentication(new AccessTokenAuthentication(token));
+                }
+
+                this.client = builder.build();
+            } else {
+                this.client = Config.defaultClient();
+            }
             Configuration.setDefaultApiClient(client);
             this.apiV1 = new CoreV1Api();
 
@@ -41,12 +64,8 @@ public class KubernetesClient {
         V1Pod pod = null;
         try {
             System.out.println(">>>>> Get Pod: namespace = " + namespace + ", pod = " + podName);
-//            pod = apiV1.readNamespacedPod(podName, namespace, "true", false, false);
-            pod = Kubectl.get(V1Pod.class)
-                    .namespace(namespace)
-                    .name(podName)
-                    .execute();
-        } catch (KubectlException e) {
+            pod = apiV1.readNamespacedPod(podName, namespace, "true", false, false);
+        } catch ( ApiException e) {
             e.printStackTrace();
         }
         return pod;
@@ -55,18 +74,18 @@ public class KubernetesClient {
     public void stopPodAsync(String namespace, String podName, ApiCallback<V1Pod> _callback) {
         try {
             V1Pod pod = this.getPod(namespace, podName);
-            System.out.println(">>>>>>>>>>>>>>>> Pod = " + pod.toString());
-            V1DeleteOptions body = new V1DeleteOptions();
-            body.setApiVersion(pod.getApiVersion());
-            body.setDryRun(null);
-            body.setGracePeriodSeconds(300L);
-            body.setKind(pod.getKind());
-            body.setOrphanDependents(false);
-            body.setPropagationPolicy("Foreground");
-            pod = apiV1.deleteNamespacedPod(podName, namespace, "true", null, 300, false, "Foreground", body);
-            System.out.println(">>>>>>>>>>>>>>>> Deleted Pod = " + pod.toString());
-            _callback.onSuccess(pod, 0, null);
-
+            if(pod != null) {
+                System.out.println(">>>>>>>>>>>>>>>> Pod = " + pod.toString());
+                V1DeleteOptions body = new V1DeleteOptions();
+                body.setApiVersion(pod.getApiVersion());
+                body.setDryRun(null);
+                body.setGracePeriodSeconds(300L);
+                body.setKind(pod.getKind());
+                body.setOrphanDependents(false);
+                body.setPropagationPolicy("Foreground");
+                Call call = apiV1.deleteNamespacedPodAsync(podName, namespace, "true", null, 300, false, "Foreground", body, _callback);
+                System.out.println(">>>>>>>>>>>>>>>> Deleted call = " + call.toString());
+            }
         } catch (ApiException e) {
             e.printStackTrace();
         }
@@ -119,5 +138,28 @@ public class KubernetesClient {
         return null;
     }
 
+
+    public static void main(String[] args) throws IOException {
+        ApiClient client = new ClientBuilder().setBasePath("https://mordor.sensetime.com/k8s/clusters/c-kzszr").setVerifyingSsl(true)
+                .setAuthentication(new AccessTokenAuthentication("kubeconfig-u-4dchth6r7v:r4pczsx4f74m6hgb5tm7tw5w4d5vl2rmpkfnsst62l25wndzzg9652")).build();
+
+        Configuration.setDefaultApiClient(client);
+
+//        Configuration.setDefaultApiClient(Config.defaultClient());
+        CoreV1Api apiV1 = new CoreV1Api();
+        V1Pod pod = null;
+        try {
+//            V1PodList list = apiV1.listNamespacedPod("dlink-prod", null, false, null, null, null, 10, null, 30, false);
+//            list.getItems().forEach(v1Pod -> {
+//                System.out.println(v1Pod.getMetadata().getName());
+//                System.out.println("==========================================");
+//            });
+
+            pod = apiV1.readNamespacedPod("dlink-metadata-748454f8dd-8fc5x", "dlink-prod", "true", false, false);
+            System.out.println(pod);
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
