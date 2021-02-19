@@ -21,7 +21,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
-@ConfigurationProperties(prefix = "service.submitter.env")
+@ConfigurationProperties(prefix = "service.submitter")
 public class RestfulApiSubmitter {
 
     @Autowired
