@@ -15,7 +15,6 @@
 {% for topic in source.topics %}{% for table in sink.tables %}{% if table.ref == topic.name %}
         {
             "kafka.topic.name": "{{ topic.name }}", // 必填
-            "kafka.topic.partition.num": "{{ topic.partitions }}", // 非必填，topic 分区数量
             "kafka.data.type": "Json", // 非必填，Json, String, <Avro, Protobuf> 默认 String
             "target.db.type": "{{ sink["db.type"] }}",
             "target.db": "{{ sink.db }}",
