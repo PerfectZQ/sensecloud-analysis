@@ -6,7 +6,7 @@ from airflow.utils.dates import days_ago
 
 from base64 import b64encode, b64decode
 
-app_name = "{{ appName | replace({'_': '-'})}}"
+app_name = "{{ appName }}"
 kubernetes_context = "{{ env.kubernetes_context }}"
 kubernetes_namespace = "{{ env.kubernetes_namespace }}"
 kubernetes_project = "{{ env.kubernetes_project }}"
@@ -92,6 +92,9 @@ env_vars = {
     "JOB_CONFIG": base64_bytes_str
 }
 
+# replace '_' to '-' in app_name, because kuberenetes pod name is not support '_'.
+pod_name = "connector-" + app_name.replace("_", "-")
+
 submit = [
     "sh", "-c",
     r"""
@@ -118,14 +121,14 @@ submit = [
         --conf "spark.streaming.kafka.maxRatePerPartition=10000" \
         --conf "spark.streaming.kafka.maxRetries=3" \
         --conf "spark.streaming.kafka.consumer.poll.ms=310000" \
-        --conf "spark.kubernetes.driver.pod.name=connector-{app_name}" \
+        --conf "spark.kubernetes.driver.pod.name={ pod_name }" \
         "local:///app/app.jar" \
         --jobConfig "$JOB_CONFIG" \
-    """.format(app_name=app_name, image=image, oauthToken=oauthToken)
+    """.format(app_name=app_name, image=image, oauthToken=oauthToken, pod_name=pod_name)
 ]
 
 spark_submit_operator = KubernetesPodOperator(
-    name=app_name + "-submitter",
+    name="submitter-" + pod_name,
     task_id="spark-streaming-submit",
     in_cluster=False,
     cluster_context=kubernetes_context,

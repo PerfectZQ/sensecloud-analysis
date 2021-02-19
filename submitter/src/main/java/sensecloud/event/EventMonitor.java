@@ -103,40 +103,25 @@ public class EventMonitor {
                                     break;
                                 }
                                 String namespace = env.get("kubernetes_namespace");
-                                String podName = "connector-" + dagId;
-                                kubernetesClient.stopPodAsync(namespace, podName, new ApiCallback<V1Pod>() {
-                                    @Override
-                                    public void onFailure(ApiException e, int i, Map<String, List<String>> map) {
-                                        log.info("Failed to stop pod {} in namespace {} with exception {}.", podName, namespace, e.getMessage());
-                                    }
+                                String podName = "connector-" + dagId.replaceAll("_", "-");
+                                boolean stopped = kubernetesClient.stopPod(namespace, podName);
 
-                                    @Override
-                                    public void onSuccess(V1Pod v1Pod, int i, Map<String, List<String>> map) {
-                                        log.info("Stop pod {} in namespace {} successfully.", podName, namespace);
-                                        ResultVO<String> triggerResult = airflowSidecarService.dagTrigger(dagId);
+                                if (stopped) {
+                                    ResultVO<String> triggerResult = airflowSidecarService.dagTrigger(dagId);
 
-                                        if (triggerResult.getCode() == 200) {
-                                            ResultVO<String> pauseResult = airflowSidecarService.dagPause(dagId, false);
-                                            if (pauseResult.getCode() == 200) {
-                                                log.info("DAG {} is ready to rerun", dagId);
-                                            } else {
-                                                log.error("Failed to un-pause DAG {}, message is {}", dagId, pauseResult.getMsg());
-                                            }
-                                        }  else {
-                                            log.error("Failed to trigger DAG {}, message is {}", dagId, triggerResult.getMsg());
+                                    if (triggerResult.getCode() == 200) {
+                                        ResultVO<String> pr = airflowSidecarService.dagPause(dagId, false);
+                                        if (pr.getCode() == 200) {
+                                            log.info("DAG {} is ready to rerun", dagId);
+                                        } else {
+                                            log.error("Failed to un-pause DAG {}, message is {}", dagId, pauseResult.getMsg());
                                         }
+                                    }  else {
+                                        log.error("Failed to trigger DAG {}, message is {}", dagId, triggerResult.getMsg());
                                     }
-
-                                    @Override
-                                    public void onUploadProgress(long l, long l1, boolean b) {
-
-                                    }
-
-                                    @Override
-                                    public void onDownloadProgress(long l, long l1, boolean b) {
-
-                                    }
-                                });
+                                } else {
+                                    log.info("Failed to stop pod {} in namespace {}.", podName, namespace);
+                                }
 
                             } else {
                                 ResultVO<String> pauseResult = airflowSidecarService.dagPause(dagId, false);
@@ -162,28 +147,12 @@ public class EventMonitor {
                                 }
                                 String namespace = env.get("kubernetes_namespace");
                                 String podName = "connector-" + dagId;
-                                kubernetesClient.stopPodAsync(namespace, podName, new ApiCallback<V1Pod>() {
-                                    @Override
-                                    public void onFailure(ApiException e, int i, Map<String, List<String>> map) {
-                                        log.info("Failed to stop pod {} in namespace {} with exception {}.", podName, namespace, e.getMessage());
-                                    }
-
-                                    @Override
-                                    public void onSuccess(V1Pod v1Pod, int i, Map<String, List<String>> map) {
-                                        log.info("Stop pod {} in namespace {} successfully.", podName, namespace);
-                                    }
-
-                                    @Override
-                                    public void onUploadProgress(long l, long l1, boolean b) {
-
-                                    }
-
-                                    @Override
-                                    public void onDownloadProgress(long l, long l1, boolean b) {
-
-                                    }
-                                });
-
+                                boolean stopped = kubernetesClient.stopPod(namespace, podName);
+                                if (stopped) {
+                                    log.info("Stop pod {} in namespace {} successfully.", podName, namespace);
+                                } else {
+                                    log.info("Failed to stop pod {} in namespace {}.", podName, namespace);
+                                }
                             }
                             break;
                         }

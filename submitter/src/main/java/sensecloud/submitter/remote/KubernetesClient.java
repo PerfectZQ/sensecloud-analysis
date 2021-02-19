@@ -12,6 +12,7 @@ import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.credentials.AccessTokenAuthentication;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.*;
 
+@Slf4j
 @Data
 @Component
 public class KubernetesClient {
@@ -63,7 +65,7 @@ public class KubernetesClient {
     public V1Pod getPod (String namespace, String podName) {
         V1Pod pod = null;
         try {
-            System.out.println(">>>>> Get Pod: namespace = " + namespace + ", pod = " + podName);
+            log.info(">>>>> Get Pod: namespace = " + namespace + ", pod = " + podName);
             pod = apiV1.readNamespacedPod(podName, namespace, "true", false, false);
         } catch ( ApiException e) {
             e.printStackTrace();
@@ -71,11 +73,10 @@ public class KubernetesClient {
         return pod;
     }
 
-    public void stopPodAsync(String namespace, String podName, ApiCallback<V1Pod> _callback) {
+    public boolean stopPod(String namespace, String podName) {
         try {
             V1Pod pod = this.getPod(namespace, podName);
             if(pod != null) {
-                System.out.println(">>>>>>>>>>>>>>>> Pod = " + pod.toString());
                 V1DeleteOptions body = new V1DeleteOptions();
                 body.setApiVersion(pod.getApiVersion());
                 body.setDryRun(null);
@@ -83,12 +84,17 @@ public class KubernetesClient {
                 body.setKind(pod.getKind());
                 body.setOrphanDependents(false);
                 body.setPropagationPolicy("Foreground");
-                Call call = apiV1.deleteNamespacedPodAsync(podName, namespace, "true", null, 300, false, "Foreground", body, _callback);
-                System.out.println(">>>>>>>>>>>>>>>> Deleted call = " + call.toString());
+                pod = apiV1.deleteNamespacedPod(podName, namespace, "true", null, 300, false, "Foreground", body);
+                log.info("Stop and delete pod {} in namespace {} successfully", podName, namespace);
+                return true;
+            } else {
+                log.warn(">>>>>>>>>>>>>>>> Pod Not Found namespace = {}, pod = {}", namespace, podName);
+                return false;
             }
         } catch (ApiException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public void createSecret(String namespace, String secretName, Map<String, byte[]> originalSecretData) {
