@@ -93,7 +93,7 @@ env_vars = {
 }
 
 # replace '_' to '-' in app_name, because kuberenetes pod name is not support '_'.
-pod_name = "connector-" + app_name.replace("_", "-")
+pn = "connector-" + app_name.replace("_", "-")
 
 submit = [
     "sh", "-c",
@@ -124,11 +124,11 @@ submit = [
         --conf "spark.kubernetes.driver.pod.name={pod_name}" \
         "local:///app/app.jar" \
         --jobConfig "$JOB_CONFIG" \
-    """.format(app_name=app_name, image=image, oauthToken=oauthToken, pod_name=pod_name)
+    """.format(app_name=app_name, image=image, oauthToken=oauthToken, pod_name=pn)
 ]
 
 spark_submit_operator = KubernetesPodOperator(
-    name="submitter-" + pod_name,
+    name="submitter-" + pn,
     task_id="spark-streaming-submit",
     in_cluster=False,
     cluster_context=kubernetes_context,
