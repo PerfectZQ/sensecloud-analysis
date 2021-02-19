@@ -113,22 +113,49 @@ public class EventMonitor {
                                         ResultVO<String> pr = airflowSidecarService.dagPause(dagId, false);
                                         if (pr.getCode() == 200) {
                                             log.info("DAG {} is ready to rerun", dagId);
+
+                                            event.setStatus(EventStatus.SUCCESS.name());
+                                            event.setUpdateBy("system");
+                                            event.setUpdateTime(LocalDateTime.now());
+                                            eventService.updateById(event);
                                         } else {
                                             log.error("Failed to un-pause DAG {}, message is {}", dagId, pauseResult.getMsg());
+
+                                            event.setStatus(EventStatus.PENDING.name());
+                                            event.setUpdateBy("system");
+                                            event.setUpdateTime(LocalDateTime.now());
+                                            eventService.updateById(event);
                                         }
                                     }  else {
                                         log.error("Failed to trigger DAG {}, message is {}", dagId, triggerResult.getMsg());
+                                        event.setStatus(EventStatus.PENDING.name());
+                                        event.setUpdateBy("system");
+                                        event.setUpdateTime(LocalDateTime.now());
+                                        eventService.updateById(event);
                                     }
                                 } else {
                                     log.info("Failed to stop pod {} in namespace {}.", podName, namespace);
+
+                                    event.setStatus(EventStatus.FAILURE.name());
+                                    event.setUpdateBy("system");
+                                    event.setUpdateTime(LocalDateTime.now());
+                                    eventService.updateById(event);
                                 }
 
                             } else {
                                 ResultVO<String> pauseResult = airflowSidecarService.dagPause(dagId, false);
                                 if (pauseResult.getCode() == 200) {
                                     log.info("DAG {} is ready to run", dagId);
+                                    event.setStatus(EventStatus.SUCCESS.name());
+                                    event.setUpdateBy("system");
+                                    event.setUpdateTime(LocalDateTime.now());
+                                    eventService.updateById(event);
                                 } else {
                                     log.error("Failed to un-pause DAG {}, message is {}", dagId, pauseResult.getMsg());
+                                    event.setStatus(EventStatus.PENDING.name());
+                                    event.setUpdateBy("system");
+                                    event.setUpdateTime(LocalDateTime.now());
+                                    eventService.updateById(event);
                                 }
                             }
                             break;
@@ -146,23 +173,25 @@ public class EventMonitor {
                                     break;
                                 }
                                 String namespace = env.get("kubernetes_namespace");
-                                String podName = "connector-" + dagId;
+                                String podName = "connector-" + dagId.replaceAll("_", "-");
                                 boolean stopped = kubernetesClient.stopPod(namespace, podName);
                                 if (stopped) {
                                     log.info("Stop pod {} in namespace {} successfully.", podName, namespace);
+                                    event.setStatus(EventStatus.SUCCESS.name());
+                                    event.setUpdateBy("system");
+                                    event.setUpdateTime(LocalDateTime.now());
+                                    eventService.updateById(event);
                                 } else {
                                     log.info("Failed to stop pod {} in namespace {}.", podName, namespace);
+                                    event.setStatus(EventStatus.FAILURE.name());
+                                    event.setUpdateBy("system");
+                                    event.setUpdateTime(LocalDateTime.now());
+                                    eventService.updateById(event);
                                 }
                             }
                             break;
                         }
                     }
-
-                    event.setStatus(EventStatus.SUCCESS.name());
-                    event.setUpdateBy("system");
-                    event.setUpdateTime(LocalDateTime.now());
-                    eventService.updateById(event);
-
                 }
             }
         }
