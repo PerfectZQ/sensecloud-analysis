@@ -86,11 +86,10 @@ public class KubernetesClient {
                 body.setPropagationPolicy("Foreground");
                 pod = apiV1.deleteNamespacedPod(podName, namespace, "true", null, 300, false, "Foreground", body);
                 log.info("Stop and delete pod {} in namespace {} successfully", podName, namespace);
-                return true;
             } else {
                 log.warn(">>>>>>>>>>>>>>>> Pod Not Found namespace = {}, pod = {}", namespace, podName);
-                return false;
             }
+            return true;
         } catch (ApiException e) {
             e.printStackTrace();
         }
