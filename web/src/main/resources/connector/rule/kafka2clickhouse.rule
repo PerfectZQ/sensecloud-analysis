@@ -7,7 +7,7 @@
         "auto.offset.reset": "earliest",
 {% if (sourceAccount is not empty) and (sourceAccount["security.enable"]) == true %}
 {% for entry in sourceAccount %}
-        "{{ entry.key }}": {{ entry.value }},
+        "{{ entry.key }}": "{{ entry.value }}",
 {% endfor %}
 {% endif %}
         "enable.auto.commit": false,
