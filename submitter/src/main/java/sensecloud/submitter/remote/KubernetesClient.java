@@ -77,14 +77,7 @@ public class KubernetesClient {
         try {
             V1Pod pod = this.getPod(namespace, podName);
             if(pod != null) {
-                V1DeleteOptions body = new V1DeleteOptions();
-                body.setApiVersion(pod.getApiVersion());
-                body.setDryRun(null);
-                body.setGracePeriodSeconds(300L);
-                body.setKind(pod.getKind());
-                body.setOrphanDependents(false);
-                body.setPropagationPolicy("Foreground");
-                pod = apiV1.deleteNamespacedPod(podName, namespace, "true", null, 300, false, "Foreground", body);
+                pod = apiV1.deleteNamespacedPod(podName, namespace, null, null, null, null, null, null);
                 log.info("Stop and delete pod {} in namespace {} successfully", podName, namespace);
             } else {
                 log.warn(">>>>>>>>>>>>>>>> Pod Not Found namespace = {}, pod = {}", namespace, podName);
@@ -145,7 +138,7 @@ public class KubernetesClient {
 
 
     public static void main(String[] args) throws IOException {
-        ApiClient client = new ClientBuilder().setBasePath("https://mordor.sensetime.com/k8s/clusters/c-kzszr").setVerifyingSsl(true)
+        ApiClient client = new ClientBuilder().setBasePath("https://mordor.sensetime.com/k8s/clusters/c-t5mbq").setVerifyingSsl(true)
                 .setAuthentication(new AccessTokenAuthentication("kubeconfig-u-4dchth6r7v:r4pczsx4f74m6hgb5tm7tw5w4d5vl2rmpkfnsst62l25wndzzg9652")).build();
 
         Configuration.setDefaultApiClient(client);
@@ -160,7 +153,10 @@ public class KubernetesClient {
 //                System.out.println("==========================================");
 //            });
 
-            pod = apiV1.readNamespacedPod("dlink-metadata-748454f8dd-8fc5x", "dlink-prod", "true", false, false);
+            pod = apiV1.readNamespacedPod("connector-kafka-prv-1", "sensecloud-data-viz", "true", false, false);
+            System.out.println(pod);
+            System.out.println("==========================================");
+            pod = apiV1.deleteNamespacedPod("connector-kafka-prv-1", "sensecloud-data-viz", null, null, null, null, null, null);
             System.out.println(pod);
         } catch (ApiException e) {
             e.printStackTrace();
