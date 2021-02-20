@@ -42,7 +42,7 @@ public class EventMonitor {
     @Autowired
     private KubernetesClient kubernetesClient;
 
-    @Scheduled(cron = "0 */5 * * * ?")
+    @Scheduled(cron = "0 */1 * * * ?")
     public void work() {
         List<EventEntity> events = eventService.listUnHandledEvents();
         if (events != null && !events.isEmpty()) {

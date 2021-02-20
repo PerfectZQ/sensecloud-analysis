@@ -79,7 +79,7 @@ resources = {
 
 registry = "registry.sensetime.com"
 group = "plat-bigdata"
-app = "kafka2clickhouse"
+app = "etl-kafka-clickhouse"
 tag = "latest"
 image = "%s/%s/%s:%s" % (registry, group, app, tag)
 
