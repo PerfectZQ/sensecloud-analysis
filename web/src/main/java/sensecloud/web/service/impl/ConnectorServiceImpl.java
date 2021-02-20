@@ -202,6 +202,7 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
         JSONObject params = new JSONObject();
         JSONObject accountConf = bean.getSourceAccountConf();
         JSONObject sourceConf = bean.getSourceConf();
+        JSONObject sinkConf = bean.getSinkConf();
 
         params.put("id", Long.valueOf(bean.getId()));
         params.put("dbPassword", accountConf.getString("jdbc.pwd"));
@@ -209,9 +210,9 @@ public class ConnectorServiceImpl extends ServiceImpl<ConnectorMapper, Connector
 
         params.put("dbUrl", sourceConf.getString("jdbc.url"));
 
-        String db = sourceConf.getString("db");
-        params.put("targerDb", db);
+        params.put("targerDb", sinkConf.getString("db"));
 
+        String db = sourceConf.getString("db");
         JSONArray tables = sourceConf.getJSONArray("tables");
 
         JSONArray tbs = new JSONArray();
