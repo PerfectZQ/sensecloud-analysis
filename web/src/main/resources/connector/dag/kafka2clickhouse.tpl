@@ -103,7 +103,7 @@ submit = [
         --deploy-mode cluster \
         --name "{app_name}" \
         --driver-cores 1 --driver-memory 1g \
-        --class "com.sensetime.dlink.streaming.Kafka2ClickHouse" \
+        --class "com.sensetime.bigdata.streaming.Kafka2ClickHouse" \
         --files "local:///app/conf/kafka.truststore.jks,local:///app/conf/job.config" \
         --conf "spark.executor.instances=1" \
         --conf "spark.kubernetes.executor.limit.cores=1" \
