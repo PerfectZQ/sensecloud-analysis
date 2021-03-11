@@ -82,4 +82,5 @@ INSERT INTO sensecloud.web_component_role_mapping (id,component_role_id,web_role
 	 (18,10,4,1),
 	 (19,14,4,1),
 	 (20,16,4,1),
-	 (21,20,4,0);
+	 (21,20,4,0)
+	 (22,17,4,1);
