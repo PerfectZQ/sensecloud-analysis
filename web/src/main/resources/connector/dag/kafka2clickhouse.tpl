@@ -93,7 +93,7 @@ env_vars = {
 }
 
 # replace '_' to '-' in app_name, because kuberenetes pod name is not support '_'.
-pn = "connector-" + app_name.replace("_", "-")
+pn = "connector-" + app_name.lower().replace("_", "-")
 
 submit = [
     "sh", "-c",
