@@ -16,7 +16,7 @@ stages:
 #  - code_scan
   - build
   - package
-  - deploy
+#  - deploy
 
 #job_code_scan2:
 #  image: registry.sensetime.com/security/codescan:latest
